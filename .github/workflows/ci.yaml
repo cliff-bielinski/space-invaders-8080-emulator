@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push: 
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+# checkout branch
+    - uses: actions/checkout@v3
+
+# install dependencies - TODO
+
+# clean
+    - name: make clean
+      run: make clean
+
+# build
+    - name: make
+      run: make
+
+# linter - TODO
+
+# testing - TODO
