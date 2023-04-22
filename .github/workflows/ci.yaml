@@ -17,9 +17,7 @@ jobs:
 # checkout branch
     - uses: actions/checkout@v3
 
-# install dependencies
-    - name: install cunit
-      run: sudo apt-get install libcunit1 libcunit-doc libcunit1-dev
+# install dependencies - TODO
 
 # clean
     - name: make clean
