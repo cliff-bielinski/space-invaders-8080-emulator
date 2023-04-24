@@ -371,10 +371,10 @@ int
 main(int argc, char* argv[])
 {
     // make sure an argument was passed
-    if (argc < 1)
+    if (argc < 2)
     {
-        printf("Please provide a file!\n"); 
-        return 1;
+        fprintf(stderr, "Please provide a file!\n"); 
+        exit(1);
     }
 
     // try to open the file
@@ -384,22 +384,43 @@ main(int argc, char* argv[])
     // error if open file fails
     if (!file_str)
     {
-        printf("ERROR\n");
-        return 1;
+        fprintf(stderr, "Error opening file!\n");
+        exit(1);
     }
 
     // get file size
-    fseek(file_str, 0, SEEK_END);
+    if (fseek(file_str, 0, SEEK_END) < 0)
+    {
+        fprintf(stderr, "ERROR\n");
+	    exit(1);
+    }
     size_t len = ftell(file_str); 
 
     // reset file position indicator to beginning
-    fseek(file_str, 0, SEEK_SET);
+    if (fseek(file_str, 0, SEEK_SET) < 0)
+    {
+        fprintf(stderr, "ERROR\n");
+	    exit(1);
+    }
 
     // allocate buffer
     unsigned char *buf = malloc(len);
+    
+    if (NULL == buf) 
+    {
+        fprintf(stderr, "Error allocating buffer!\n");
+	    exit(1);
+    }
 
     // read file into buffer
-    fread(buf, len, 1, file_str);
+    size_t num_read = fread(buf, len, 1, file_str);
+
+    if (num_read < 1) 
+    {
+        fprintf(stderr, "Error reading file into buffer!\n");
+	    exit(1);
+    }
+
     fclose(file_str);
 
     size_t count = 0;
