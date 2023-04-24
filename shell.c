@@ -17,8 +17,6 @@ int main() {
   }
 
   while (true) {
-    printf("pc: %d, e: %d, d: %d\n", cpu.pc, cpu.e, cpu.d);
-    execute_instruction(&cpu, 0x13);
 
     // 1 Fetch, decode, and execute next instruction
     // fetch_decode_execute(&cpu)
