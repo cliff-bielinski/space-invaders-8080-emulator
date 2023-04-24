@@ -54,7 +54,7 @@ bool cpu_load_file(i8080 *cpu, const char *file_path, uint16_t address) {
   }
 
   fseek(file, 0, SEEK_END);
-  long file_size = ftell(file);
+  size_t file_size = ftell(file);
   fseek(file, 0, SEEK_SET);
 
   if (address + file_size > MEM_SIZE) {
