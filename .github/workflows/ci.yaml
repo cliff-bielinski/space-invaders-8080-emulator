@@ -14,13 +14,19 @@ jobs:
       run: sudo apt install libcunit1 libcunit1-doc libcunit1-dev
 
 # clean
-    - name: make clean
+    - name: cleaning up
       run: make clean
 
 # build
-    - name: make
+    - name: building applications
       run: make
 
 # linter - TODO
 
 # testing - TODO
+    - name: testing build
+      run: make test
+
+# clean up
+    - name: cleaning up
+      run: make clean

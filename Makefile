@@ -4,21 +4,31 @@ CC = clang
 # compiler flags
 CFLAGS = -g -W -Wall -Wextra -pedantic
 
-# libraries to load
-LIBS = 
-
 # targets to build
-TARGETS = disassembler_8080 emulator
+TARGETS = disassembler_8080 shell
 
-# build all targets (default)
+# build all non-testing executables
 all: $(TARGETS)
 
-$(TARGETS): % : %.c
-	$(CC) $(CFLAGS) -o $@ $^ $(LIBS)
+# build disassembler executable
+disassembler_8080:
+	$(CC) $(CFLAGS) -o disassembler_8080 disassembler_8080.c
 
-# run tests
-test:
+# build emulator object
+emulator:
+	$(CC) $(CFLAGS) -c emulator.c
+
+# build shell executable
+shell: emulator
+	$(CC) $(CFLAGS) -c shell.c
+	$(CC) $(CFLAGS) -o shell shell.o emulator.o
+
+# build tests executable and run tests
+test: emulator
+	$(CC) $(CFLAGS) -c tests.c
+	$(CC) $(CFLAGS) -o tests tests.o emulator.o -lcunit
+	./tests
 
 # removes existing objects and executables
 clean:
-	$(RM) *.o $(TARGETS)
+	$(RM) *.o emulator tests shell disassembler_8080
