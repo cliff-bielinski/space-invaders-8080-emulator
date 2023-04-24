@@ -8,13 +8,13 @@ CFLAGS = -g -W -Wall -Wextra -pedantic
 LIBS = 
 
 # targets to build
-TARGETS = disassembler_8080
+TARGETS = disassembler_8080 emulator
 
 # build all targets (default)
 all: $(TARGETS)
 
-$(TARGETS): $(TARGETS).c
-	$(CC) $(CFLAGS) -o $(TARGETS) $(TARGETS).c $(LIBS)
+$(TARGETS): % : %.c
+	$(CC) $(CFLAGS) -o $@ $^ $(LIBS)
 
 # run tests
 test:
