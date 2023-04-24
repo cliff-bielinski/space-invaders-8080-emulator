@@ -1,15 +1,9 @@
-<<<<<<< HEAD
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <CUnit/Basic.h>
 #include "emulator.h"
-=======
-#include <stdio.h>
-#include <CUnit/Basic.h>
-/* Need to include header file to import structures and emulator function */
->>>>>>> develop
 
 /* Open any necessary files for test suite here */
 int init_opcodes_suite(void)
@@ -34,7 +28,6 @@ void test_func2(void)
 	;
 }
 
-<<<<<<< HEAD
 void test_opcode_0x13(void)
 {
   i8080 cpu;
@@ -46,8 +39,6 @@ void test_opcode_0x13(void)
   CU_ASSERT(cpu.d == 0);
 }
 
-=======
->>>>>>> develop
 int main(void)
 {
 	CU_pSuite pSuite = NULL;
@@ -67,12 +58,8 @@ int main(void)
 	 * argument with the test function name.
 	*/
 	if ((NULL == CU_add_test(pSuite, "test of test_func()", test_func)) ||
-<<<<<<< HEAD
 		(NULL == CU_add_test(pSuite, "test of test_func2()", test_func2)) ||
     (NULL == CU_add_test(pSuite, "test of test_opcode_0x13()", test_func2)))
-=======
-		(NULL == CU_add_test(pSuite, "test of test_func2()", test_func2)))
->>>>>>> develop
 	{
 		CU_cleanup_registry();
 		return CU_get_error();
@@ -82,8 +69,4 @@ int main(void)
 	CU_basic_run_tests();
 	CU_cleanup_registry();
 	return CU_get_error();
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> develop
