@@ -2,20 +2,24 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include "emulator.h"
 
 int main() {
   i8080 cpu;
   cpu_init(&cpu);
   const char *rom_path = "./invaders";
-  uint16_t load_address = 0x0000;
+  uint32_t load_address = 0x0000;
   // Load ROM
-  if (!cpu_load_file(&cpu, rom_path, load_address)){
+  size_t file_size = cpu_load_file(&cpu, rom_path, load_address);
+  //printf("%zu\n", file_size);
+  //printf("%lu\n", sizeof(uint32_t));
+  if (file_size == 0) {
     printf("Failed to load ROM\n");
     return 1;
-
   }
-
+  uint32_t end_address = load_address + file_size;
+  print_memory(&cpu, load_address, end_address);
   while (true) {
 
     // 1 Fetch, decode, and execute next instruction

@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include "emulator.h"
 
 // Execute Instruction
@@ -45,12 +46,18 @@ void cpu_write_mem(i8080 *cpu, uint16_t address, uint8_t data) {
   cpu->memory[address] = data;
 }
 
-bool cpu_load_file(i8080 *cpu, const char *file_path, uint16_t address) {
+void print_memory(i8080 *cpu, uint16_t start_address, uint16_t end_address) {
+  for (uint16_t address = start_address; address < end_address; ++address) {
+    printf("0x%04X: 0x%02X\n", address, cpu->memory[address]);
+  }
+}
+
+size_t cpu_load_file(i8080 *cpu, const char *file_path, uint32_t address) {
   FILE *file = fopen(file_path, "rb");
 
   if (file == NULL){
       printf("Error: Unable to open file %s\n", file_path);
-      return false;
+      return 1;
   }
 
   fseek(file, 0, SEEK_END);
@@ -60,7 +67,7 @@ bool cpu_load_file(i8080 *cpu, const char *file_path, uint16_t address) {
   if (address + file_size > MEM_SIZE) {
     printf("Error: File size exceeds available memory\n");
     fclose(file);
-    return false;
+    return 1;
   }
 
   size_t bytes_read = fread(&cpu->memory[address], 1, file_size, file);
@@ -68,8 +75,8 @@ bool cpu_load_file(i8080 *cpu, const char *file_path, uint16_t address) {
 
   if (bytes_read != file_size){
     printf("Error: Unable to read the entire file into memory\n");
-    return false;
+    return 1;
   }
 
-  return true;
+  return file_size;
 }

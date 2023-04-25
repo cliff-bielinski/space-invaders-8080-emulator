@@ -1,4 +1,4 @@
-#define MEM_SIZE 65536
+#define MEM_SIZE 65535
 
 typedef struct {
   // Registers
@@ -42,9 +42,12 @@ typedef struct {
 void cpu_init(i8080 *cpu);
 uint8_t cpu_read_mem(i8080 *cpu, uint16_t address);
 void cpu_write_mem(i8080 *cpu, uint16_t address, uint8_t data);
-bool cpu_load_file(i8080 *cpu, const char *file_path, uint16_t address);
+size_t cpu_load_file(i8080 *cpu, const char *file_path, uint32_t address);
 void execute_instruction(i8080 *cpu, uint8_t opcode);
 
 // Prototypes for Flags
 void cpu_set_flag(i8080 *cpu, uint8_t flag, bool value);
 bool cpu_get_flag(i8080 *cpu, uint8_t flag);
+
+// Print memory prototype
+void print_memory(i8080 *cpu, uint16_t start_address, uint16_t end_address);
