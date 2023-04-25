@@ -1,6 +1,9 @@
+#include <stdbool.h>
 #include <stdio.h>
+#include <stdint.h>
+#include <stdlib.h>
 #include <CUnit/Basic.h>
-/* Need to include header file to import structures and emulator function */
+#include "emulator.h"
 
 /* Open any necessary files for test suite here */
 int init_opcodes_suite(void)
@@ -25,6 +28,17 @@ void test_func2(void)
 	;
 }
 
+void test_opcode_0x13(void)
+{
+  i8080 cpu;
+  cpu_init(&cpu);
+  execute_instruction(&cpu, 0x13);
+
+  CU_ASSERT(cpu.pc == 1);
+  CU_ASSERT(cpu.e == 1);
+  CU_ASSERT(cpu.d == 0);
+}
+
 int main(void)
 {
 	CU_pSuite pSuite = NULL;
@@ -44,7 +58,8 @@ int main(void)
 	 * argument with the test function name.
 	*/
 	if ((NULL == CU_add_test(pSuite, "test of test_func()", test_func)) ||
-		(NULL == CU_add_test(pSuite, "test of test_func2()", test_func2)))
+		(NULL == CU_add_test(pSuite, "test of test_func2()", test_func2)) ||
+    (NULL == CU_add_test(pSuite, "test of test_opcode_0x13()", test_func2)))
 	{
 		CU_cleanup_registry();
 		return CU_get_error();
