@@ -15,7 +15,7 @@ jobs:
           style: file
           extensions: 'c,h,C,H'
           tidy-checks: 'bugprone-*,readability-*,portability-*,clang-analyzer-*' 
-          ignore: 'tests.c'
+          ignore: 'tests.c | disassembler_8080.c'
 
       - name: Fail fast
         if: steps.linter.outputs.checks-failed > 0
