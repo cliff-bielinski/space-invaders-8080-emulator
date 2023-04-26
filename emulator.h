@@ -1,5 +1,5 @@
-//#include <stdbool.h>
-//#include <stdint.h>
+#include <stdbool.h>
+#include <stdint.h>
 
 #define MEM_SIZE 65536
 
