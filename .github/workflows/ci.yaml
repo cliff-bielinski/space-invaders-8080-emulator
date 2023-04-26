@@ -3,6 +3,24 @@ name: CI
 on: [push, pull_request]
   
 jobs:
+  cpp-linter:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: cpp-linter/cpp-linter-action@v2
+        id: linter
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          style: file
+          extensions: 'c,h,C,H'
+          tidy-checks: 'bugprone-*,readability-*,portability-*,clang-analyzer-*' 
+          ignore: 'tests.c | disassembler_8080.c'
+
+      - name: Fail fast
+        if: steps.linter.outputs.checks-failed > 0
+        run: exit 1
+  
   build:
     runs-on: ubuntu-latest
     steps:
@@ -20,8 +38,6 @@ jobs:
 # build
     - name: building applications
       run: make
-
-# linter - TODO
 
 # testing - TODO
     - name: testing build
