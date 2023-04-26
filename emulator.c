@@ -10,7 +10,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
 {
   switch (opcode)
     {
-    case 0x13:
+    case 0x13: // NOLINT
       { // INX D
         cpu->e += 1;
 
