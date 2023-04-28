@@ -7,6 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - run: sudo apt install libcunit1 libcunit1-doc libcunit1-dev 
       - uses: cpp-linter/cpp-linter-action@v2
         id: linter
         env:
@@ -15,7 +16,7 @@ jobs:
           style: file
           extensions: 'c,h,C,H'
           tidy-checks: 'bugprone-*,readability-*,portability-*,clang-analyzer-*' 
-          ignore: 'tests.c | disassembler_8080.c'
+          ignore: 'disassembler_8080.c'
 
       - name: Fail fast
         if: steps.linter.outputs.checks-failed > 0
