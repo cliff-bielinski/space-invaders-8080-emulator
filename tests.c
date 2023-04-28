@@ -37,7 +37,7 @@ test_opcode_0x13(void) // NOLINT
 {
   i8080 cpu;
   cpu_init(&cpu);
-  execute_instruction(&cpu, 0x13);
+  execute_instruction(&cpu, 0x13); // NOLINT
 
   CU_ASSERT(cpu.pc == 1);
   CU_ASSERT(cpu.e == 1);
@@ -50,8 +50,10 @@ main(void)
   CU_pSuite pSuite = NULL;
 
   if (CUE_SUCCESS != CU_initialize_registry())
-    return CU_get_error();
-
+    {
+      return CU_get_error();
+    }
+  
   pSuite = CU_add_suite("opcodes", init_opcodes_suite, clean_suite);
   if (NULL == pSuite)
     {
