@@ -33,7 +33,7 @@ test_func2(void)
 }
 
 void
-test_opcode_0x13(void)
+test_opcode_0x13(void) // NOLINT
 {
   i8080 cpu;
   cpu_init(&cpu);
