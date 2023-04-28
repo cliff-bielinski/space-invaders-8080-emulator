@@ -171,26 +171,6 @@ void execute_instruction(i8080 *cpu, uint8_t opcode) {
 }
 
 void
-execute_instruction(i8080 *cpu, uint8_t opcode)
-{
-  switch (opcode)
-    {
-    case 0x13: // NOLINT
-      {        // INX D
-        cpu->e += 1;
-
-        if (cpu->e == 0)
-          {
-            cpu->d += 1;
-          }
-
-        cpu->pc += 1;
-        break;
-      }
-    }
-}
-
-void
 cpu_init(i8080 *cpu)
 {
   cpu->a = 0;
