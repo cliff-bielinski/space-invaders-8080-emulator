@@ -53,7 +53,7 @@ main(void)
     {
       return CU_get_error();
     }
-  
+
   pSuite = CU_add_suite("opcodes", init_opcodes_suite, clean_suite);
   if (NULL == pSuite)
     {
