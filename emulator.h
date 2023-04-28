@@ -1,3 +1,6 @@
+#include <stdbool.h>
+#include <stdint.h>
+
 #define MEM_SIZE 65536
 
 typedef struct {
