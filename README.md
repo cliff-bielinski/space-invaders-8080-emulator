@@ -13,3 +13,5 @@ An Intel 8080 emulator to run Space Invaders. OSU Senior Capstone Project - Spri
 
 ## Running the Emulator
 - After building the emulator and its shell, run `./shell file_path` to run the emulator with the ROM file path as an argument.
+
+[![cpp-linter](https://github.com/cpp-linter/cpp-linter-action/actions/workflows/cpp-linter.yml/badge.svg)](https://github.com/cpp-linter/cpp-linter-action/actions/workflows/cpp-linter.yml)

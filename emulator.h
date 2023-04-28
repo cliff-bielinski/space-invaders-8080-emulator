@@ -3,7 +3,8 @@
 
 #define MEM_SIZE 65536
 
-typedef struct {
+typedef struct
+{
   // Registers
   uint8_t a;
   uint8_t b;
@@ -19,11 +20,12 @@ typedef struct {
   uint8_t flags;
 
   /*
-  Sign (S): Set if the result of an operation is negative (most significant bit is 1).
-  Zero (Z): Set if the result of an operation is zero.
-  Auxiliary Carry (AC): Set if there's a carry from bit 3 to bit 4 during an operation.
-  Parity (P): Set if the result of an operation has an even number of 1 bits.
-  Carry (CY): Set if there's a carry from the most significant bit after an operation.
+  Sign (S): Set if the result of an operation is negative (most significant bit
+  is 1). Zero (Z): Set if the result of an operation is zero. Auxiliary Carry
+  (AC): Set if there's a carry from bit 3 to bit 4 during an operation. Parity
+  (P): Set if the result of an operation has an even number of 1 bits. Carry
+  (CY): Set if there's a carry from the most significant bit after an
+  operation.
   */
 
   // Program Counter & Stack pointer
