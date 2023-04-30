@@ -2,25 +2,19 @@
 #include <stdint.h>
 
 // Flags Defined
-#define FLAG_S 0x80
-#define FLAG_Z 0x40
-#define FLAG_AC 0x20
-#define FLAG_P 0x10
+#define FLAG_S 0x80  // NOLINT
+#define FLAG_Z 0x40  // NOLINT
+#define FLAG_AC 0x20 // NOLINT
+#define FLAG_P 0x10  // NOLINT
 #define FLAG_CY 0x08
 
 // Memory
-#define MEM_SIZE 65536
+#define MEM_SIZE 65536 // NOLINT
 
 typedef struct
 {
   // Registers
-  uint8_t a;
-  uint8_t b;
-  uint8_t c;
-  uint8_t d;
-  uint8_t e;
-  uint8_t h;
-  uint8_t l;
+  uint8_t a, b, c, d, e, h, l;
 
   // Flags (stored in the F register)
   // Includes z, s, p, cy, ac, pad

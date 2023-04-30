@@ -244,8 +244,8 @@ update_aux_carry_flag(i8080 *cpu, uint8_t a, uint8_t b)
 {
   // Masks highest 4 bits which preserves the nibbles(last 4 bits of a and b)
   // then adds nibbles to test for AC
-  uint16_t result = (a & 0x0F) + (b & 0x0F);
-  if (result & 0x10)
+  uint16_t result = (a & 0x0F) + (b & 0x0F); // NOLINT
+  if (result & 0x10)                         // NOLINT
     { // Check if carry from bit 3 to bit 4 existss
       cpu->flags |= FLAG_AC;
     }
@@ -289,7 +289,7 @@ is_sign_flag_set(i8080 *cpu)
 void
 update_sign_flag(i8080 *cpu, uint8_t result)
 {
-  if (result & 0x80)
+  if (result & 0x80) // NOLINT
     {
       cpu->flags |= FLAG_S;
     }
