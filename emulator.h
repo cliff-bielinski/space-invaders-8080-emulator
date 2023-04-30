@@ -1,7 +1,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-
 // Flags Defined
 #define FLAG_S 0x80
 #define FLAG_Z 0x40
@@ -69,7 +68,7 @@ void update_zero_flag(i8080 *cpu, uint8_t result);
 // Sign Flag
 void update_sign_flag(i8080 *cpu, uint8_t result);
 bool is_sign_flag_set(i8080 *cpu);
-// Carry Flag 
+// Carry Flag
 void update_carry_flag(i8080 *cpu, bool carry_occurred);
 /*
 How to use in a function
