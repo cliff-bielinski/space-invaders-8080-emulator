@@ -20,7 +20,7 @@ main()
 
   while (true)
     {
-
+      exit(1)
       // 1 Fetch, decode, and execute next instruction
       // fetch_decode_execute(&cpu)
 
