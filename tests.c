@@ -37,8 +37,9 @@ test_opcode_0x13(void)
 {
   i8080 cpu;
   cpu_init(&cpu);
-  execute_instruction(&cpu, 0x13);
+  int code_found = execute_instruction(&cpu, 0x13);
 
+  CU_ASSERT(code_found == 0);
   CU_ASSERT(cpu.pc == 1);
   CU_ASSERT(cpu.e == 1);
   CU_ASSERT(cpu.d == 0);
