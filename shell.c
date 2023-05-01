@@ -10,7 +10,8 @@ main(int argc, char *argv[])
   // Only accept one argument
   if (argc != 2)
     {
-      fprintf(stderr, "Invalid number of arguments. Correct syntax: ./shell rom_filepath\n");
+      fprintf(stderr, "Invalid number of arguments. Correct syntax: ./shell "
+                      "rom_filepath\n");
       exit(EXIT_FAILURE);
     }
 
@@ -30,9 +31,10 @@ main(int argc, char *argv[])
     {
       // fetch and execute next instruction
       uint8_t next_instruction = cpu_read_mem(&cpu, cpu.pc);
-      if (execute_instruction(&cpu, next_instruction) < 0) 
+      if (execute_instruction(&cpu, next_instruction) < 0)
         {
-          fprintf(stderr, "Unimplemented opcode encountered. Exiting program.\n");
+          fprintf(stderr,
+                  "Unimplemented opcode encountered. Exiting program.\n");
           exit(EXIT_FAILURE);
         }
 

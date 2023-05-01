@@ -19,16 +19,15 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
             cpu->d += 1;
           }
 
-        cpu->pc += 1;
         break;
       }
-      default:
+    default:
       {
-        cpu->pc += 1;
         fprintf(stderr, "Error: opcode 0x%02x not found\n", opcode);
         return -1;
       }
     }
+  cpu->pc += 1;
   return 0;
 }
 
@@ -81,7 +80,7 @@ cpu_load_file(i8080 *cpu, const char *file_path, uint16_t address)
       perror("Error: unable to obtain file size");
       return false;
     }
-    
+
   fseek(file, 0, SEEK_SET);
 
   if (address + file_size > MEM_SIZE)
