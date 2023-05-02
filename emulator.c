@@ -10,6 +10,33 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
 {
   switch (opcode)
     {
+    case 0x00: // NOLINT
+      printf("NOP");
+      break;
+    case 0x01: // NOLINT
+      printf("LXI B");
+      break;
+    case 0x05: // NOLINT
+      printf("DCR B");
+      break;
+    case 0x06: // NOLINT
+      printf("MVI B");
+      break;
+    case 0x09: // NOLINT
+      printf("DAD B");
+      break;
+    case 0x0d: // NOLINT
+      printf("DCR C");
+      break;
+    case 0x0e: // NOLINT
+      printf("MVI C");
+      break;
+    case 0x0f: // NOLINT
+      printf("RRC");
+      break;
+    case 0x11: // NOLINT
+      printf("LXI D");
+      break;
     case 0x13: // NOLINT
       {        // INX D
         cpu->e += 1;
@@ -21,6 +48,126 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
 
         break;
       }
+    case 0x19: // NOLINT
+      printf("DAD D");
+      break;
+    case 0x1a: // NOLINT
+      printf("LDAX D");
+      break;
+    case 0x21: // NOLINT
+      printf("LXI H");
+      break;
+    case 0x23: // NOLINT
+      printf("INX H");
+      break;
+    case 0x26: // NOLINT
+      printf("MVI H");
+      break;
+    case 0x29: // NOLINT
+      printf("DAD H");
+      break;
+    case 0x31: // NOLINT
+      printf("LXI SP");
+      break;
+    case 0x32: // NOLINT
+      printf("STA");
+      break;
+    case 0x36: // NOLINT
+      printf("MVI M");
+      break;
+    case 0x3a: // NOLINT
+      printf("LDA ");
+      break;
+    case 0x3e: // NOLINT
+      printf("MVI A");
+      break;
+    case 0x56: // NOLINT
+      printf("MOV D,M");
+      break;
+    case 0x5e: // NOLINT
+      printf("MOV E,M");
+      break;
+    case 0x66: // NOLINT
+      printf("MOV H,M");
+      break;
+    case 0x6f: // NOLINT
+      printf("MOV L,A");
+      break;
+    case 0x77: // NOLINT
+      printf("MOV M,A");
+      break;
+    case 0x7a: // NOLINT
+      printf("MOV A,D");
+      break;
+    case 0x7b: // NOLINT
+      printf("MOV A,E");
+      break;
+    case 0x7c: // NOLINT
+      printf("MOV A,H");
+      break;
+    case 0x7e: // NOLINT
+      printf("MOV A,M");
+      break;
+    case 0xa7: // NOLINT
+      printf("ANA A");
+      break;
+    case 0xaf: // NOLINT
+      printf("XRA A");
+      break;
+    case 0xc1: // NOLINT
+      printf("POP B");
+      break;
+    case 0xc2: // NOLINT
+      printf("JNZ ");
+      break;
+    case 0xc3: // NOLINT
+      printf("JMP ");
+      break;
+    case 0xc5: // NOLINT
+      printf("PUSH B");
+      break;
+    case 0xc6: // NOLINT
+      printf("ADI ");
+      break;
+    case 0xc9: // NOLINT
+      printf("RET");
+      break;
+    case 0xcd: // NOLINT
+      printf("CALL ");
+      break;
+    case 0xd1: // NOLINT
+      printf("POP D");
+      break;
+    case 0xd3: // NOLINT
+      printf("OUT ");
+      break;
+    case 0xd5: // NOLINT
+      printf("PUSH D");
+      break;
+    case 0xe1: // NOLINT
+      printf("POP H");
+      break;
+    case 0xe5: // NOLINT
+      printf("PUSH H");
+      break;
+    case 0xe6: // NOLINT
+      printf("ANI ");
+      break;
+    case 0xeb: // NOLINT
+      printf("XCHG");
+      break;
+    case 0xf1: // NOLINT
+      printf("POP PSW");
+      break;
+    case 0xf5: // NOLINT
+      printf("PUSH PSW");
+      break;
+    case 0xfb: // NOLINT
+      printf("EI");
+      break;
+    case 0xfe: // NOLINT
+      printf("CPI ");
+      break;
     default:
       {
         fprintf(stderr, "Error: opcode 0x%02x not found\n", opcode);
