@@ -5,7 +5,7 @@
 #include <stdlib.h>
 
 // Execute Instruction
-void
+int
 execute_instruction(i8080 *cpu, uint8_t opcode)
 {
   switch (opcode)
@@ -46,7 +46,6 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
             cpu->d += 1;
           }
 
-        cpu->pc += 1;
         break;
       }
     case 0x19: // NOLINT
@@ -170,131 +169,130 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       printf("CPI ");
       break;
     default:
-      break;
-    }
-}
-
-void
-cpu_init(i8080 *cpu)
-{
-  cpu->a = 0;
-  cpu->b = 0;
-  cpu->c = 0;
-  cpu->d = 0;
-  cpu->e = 0;
-  cpu->h = 0;
-  cpu->l = 0;
-
-  cpu->flags = 0;
-  cpu->pc = 0;
-  cpu->sp = 0;
-  cpu->interrupt_enabled = false;
-  cpu->halted = false;
-}
-
-uint8_t
-cpu_read_mem(i8080 *cpu, uint16_t address)
-{
-  return cpu->memory[address];
-}
-
-void
-cpu_write_mem(i8080 *cpu, uint16_t address, uint8_t data)
-{
-  cpu->memory[address] = data;
-}
-
-bool
-cpu_load_file(i8080 *cpu, const char *file_path, uint16_t address)
-{
-  FILE *file = fopen(file_path, "rb");
-
-  if (file == NULL)
-    {
-      printf("Error: Unable to open file %s\n", file_path);
-      return false;
+      {
+        fprintf(stderr, "Error: opcode 0x%02x not found\n", opcode);
+        return -1;
+      }
+      cpu->pc += 1;
+      return 0;
     }
 
-  fseek(file, 0, SEEK_END);
-  size_t file_size = ftell(file);
-  fseek(file, 0, SEEK_SET);
+  void cpu_init(i8080 * cpu)
+  {
+    cpu->a = 0;
+    cpu->b = 0;
+    cpu->c = 0;
+    cpu->d = 0;
+    cpu->e = 0;
+    cpu->h = 0;
+    cpu->l = 0;
 
-  if (address + file_size > MEM_SIZE)
-    {
-      printf("Error: File size exceeds available memory\n");
-      fclose(file);
-      return false;
-    }
+    cpu->flags = 0;
+    cpu->pc = 0;
+    cpu->sp = 0;
+    cpu->interrupt_enabled = false;
+    cpu->halted = false;
+  }
 
-  size_t bytes_read = fread(&cpu->memory[address], 1, file_size, file);
-  fclose(file);
+  uint8_t cpu_read_mem(i8080 * cpu, uint16_t address)
+  {
+    return cpu->memory[address];
+  }
 
-  if (bytes_read != file_size)
-    {
-      printf("Error: Unable to read the entire file into memory\n");
-      return false;
-    }
+  void cpu_write_mem(i8080 * cpu, uint16_t address, uint8_t data)
+  {
+    cpu->memory[address] = data;
+  }
 
-  return true;
-}
-// FLAGS
+  bool cpu_load_file(i8080 * cpu, const char *file_path, uint16_t address)
+  {
+    FILE *file = fopen(file_path, "rb");
 
-void
-update_aux_carry_flag(i8080 *cpu, uint8_t a, uint8_t b)
-{
-  // Masks highest 4 bits which preserves the nibbles(last 4 bits of a and b)
-  // then adds nibbles to test for AC
-  uint16_t result = (a & 0x0F) + (b & 0x0F); // NOLINT
-  if (result & 0x10)                         // NOLINT
-    { // Check if carry from bit 3 to bit 4 existss
-      cpu->flags |= FLAG_AC;
-    }
-  else
-    {
-      cpu->flags &= ~FLAG_AC;
-    }
-}
+    if (file == NULL)
+      {
+        fprintf(stderr, "Error: Unable to open file %s\n", file_path);
+        return false;
+      }
 
-void
-update_zero_flag(i8080 *cpu, uint8_t result)
-{
-  if (result == 0)
-    {
-      cpu->flags |= FLAG_Z;
-    }
-  else
-    {
-      cpu->flags &= ~FLAG_Z;
-    }
-}
+    fseek(file, 0, SEEK_END);
+    size_t file_size = ftell(file);
 
-void
-update_carry_flag(i8080 *cpu, bool carry_occurred)
-{
-  if (carry_occurred)
-    {
-      cpu->flags |= FLAG_CY;
-    }
-  else
-    {
-      cpu->flags &= ~FLAG_CY;
-    }
-}
+    if (file_size < 0)
+      {
+        perror("Error: unable to obtain file size");
+        return false;
+      }
 
-bool
-is_sign_flag_set(i8080 *cpu)
-{
-  return (cpu->flags & FLAG_S) != 0;
-}
-void
-update_sign_flag(i8080 *cpu, uint8_t result)
-{
-  if (result & 0x80) // NOLINT
-    {
-      cpu->flags |= FLAG_S;
-    }
-  else
-    {
-      cpu->flags &= ~FLAG_S;
-    }
-}
+    fseek(file, 0, SEEK_SET);
+
+    if (address + file_size > MEM_SIZE)
+      {
+        fprintf(stderr, "Error: File size exceeds available memory\n");
+        fclose(file);
+        return false;
+      }
+
+    size_t bytes_read = fread(&cpu->memory[address], 1, file_size, file);
+    fclose(file);
+
+    if (bytes_read != file_size)
+      {
+        fprintf(stderr, "Error: Unable to read the entire file into memory\n");
+        return false;
+      }
+
+    return true;
+  }
+  // FLAGS
+
+  void update_aux_carry_flag(i8080 * cpu, uint8_t a, uint8_t b)
+  {
+    // Masks highest 4 bits which preserves the nibbles(last 4 bits of a and b)
+    // then adds nibbles to test for AC
+    uint16_t result = (a & 0x0F) + (b & 0x0F); // NOLINT
+    if (result & 0x10)                         // NOLINT
+      { // Check if carry from bit 3 to bit 4 existss
+        cpu->flags |= FLAG_AC;
+      }
+    else
+      {
+        cpu->flags &= ~FLAG_AC;
+      }
+  }
+
+  void update_zero_flag(i8080 * cpu, uint8_t result)
+  {
+    if (result == 0)
+      {
+        cpu->flags |= FLAG_Z;
+      }
+    else
+      {
+        cpu->flags &= ~FLAG_Z;
+      }
+  }
+
+  void update_carry_flag(i8080 * cpu, bool carry_occurred)
+  {
+    if (carry_occurred)
+      {
+        cpu->flags |= FLAG_CY;
+      }
+    else
+      {
+        cpu->flags &= ~FLAG_CY;
+      }
+  }
+
+  bool is_sign_flag_set(i8080 * cpu) { return (cpu->flags & FLAG_S) != 0; }
+  void update_sign_flag(i8080 * cpu, uint8_t result)
+  {
+    if (result & 0x80) // NOLINT
+      {
+        cpu->flags |= FLAG_S;
+      }
+    else
+      {
+        cpu->flags &= ~FLAG_S;
+      }
+  }

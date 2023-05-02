@@ -50,7 +50,7 @@ void cpu_init(i8080 *cpu);
 uint8_t cpu_read_mem(i8080 *cpu, uint16_t address);
 void cpu_write_mem(i8080 *cpu, uint16_t address, uint8_t data);
 bool cpu_load_file(i8080 *cpu, const char *file_path, uint16_t address);
-void execute_instruction(i8080 *cpu, uint8_t opcode);
+int execute_instruction(i8080 *cpu, uint8_t opcode);
 
 // Prototypes for Flags
 // Auxiliary Carry (AC)
