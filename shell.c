@@ -18,6 +18,8 @@ main(int argc, char *argv[])
   // initialize CPU state
   i8080 cpu;
   cpu_init(&cpu);
+
+  // NOLINTNEXTLINE
   uint16_t load_address = 0x0000;
 
   // Load ROM into memory
@@ -29,6 +31,10 @@ main(int argc, char *argv[])
 
   while (true)
     {
+
+      // 1 Fetch, decode, and execute next instruction
+      // fetch_decode_execute(&cpu)
+
       // fetch and execute next instruction
       uint8_t next_instruction = cpu_read_mem(&cpu, cpu.pc);
       if (execute_instruction(&cpu, next_instruction) < 0)

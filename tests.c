@@ -37,6 +37,7 @@ test_opcode_0x13(void) // NOLINT
 {
   i8080 cpu;
   cpu_init(&cpu);
+
   int code_found = execute_instruction(&cpu, 0x13); // NOLINT
 
   CU_ASSERT(code_found == 0);

@@ -1,18 +1,20 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#define MEM_SIZE 65536
+// Flags Defined
+#define FLAG_S 0x80  // NOLINT
+#define FLAG_Z 0x40  // NOLINT
+#define FLAG_AC 0x20 // NOLINT
+#define FLAG_P 0x10  // NOLINT
+#define FLAG_CY 0x08 // NOLINT
+
+// Memory
+#define MEM_SIZE 65536 // NOLINT
 
 typedef struct
 {
   // Registers
-  uint8_t a;
-  uint8_t b;
-  uint8_t c;
-  uint8_t d;
-  uint8_t e;
-  uint8_t h;
-  uint8_t l;
+  uint8_t a, b, c, d, e, h, l;
 
   // Flags (stored in the F register)
   // Includes z, s, p, cy, ac, pad
@@ -51,5 +53,26 @@ bool cpu_load_file(i8080 *cpu, const char *file_path, uint16_t address);
 int execute_instruction(i8080 *cpu, uint8_t opcode);
 
 // Prototypes for Flags
+
+// Parity Flag
+int count_set_bits(uint8_t value);
+void update_parity_flag(i8080 *cpu, uint8_t result);
+
+// Auxiliary Carry (AC)
+void update_aux_carry_flag(i8080 *cpu, uint8_t a, uint8_t b);
+
+// Zero Flag
+void update_zero_flag(i8080 *cpu, uint8_t result);
+
+// Sign Flag
+void update_sign_flag(i8080 *cpu, uint8_t result);
+bool is_sign_flag_set(i8080 *cpu);
+// Carry Flag
+void update_carry_flag(i8080 *cpu, bool carry_occurred);
+/*
+How to use in a function
+update_carry_flag(cpu, result > 0xFF); result > 0XFF will return true or false
+*/
+
 void cpu_set_flag(i8080 *cpu, uint8_t flag, bool value);
 bool cpu_get_flag(i8080 *cpu, uint8_t flag);

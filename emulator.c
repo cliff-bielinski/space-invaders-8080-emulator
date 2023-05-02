@@ -248,3 +248,92 @@ cpu_load_file(i8080 *cpu, const char *file_path, uint16_t address)
 
   return true;
 }
+
+// FLAGS
+
+void
+update_aux_carry_flag(i8080 *cpu, uint8_t a, uint8_t b)
+{
+  // Masks highest 4 bits which preserves the nibbles(last 4 bits of a and b)
+  // then adds nibbles to test for AC
+  uint16_t result = (a & 0x0F) + (b & 0x0F); // NOLINT
+  if (result & 0x10)                         // NOLINT
+    { // Check if carry from bit 3 to bit 4 existss
+      cpu->flags |= FLAG_AC;
+    }
+  else
+    {
+      cpu->flags &= ~FLAG_AC;
+    }
+}
+
+void
+update_zero_flag(i8080 *cpu, uint8_t result)
+{
+  if (result == 0)
+    {
+      cpu->flags |= FLAG_Z;
+    }
+  else
+    {
+      cpu->flags &= ~FLAG_Z;
+    }
+}
+
+void
+update_carry_flag(i8080 *cpu, bool carry_occurred)
+{
+  if (carry_occurred)
+    {
+      cpu->flags |= FLAG_CY;
+    }
+  else
+    {
+      cpu->flags &= ~FLAG_CY;
+    }
+}
+int
+count_set_bits(uint8_t value)
+{
+  int count = 0;
+  for (int i = 0; i < 8; i++) // NOLINT
+    {
+      if (value & (1 << i))
+        {
+          count++;
+        }
+    }
+  return count;
+}
+
+void
+update_parity_flag(i8080 *cpu, uint8_t result)
+{
+  int set_bits = count_set_bits(result);
+  if (set_bits % 2 == 0)
+    {
+      cpu->flags |= FLAG_P;
+    }
+  else
+    {
+      cpu->flags &= ~FLAG_P;
+    }
+}
+bool
+is_sign_flag_set(i8080 *cpu)
+{
+  return (cpu->flags & FLAG_S) != 0;
+}
+
+void
+update_sign_flag(i8080 *cpu, uint8_t result)
+{
+  if (result & 0x80) // NOLINT
+    {
+      cpu->flags |= FLAG_S;
+    }
+  else
+    {
+      cpu->flags &= ~FLAG_S;
+    }
+}
