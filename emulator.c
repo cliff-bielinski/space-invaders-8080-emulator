@@ -248,4 +248,3 @@ cpu_load_file(i8080 *cpu, const char *file_path, uint16_t address)
 
   return true;
 }
-
