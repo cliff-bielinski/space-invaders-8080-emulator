@@ -9,7 +9,7 @@
 #define FLAG_CY 0x08 // NOLINT
 
 // Memory
-#define MEM_SIZE 65535 // NOLINT
+#define MEM_SIZE 65536 // NOLINT
 
 typedef struct
 {
