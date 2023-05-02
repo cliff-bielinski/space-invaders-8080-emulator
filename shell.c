@@ -19,9 +19,7 @@ main(int argc, char *argv[])
   i8080 cpu;
   cpu_init(&cpu);
 
-  const char *rom_path = "./invaders";
   // NOLINTNEXTLINE
-
   uint16_t load_address = 0x0000;
 
   // Load ROM into memory
