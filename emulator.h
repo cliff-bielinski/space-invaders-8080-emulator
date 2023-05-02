@@ -6,10 +6,10 @@
 #define FLAG_Z 0x40  // NOLINT
 #define FLAG_AC 0x20 // NOLINT
 #define FLAG_P 0x10  // NOLINT
-#define FLAG_CY 0x08
+#define FLAG_CY 0x08 // NOLINT
 
 // Memory
-#define MEM_SIZE 65536 // NOLINT
+#define MEM_SIZE 65535 // NOLINT
 
 typedef struct
 {
@@ -73,3 +73,6 @@ void update_carry_flag(i8080 *cpu, bool carry_occurred);
 How to use in a function
 update_carry_flag(cpu, result > 0xFF); result > 0XFF will return true or false
 */
+
+void cpu_set_flag(i8080 *cpu, uint8_t flag, bool value);
+bool cpu_get_flag(i8080 *cpu, uint8_t flag);

@@ -248,6 +248,7 @@ cpu_load_file(i8080 *cpu, const char *file_path, uint16_t address)
 
   return true;
 }
+
 // FLAGS
 
 void
@@ -295,7 +296,7 @@ int
 count_set_bits(uint8_t value)
 {
   int count = 0;
-  for (int i = 0; i < 8; i++) //NOLINT
+  for (int i = 0; i < 8; i++) // NOLINT
     {
       if (value & (1 << i))
         {
