@@ -18,7 +18,7 @@ jobs:
           tidy-checks: 'bugprone-*,readability-*,portability-*,clang-analyzer-*' 
           ignore: 'disassembler_8080.c'
 
-      - name: Fail fast
+      - name: static analysis
         if: steps.linter.outputs.checks-failed > 0
         run: exit 1
   
