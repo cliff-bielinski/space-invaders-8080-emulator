@@ -1,15 +1,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-
-// Flags Defined
-#define FLAG_S 0x80
-#define FLAG_Z 0x40
-#define FLAG_AC 0x20
-#define FLAG_P 0x10
-#define FLAG_CY 0x08
-
-// Memory
 #define MEM_SIZE 65536
 
 typedef struct
@@ -60,18 +51,6 @@ bool cpu_load_file(i8080 *cpu, const char *file_path, uint16_t address);
 void execute_instruction(i8080 *cpu, uint8_t opcode);
 
 // Prototypes for Flags
-// Auxiliary Carry (AC)
-void update_aux_carry_flag(i8080 *cpu, uint8_t a, uint8_t b);
+void cpu_set_flag(i8080 *cpu, uint8_t flag, bool value);
+bool cpu_get_flag(i8080 *cpu, uint8_t flag);
 
-// Zero Flag
-void update_zero_flag(i8080 *cpu, uint8_t result);
-
-// Sign Flag
-void update_sign_flag(i8080 *cpu, uint8_t result);
-bool is_sign_flag_set(i8080 *cpu);
-// Carry Flag 
-void update_carry_flag(i8080 *cpu, bool carry_occurred);
-/*
-How to use in a function
-update_carry_flag(cpu, result > 0xFF); result > 0XFF will return true or false
-*/
