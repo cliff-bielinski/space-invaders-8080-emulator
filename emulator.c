@@ -5,7 +5,7 @@
 #include <stdlib.h>
 
 // Execute Instruction
-void
+int
 execute_instruction(i8080 *cpu, uint8_t opcode)
 {
   switch (opcode)
@@ -46,7 +46,6 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
             cpu->d += 1;
           }
 
-        cpu->pc += 1;
         break;
       }
     case 0x19: // NOLINT
@@ -170,8 +169,13 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       printf("CPI ");
       break;
     default:
-      break;
+      {
+        fprintf(stderr, "Error: opcode 0x%02x not found\n", opcode);
+        return -1;
+      }
     }
+  cpu->pc += 1;
+  return 0;
 }
 
 void
@@ -211,17 +215,24 @@ cpu_load_file(i8080 *cpu, const char *file_path, uint16_t address)
 
   if (file == NULL)
     {
-      printf("Error: Unable to open file %s\n", file_path);
+      fprintf(stderr, "Error: Unable to open file %s\n", file_path);
       return false;
     }
 
   fseek(file, 0, SEEK_END);
   size_t file_size = ftell(file);
+
+  if (file_size < 0)
+    {
+      perror("Error: unable to obtain file size");
+      return false;
+    }
+
   fseek(file, 0, SEEK_SET);
 
   if (address + file_size > MEM_SIZE)
     {
-      printf("Error: File size exceeds available memory\n");
+      fprintf(stderr, "Error: File size exceeds available memory\n");
       fclose(file);
       return false;
     }
@@ -231,7 +242,7 @@ cpu_load_file(i8080 *cpu, const char *file_path, uint16_t address)
 
   if (bytes_read != file_size)
     {
-      printf("Error: Unable to read the entire file into memory\n");
+      fprintf(stderr, "Error: Unable to read the entire file into memory\n");
       return false;
     }
 
