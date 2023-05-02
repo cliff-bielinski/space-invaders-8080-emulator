@@ -53,4 +53,3 @@ void execute_instruction(i8080 *cpu, uint8_t opcode);
 // Prototypes for Flags
 void cpu_set_flag(i8080 *cpu, uint8_t flag, bool value);
 bool cpu_get_flag(i8080 *cpu, uint8_t flag);
-
