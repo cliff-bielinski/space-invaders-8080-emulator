@@ -53,6 +53,11 @@ bool cpu_load_file(i8080 *cpu, const char *file_path, uint16_t address);
 int execute_instruction(i8080 *cpu, uint8_t opcode);
 
 // Prototypes for Flags
+
+// Parity Flag
+int count_set_bits(uint8_t value);
+void update_parity_flag(i8080 *cpu, uint8_t result);
+
 // Auxiliary Carry (AC)
 void update_aux_carry_flag(i8080 *cpu, uint8_t a, uint8_t b);
 

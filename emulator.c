@@ -283,7 +283,31 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         cpu->flags &= ~FLAG_CY;
       }
   }
+  int count_set_bits(uint8_t value)
+  {
+    int count = 0;
+    for (int i = 0; i < 8; i++)
+      {
+        if (value & (1 << i))
+          {
+            count++;
+          }
+      }
+    return count;
+  }
 
+  void update_parity_flag(i8080 * cpu, uint8_t result)
+  {
+    int set_bits = count_set_bits(result);
+    if (set_bits % 2 == 0)
+      {
+        cpu->flags |= FLAG_P;
+      }
+    else
+      {
+        cpu->flags &= ~FLAG_P;
+      }
+  }
   bool is_sign_flag_set(i8080 * cpu) { return (cpu->flags & FLAG_S) != 0; }
   void update_sign_flag(i8080 * cpu, uint8_t result)
   {
