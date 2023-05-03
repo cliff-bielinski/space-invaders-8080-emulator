@@ -17,8 +17,17 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       printf("LXI B");
       break;
     case 0x05: // NOLINT
-      printf("DCR B");
-      break;
+      { // DCR B
+        uint8_t temp = cpu->b;
+        cpu->b -= 1;
+
+        update_zero_flag(cpu, cpu->b);
+        update_sign_flag(cpu, cpu->b);
+        update_parity_flag(cpu, cpu->b);
+        update_aux_carry_flag(cpu, temp, cpu->b);
+
+        break;
+      }
     case 0x06: // NOLINT
       printf("MVI B");
       break;
@@ -292,6 +301,7 @@ update_carry_flag(i8080 *cpu, bool carry_occurred)
       cpu->flags &= ~FLAG_CY;
     }
 }
+
 int
 count_set_bits(uint8_t value)
 {
@@ -319,6 +329,7 @@ update_parity_flag(i8080 *cpu, uint8_t result)
       cpu->flags &= ~FLAG_P;
     }
 }
+
 bool
 is_sign_flag_set(i8080 *cpu)
 {
