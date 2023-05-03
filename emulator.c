@@ -103,8 +103,13 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       printf("MVI A");
       break;
     case 0x56: // NOLINT
-      printf("MOV D,M");
-      break;
+      {
+        // 16-bit memory address located in registers HL
+        uint16_t address = cpu->l;
+        address += (cpu->h << 8);
+        cpu->d = cpu_read_mem(cpu, address);
+        break;
+      }
     case 0x5e: // NOLINT
       printf("MOV E,M");
       break;
