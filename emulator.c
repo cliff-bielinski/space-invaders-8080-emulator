@@ -30,7 +30,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       printf("DAD B");
       break;
     case 0x0d: // NOLINT
-      {
+      {        // DCR C
         cpu->c -= 1;
         update_zero_flag(cpu, cpu->c);
         update_sign_flag(cpu, cpu->c);
