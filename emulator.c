@@ -85,8 +85,14 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       printf("LXI SP");
       break;
     case 0x32: // NOLINT
-      printf("STA");
-      break;
+      {        // STA
+        // little endian - first byte is LSB, second byte is MSB for memory address
+        uint16_t address = cpu_read_mem(cpu, cpu->pc + 1);
+        address += (cpu_read_mem(cpu, cpu->pc + 2) << 8);
+        cpu_write_mem(cpu, address, cpu->a);
+        cpu->pc += 2;
+        break;
+      }
     case 0x36: // NOLINT
       printf("MVI M");
       break;
