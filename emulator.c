@@ -51,12 +51,10 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
     case 0x13: // NOLINT
       {        // INX D
         cpu->e += 1;
-
         if (cpu->e == 0)
           {
             cpu->d += 1;
           }
-
         break;
       }
     case 0x19: // NOLINT
@@ -69,8 +67,14 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       printf("LXI H");
       break;
     case 0x23: // NOLINT
-      printf("INX H");
-      break;
+      {        // INX H
+        cpu->l += 1;
+        if (cpu->l == 0)
+          {
+            cpu->h += 1;
+          }
+        break;
+      }
     case 0x26: // NOLINT
       printf("MVI H");
       break;

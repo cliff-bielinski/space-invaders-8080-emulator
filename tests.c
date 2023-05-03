@@ -100,6 +100,27 @@ test_opcode_0x13(void) // NOLINT
   CU_ASSERT(cpu.d == 1);
 }
 
+void
+test_opcode_0x23(void) // NOLINT
+{
+  i8080 cpu;
+  cpu_init(&cpu);
+
+  int code_found = execute_instruction(&cpu, 0x23); // NOLINT
+
+  CU_ASSERT(code_found == 0);
+  CU_ASSERT(cpu.pc == 1);
+  CU_ASSERT(cpu.l == 1);
+  CU_ASSERT(cpu.h == 0);
+
+  cpu.l = 0xFF;                                 // NOLINT
+  code_found = execute_instruction(&cpu, 0x23); // NOLINT
+  CU_ASSERT(code_found == 0);
+  CU_ASSERT(cpu.pc == 2);
+  CU_ASSERT(cpu.l == 0);
+  CU_ASSERT(cpu.h == 1);
+}
+
 int
 main(void)
 {
@@ -129,7 +150,10 @@ main(void)
                          test_opcode_0x0d))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x13()",
-                         test_opcode_0x13)))
+                         test_opcode_0x13))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0x23()",
+                         test_opcode_0x23)))
     {
       CU_cleanup_registry();
       return CU_get_error();
