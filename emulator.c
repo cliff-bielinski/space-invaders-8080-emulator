@@ -18,13 +18,12 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       break;
     case 0x05: // NOLINT
       { // DCR B
-        uint8_t temp = cpu->b;
         cpu->b -= 1;
 
         update_zero_flag(cpu, cpu->b);
         update_sign_flag(cpu, cpu->b);
         update_parity_flag(cpu, cpu->b);
-        update_aux_carry_flag(cpu, temp, cpu->b);
+        update_aux_carry_flag(cpu, cpu->b, 0xFF);
 
         break;
       }
