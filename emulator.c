@@ -31,10 +31,12 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       break;
     case 0x0d: // NOLINT
       {        // DCR C
-        cpu->c -= 1;
-        update_zero_flag(cpu, cpu->c);
-        update_sign_flag(cpu, cpu->c);
-        update_parity_flag(cpu, cpu->c);
+        uint8_t result = cpu->c - 1;
+        update_zero_flag(cpu, result);
+        update_sign_flag(cpu, result);
+        update_parity_flag(cpu, result);
+        update_aux_carry_flag(cpu, cpu->c, 0xFF);
+        cpu->c = result;
         break;
       }
     case 0x0e: // NOLINT

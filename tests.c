@@ -54,6 +54,7 @@ test_opcode_0x0d(void) // NOLINT
   CU_ASSERT((cpu.flags & FLAG_P) == 0);
   CU_ASSERT((cpu.flags & FLAG_S) == 0);
   CU_ASSERT((cpu.flags & FLAG_Z) == 0);
+  CU_ASSERT((cpu.flags & FLAG_AC) == FLAG_AC);
 
   // decrease C from 1 to 0
   code_found = execute_instruction(&cpu, 0x0d); // NOLINT
@@ -64,6 +65,7 @@ test_opcode_0x0d(void) // NOLINT
   CU_ASSERT((cpu.flags & FLAG_P) == FLAG_P);
   CU_ASSERT((cpu.flags & FLAG_S) == 0);
   CU_ASSERT((cpu.flags & FLAG_Z) == FLAG_Z);
+  CU_ASSERT((cpu.flags & FLAG_AC) == FLAG_AC);
 
   // decrease C from 0 to 255
   code_found = execute_instruction(&cpu, 0x0d); // NOLINT
@@ -74,6 +76,7 @@ test_opcode_0x0d(void) // NOLINT
   CU_ASSERT((cpu.flags & FLAG_P) == FLAG_P);
   CU_ASSERT((cpu.flags & FLAG_S) == FLAG_S);
   CU_ASSERT((cpu.flags & FLAG_Z) == 0);
+  CU_ASSERT((cpu.flags & FLAG_AC) == 0);
 }
 
 void
