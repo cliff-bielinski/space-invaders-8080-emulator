@@ -14,8 +14,12 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       printf("NOP");
       break;
     case 0x01: // NOLINT
-      printf("LXI B");
-      break;
+      {        // LXI B
+        cpu->c = cpu_read_mem(cpu, cpu->pc + 1);
+        cpu->b = cpu_read_mem(cpu, cpu->pc + 2);
+        cpu->pc += 2;
+        break;
+      }
     case 0x05: // NOLINT
       printf("DCR B");
       break;
@@ -26,8 +30,13 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       printf("DAD B");
       break;
     case 0x0d: // NOLINT
-      printf("DCR C");
-      break;
+      {
+        cpu->c -= 1;
+        update_zero_flag(cpu, cpu->c);
+        update_sign_flag(cpu, cpu->c);
+        update_parity_flag(cpu, cpu->c);
+        break;
+      }
     case 0x0e: // NOLINT
       printf("MVI C");
       break;
