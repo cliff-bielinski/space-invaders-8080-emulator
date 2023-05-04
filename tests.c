@@ -210,6 +210,39 @@ test_opcode_0x7e(void) // NOLINT
   cpu_write_mem(&cpu, 0xBBAA, 0x00);
 }
 
+void
+test_opcode_0xc2(void) // NOLINT
+{
+  i8080 cpu;
+  cpu_init(&cpu);
+
+  cpu_write_mem(&cpu, 0x0001, 0xAA);
+  cpu_write_mem(&cpu, 0x0002, 0xBB);
+
+  // set flag to Zero
+  update_zero_flag(&cpu, 0x00);
+
+  int code_found = execute_instruction(&cpu, 0xc2); // NOLINT
+
+  CU_ASSERT(code_found == 0);
+  CU_ASSERT(cpu.pc == 3);
+  CU_ASSERT((cpu.flags & FLAG_Z) == FLAG_Z);
+
+  // set flag to Non-Zero
+  update_zero_flag(&cpu, 0x01);
+  cpu.pc = 0;
+
+  code_found = execute_instruction(&cpu, 0xc2); // NOLINT
+
+  CU_ASSERT(code_found == 0);
+  CU_ASSERT(cpu.pc == 0xBBAA);
+  CU_ASSERT((cpu.flags & FLAG_Z) == 0);
+
+  // clean up
+  cpu_write_mem(&cpu, 0x0001, 0x00);
+  cpu_write_mem(&cpu, 0x0002, 0x00);
+}
+
 int
 main(void)
 {
@@ -254,7 +287,10 @@ main(void)
                          test_opcode_0x77))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x7e()",
-                         test_opcode_0x7e)))
+                         test_opcode_0x7e))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0xc2()",
+                         test_opcode_0xc2)))
     {
       CU_cleanup_registry();
       return CU_get_error();

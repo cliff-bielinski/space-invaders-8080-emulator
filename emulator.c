@@ -155,11 +155,11 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       {        // JNZ
         uint16_t address = cpu_read_mem(cpu, cpu->pc + 1);
         address += (cpu_read_mem(cpu, cpu->pc + 2) << 8);
-        if (cpu->flags & FLAG_Z == 0) 
+        if ((cpu->flags & FLAG_Z) == 0) 
           {
             // returns rather than breaks to avoid pc increment at end of function
             cpu->pc = address;
-            return;
+            return 0;
           }
         cpu->pc += 2;
         break;
