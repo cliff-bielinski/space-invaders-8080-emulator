@@ -243,6 +243,29 @@ test_opcode_0xc2(void) // NOLINT
   cpu_write_mem(&cpu, 0x0002, 0x00);
 }
 
+void
+test_opcode_0xc9(void) // NOLINT
+{
+  i8080 cpu;
+  cpu_init(&cpu);
+
+  // write memory address in stack pointer
+  cpu_write_mem(&cpu, 0x0001, 0xAA);
+  cpu_write_mem(&cpu, 0x0002, 0xBB);
+
+  cpu.sp = 0x0001;
+
+  int code_found = execute_instruction(&cpu, 0xc9); // NOLINT
+
+  CU_ASSERT(code_found == 0);
+  CU_ASSERT(cpu.pc == 0xBBAA);
+  CU_ASSERT(cpu.sp == 0x0003);
+
+  // clean up
+  cpu_write_mem(&cpu, 0x0001, 0x00);
+  cpu_write_mem(&cpu, 0x0002, 0x00);
+}
+
 int
 main(void)
 {
@@ -290,7 +313,10 @@ main(void)
                          test_opcode_0x7e))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0xc2()",
-                         test_opcode_0xc2)))
+                         test_opcode_0xc2))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0xc9()",
+                         test_opcode_0xc9)))
     {
       CU_cleanup_registry();
       return CU_get_error();

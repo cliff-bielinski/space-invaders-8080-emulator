@@ -174,8 +174,14 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       printf("ADI ");
       break;
     case 0xc9: // NOLINT
-      printf("RET");
-      break;
+      {        // RET
+        // returns rather than breaks to avoid pc increment at end of function
+        uint16_t address = cpu_read_mem(cpu, cpu->sp);
+        address += (cpu_read_mem(cpu, cpu->sp + 1) << 8);
+        cpu->sp += 2;
+        cpu->pc = address;
+        return 0;
+      }
     case 0xcd: // NOLINT
       printf("CALL ");
       break;
