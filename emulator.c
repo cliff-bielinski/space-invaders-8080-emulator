@@ -136,8 +136,12 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       printf("MOV A,H");
       break;
     case 0x7e: // NOLINT
-      printf("MOV A,M");
-      break;
+      {        // MOV A,M
+        uint16_t address = cpu->l;
+        address += (cpu->h << 8);
+        cpu->a = cpu_read_mem(cpu, address);
+        break;
+      }
     case 0xa7: // NOLINT
       printf("ANA A");
       break;
@@ -148,8 +152,18 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       printf("POP B");
       break;
     case 0xc2: // NOLINT
-      printf("JNZ ");
-      break;
+      {        // JNZ
+        uint16_t address = cpu_read_mem(cpu, cpu->pc + 1);
+        address += (cpu_read_mem(cpu, cpu->pc + 2) << 8);
+        if (cpu->flags & FLAG_Z == 0) 
+          {
+            // returns rather than breaks to avoid pc increment at end of function
+            cpu->pc = address;
+            return;
+          }
+        cpu->pc += 2;
+        break;
+      }
     case 0xc3: // NOLINT
       printf("JMP ");
       break;
