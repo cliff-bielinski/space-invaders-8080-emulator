@@ -208,8 +208,18 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       printf("ANI ");
       break;
     case 0xeb: // NOLINT
-      printf("XCHG");
-      break;
+      {        // XCHG
+        // exchange h and d
+        uint8_t temp = cpu->h;
+        cpu->h = cpu->d;
+        cpu->d = temp;
+
+        // exchange l and e
+        temp = cpu->l;
+        cpu->l = cpu->e;
+        cpu->e = temp;
+        break;
+      }
     case 0xf1: // NOLINT
       printf("POP PSW");
       break;

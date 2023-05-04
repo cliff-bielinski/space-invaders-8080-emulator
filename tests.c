@@ -289,6 +289,27 @@ test_opcode_0xd5(void) // NOLINT
   cpu_write_mem(&cpu, 0xFFFD, 0x00);
 }
 
+void
+test_opcode_0xeb(void) // NOLINT
+{
+  i8080 cpu;
+  cpu_init(&cpu);
+
+  cpu.d = 0xAA;
+  cpu.e = 0xBB;
+  cpu.h = 0xCC;
+  cpu.l = 0xDD;
+
+  int code_found = execute_instruction(&cpu, 0xeb); // NOLINT
+
+  CU_ASSERT(code_found == 0);
+  CU_ASSERT(cpu.pc == 0x0001);
+  CU_ASSERT(cpu.d == 0xCC);
+  CU_ASSERT(cpu.e == 0xDD);
+  CU_ASSERT(cpu.h == 0xAA);
+  CU_ASSERT(cpu.l == 0xBB);
+}
+
 int
 main(void)
 {
@@ -342,7 +363,10 @@ main(void)
                          test_opcode_0xc9))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0xd5()",
-                         test_opcode_0xd5)))
+                         test_opcode_0xd5))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0xeb()",
+                         test_opcode_0xeb)))
     {
       CU_cleanup_registry();
       return CU_get_error();
