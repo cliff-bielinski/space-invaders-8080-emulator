@@ -86,7 +86,8 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       break;
     case 0x32: // NOLINT
       {        // STA
-        // little endian - first byte is LSB, second byte is MSB for memory address
+        // little endian - first byte is LSB, second byte is MSB for memory
+        // address
         uint16_t address = cpu_read_mem(cpu, cpu->pc + 1);
         address += (cpu_read_mem(cpu, cpu->pc + 2) << 8);
         cpu_write_mem(cpu, address, cpu->a);
@@ -155,9 +156,10 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       {        // JNZ
         uint16_t address = cpu_read_mem(cpu, cpu->pc + 1);
         address += (cpu_read_mem(cpu, cpu->pc + 2) << 8);
-        if ((cpu->flags & FLAG_Z) == 0) 
+        if ((cpu->flags & FLAG_Z) == 0)
           {
-            // returns rather than breaks to avoid pc increment at end of function
+            // returns rather than breaks to avoid pc increment at end of
+            // function
             cpu->pc = address;
             return 0;
           }
