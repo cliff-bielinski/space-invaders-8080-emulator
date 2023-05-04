@@ -192,8 +192,12 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       printf("OUT ");
       break;
     case 0xd5: // NOLINT
-      printf("PUSH D");
-      break;
+      {        // PUSH D
+        cpu_write_mem(cpu, cpu->sp - 2, cpu->e);
+        cpu_write_mem(cpu, cpu->sp - 1, cpu->d);
+        cpu->sp -= 2;
+        break;
+      }
     case 0xe1: // NOLINT
       printf("POP H");
       break;
