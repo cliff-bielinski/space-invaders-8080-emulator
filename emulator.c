@@ -230,8 +230,17 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       printf("EI");
       break;
     case 0xfe: // NOLINT
-      printf("CPI ");
-      break;
+      {        // CPI
+        uint8_t data = cpu_read_mem(cpu, cpu->pc + 1);
+        uint8_t result = cpu->a - data;
+        update_zero_flag(cpu, result);
+        update_sign_flag(cpu, result);
+        update_parity_flag(cpu, result);
+        update_carry_flag(cpu, (data > cpu->a));
+        update_aux_carry_flag(cpu, cpu->a, (~data + 1));
+        cpu->pc += 1;
+        break;
+      }
     default:
       {
         fprintf(stderr, "Error: opcode 0x%02x not found\n", opcode);
