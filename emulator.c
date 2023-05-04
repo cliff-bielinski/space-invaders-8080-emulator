@@ -89,7 +89,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         // little endian - first byte is LSB, second byte is MSB for memory
         // address
         uint16_t address = cpu_read_mem(cpu, cpu->pc + 1);
-        address += (cpu_read_mem(cpu, cpu->pc + 2) << 8);  // NOLINT
+        address += (cpu_read_mem(cpu, cpu->pc + 2) << 8); // NOLINT
         cpu_write_mem(cpu, address, cpu->a);
         cpu->pc += 2;
         break;
@@ -107,7 +107,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       {        // MOV D,M
         // 16-bit memory address located in registers HL
         uint16_t address = cpu->l;
-        address += (cpu->h << 8);  // NOLINT
+        address += (cpu->h << 8); // NOLINT
         cpu->d = cpu_read_mem(cpu, address);
         break;
       }
@@ -123,7 +123,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
     case 0x77: // NOLINT
       {        // MOV M,A
         uint16_t address = cpu->l;
-        address += (cpu->h << 8);  // NOLINT
+        address += (cpu->h << 8); // NOLINT
         cpu_write_mem(cpu, address, cpu->a);
         break;
       }
@@ -139,7 +139,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
     case 0x7e: // NOLINT
       {        // MOV A,M
         uint16_t address = cpu->l;
-        address += (cpu->h << 8);  // NOLINT
+        address += (cpu->h << 8); // NOLINT
         cpu->a = cpu_read_mem(cpu, address);
         break;
       }
@@ -155,7 +155,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
     case 0xc2: // NOLINT
       {        // JNZ
         uint16_t address = cpu_read_mem(cpu, cpu->pc + 1);
-        address += (cpu_read_mem(cpu, cpu->pc + 2) << 8);  // NOLINT
+        address += (cpu_read_mem(cpu, cpu->pc + 2) << 8); // NOLINT
         if ((cpu->flags & FLAG_Z) == 0)
           {
             // returns rather than breaks to avoid pc increment at end of
@@ -179,7 +179,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       {        // RET
         // returns rather than breaks to avoid pc increment at end of function
         uint16_t address = cpu_read_mem(cpu, cpu->sp);
-        address += (cpu_read_mem(cpu, cpu->sp + 1) << 8);  // NOLINT
+        address += (cpu_read_mem(cpu, cpu->sp + 1) << 8); // NOLINT
         cpu->sp += 2;
         cpu->pc = address;
         return 0;
