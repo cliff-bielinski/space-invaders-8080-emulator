@@ -272,8 +272,8 @@ test_opcode_0xd5(void) // NOLINT
   i8080 cpu;
   cpu_init(&cpu);
 
-  cpu.d = 0xBB; // NOLINT
-  cpu.e = 0xAA; // NOLINT
+  cpu.d = 0xBB;    // NOLINT
+  cpu.e = 0xAA;    // NOLINT
   cpu.sp = 0xFFFF; // NOLINT
 
   int code_found = execute_instruction(&cpu, 0xd5); // NOLINT
