@@ -20,8 +20,11 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       printf("DCR B");
       break;
     case 0x06: // NOLINT
-      printf("MVI B");
-      break;
+      { // MVI B, mem8
+        cpu->b = cpu_read_mem(cpu, cpu->pc + 1);
+        cpu->pc += 1;
+        break;
+      }
     case 0x09: // NOLINT
       printf("DAD B");
       break;
@@ -32,6 +35,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       printf("MVI C");
       break;
     case 0x0f: // NOLINT
+      // TODO
       printf("RRC");
       break;
     case 0x11: // NOLINT
@@ -52,6 +56,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       printf("DAD D");
       break;
     case 0x1a: // NOLINT
+      // TODO
       printf("LDAX D");
       break;
     case 0x21: // NOLINT
@@ -64,6 +69,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       printf("MVI H");
       break;
     case 0x29: // NOLINT
+      // TODO
       printf("DAD H");
       break;
     case 0x31: // NOLINT
@@ -76,6 +82,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       printf("MVI M");
       break;
     case 0x3a: // NOLINT
+      // TODO 
       printf("LDA ");
       break;
     case 0x3e: // NOLINT
@@ -88,6 +95,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       printf("MOV E,M");
       break;
     case 0x66: // NOLINT
+      // TODO
       printf("MOV H,M");
       break;
     case 0x6f: // NOLINT
@@ -100,6 +108,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       printf("MOV A,D");
       break;
     case 0x7b: // NOLINT
+      // TODO
       printf("MOV A,E");
       break;
     case 0x7c: // NOLINT
@@ -112,6 +121,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       printf("ANA A");
       break;
     case 0xaf: // NOLINT
+      // TODO 
       printf("XRA A");
       break;
     case 0xc1: // NOLINT
@@ -124,6 +134,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       printf("JMP ");
       break;
     case 0xc5: // NOLINT
+      // TODO
       printf("PUSH B");
       break;
     case 0xc6: // NOLINT
@@ -136,6 +147,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       printf("CALL ");
       break;
     case 0xd1: // NOLINT
+      // TODO
       printf("POP D");
       break;
     case 0xd3: // NOLINT
@@ -148,6 +160,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       printf("POP H");
       break;
     case 0xe5: // NOLINT
+      // TODO
       printf("PUSH H");
       break;
     case 0xe6: // NOLINT
@@ -160,6 +173,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       printf("POP PSW");
       break;
     case 0xf5: // NOLINT
+      // TODO
       printf("PUSH PSW");
       break;
     case 0xfb: // NOLINT
