@@ -21,15 +21,20 @@ clean_suite(void)
 
 /* Add tests here */
 void
-test_func(void)
+test_opcode_0x05(void) // NOLINT
 {
-  ;
-}
+  i8080 cpu;
+  cpu_init(&cpu);
 
-void
-test_func2(void)
-{
-  ;
+  cpu.b = 0xF;
+  int code_found = execute_instruction(&cpu, 0x05); // NOLINT
+
+  CU_ASSERT(code_found == 0);
+  CU_ASSERT_EQUAL(cpu.b, 14);
+  CU_ASSERT((cpu.flags & FLAG_Z) == 0);
+  CU_ASSERT((cpu.flags & FLAG_S) == 0);
+  CU_ASSERT((cpu.flags & FLAG_P) == 0);
+  CU_ASSERT((cpu.flags & FLAG_AC) == FLAG_AC);
 }
 
 void
@@ -75,10 +80,10 @@ main(void)
    * CU_add_test with an output string for running the test, and the third
    * argument with the test function name.
    */
-  if ((NULL == CU_add_test(pSuite, "test of test_func()", test_func))
-      || (NULL == CU_add_test(pSuite, "test of test_func2()", test_func2))
+  if ((NULL == CU_add_test(pSuite, "test of test_opcode_0x13()", test_opcode_0x13))
       || (NULL
-          == CU_add_test(pSuite, "test of test_opcode_0x13()", test_func2)))
+          == CU_add_test(pSuite, "test of test_opcode_0x05()",
+                         test_opcode_0x05)))
     {
       CU_cleanup_registry();
       return CU_get_error();

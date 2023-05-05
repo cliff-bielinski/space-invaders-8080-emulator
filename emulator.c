@@ -33,7 +33,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
     case 0x09: // NOLINT
       printf("DAD B");
       break;
-    case 0x0d: // NOLINT
+    case 0x0d: // NOLINTgit 
       printf("DCR C");
       break;
     case 0x0e: // NOLINT
