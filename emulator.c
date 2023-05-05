@@ -17,13 +17,13 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       printf("LXI B");
       break;
     case 0x05: // NOLINT
-      { // DCR B
+      {        // DCR B
         cpu->b -= 1;
 
         update_zero_flag(cpu, cpu->b);
         update_sign_flag(cpu, cpu->b);
         update_parity_flag(cpu, cpu->b);
-        update_aux_carry_flag(cpu, cpu->b, 0xFF);
+        update_aux_carry_flag(cpu, cpu->b, 0xFF); // NOLINT
 
         break;
       }
@@ -37,8 +37,11 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       printf("DCR C");
       break;
     case 0x0e: // NOLINT
-      printf("MVI C");
-      break;
+      {        // MVI C
+        cpu->c = cpu_read_mem(cpu, (cpu->pc + 1));
+        cpu->pc += 1;
+        break;
+      }
     case 0x0f: // NOLINT
       printf("RRC");
       break;
