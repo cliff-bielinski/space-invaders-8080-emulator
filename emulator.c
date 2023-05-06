@@ -35,9 +35,27 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       printf("MVI C");
       break;
     case 0x0f: // NOLINT
-      // TODO
-      printf("RRC");
-      break;
+      { // RRC  
+
+	// keep bit 0
+	uint8_t tmp = cpu->a << 7;
+        
+	// right shift register a
+	cpu->a = cpu->a >> 1;
+
+	// replace wrapped bit & set cy flag
+	if (cpu->a ^ tmp)
+	{
+          cpu->a = (cpu->a ^ tmp); 
+          cpu->flags = (cpu->flags | FLAG_CY); 
+        }
+	else // set cy flag to 0
+	{
+	  cpu->flags = (cpu->flags & 0x1F7);
+	}
+	
+        break;
+      }
     case 0x11: // NOLINT
       printf("LXI D");
       break;
@@ -56,9 +74,19 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       printf("DAD D");
       break;
     case 0x1a: // NOLINT
-      // TODO
-      printf("LDAX D");
-      break;
+      {
+        // get addr
+	uint16_t addr = cpu->e;
+	addr = addr << 8; 
+	addr += cpu->d;
+
+        // get value at addr
+        uint8_t val = cpu_read_mem(cpu, addr);
+
+        // put value in d
+        cpu->d = val;  
+        break;
+      }
     case 0x21: // NOLINT
       printf("LXI H");
       break;
