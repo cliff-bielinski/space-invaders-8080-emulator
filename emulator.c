@@ -74,7 +74,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       printf("DAD D");
       break;
     case 0x1a: // NOLINT
-      {
+      { // LDAX D
         // get addr
 	uint16_t addr = cpu->e;
 	addr = addr << 8; 
@@ -120,9 +120,15 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       printf("MVI M");
       break;
     case 0x3a: // NOLINT
-      // TODO 
-      printf("LDA ");
-      break;
+      { // TODO LDA adr
+        uint16_t addr = cpu_read_mem(cpu, cpu->pc + 2);
+        addr = (addr << 8) + cpu_read_mem(cpu, cpu->pc + 1); 
+        printf("\naddress is %0x\n", addr);
+        cpu->a = cpu_read_mem(cpu, addr); 
+        printf("\ncpu->a is %0x\n", cpu->a);
+	cpu->pc += 2;
+        break;
+      }
     case 0x3e: // NOLINT
       printf("MVI A");
       break;
