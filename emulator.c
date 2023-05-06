@@ -77,7 +77,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       {        // LDAX D
                // get addr
         uint16_t addr = cpu->e;
-        addr = addr << 8;
+        addr = addr << 8; // NOLINT
         addr += cpu->d;
 
         // get value at addr
@@ -107,7 +107,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
 
         // put values back in registers
         cpu->h = sum;
-        cpu->l = (sum >> 8);
+        cpu->l = (sum >> 8); // NOLINT
         break;
       }
     case 0x31: // NOLINT
@@ -122,7 +122,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
     case 0x3a: // NOLINT
       {        // LDA adr
         uint16_t addr = cpu_read_mem(cpu, cpu->pc + 2);
-        addr = (addr << 8) + cpu_read_mem(cpu, cpu->pc + 1);
+        addr = (addr << 8) + cpu_read_mem(cpu, cpu->pc + 1); // NOLINT
         cpu->a = cpu_read_mem(cpu, addr);
         cpu->pc += 2;
         break;
@@ -173,7 +173,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         update_zero_flag(cpu, result);
         update_parity_flag(cpu, result);
         update_carry_flag(cpu, false);
-        update_aux_carry_flag(cpu, result, 0xFF);
+        update_aux_carry_flag(cpu, result, 0xFF); // NOLINT
 
         cpu->a = result;
         break;
