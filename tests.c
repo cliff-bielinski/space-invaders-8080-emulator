@@ -209,6 +209,29 @@ test_opcode_0x7b(void) // NOLINT
   CU_ASSERT(0x29 == cpu.e); // NOLINT
 }
 
+void
+test_opcode_0xaf(void) // NOLINT
+{ // XRA A
+
+  // setup
+  i8080 cpu;
+  cpu_init(&cpu);
+  cpu.a = 0xcc; 
+
+  // execute
+  int code_found = execute_instruction(&cpu, 0xaf); // NOLINT
+
+  // verify 
+  CU_ASSERT(0 == code_found);
+  CU_ASSERT(1 == cpu.pc);
+  CU_ASSERT(0x00 == cpu.a); // NOLINT
+  CU_ASSERT(FLAG_S != (cpu.flags & FLAG_S));
+  CU_ASSERT(FLAG_Z == (cpu.flags & FLAG_Z));
+  CU_ASSERT(FLAG_P == (cpu.flags & FLAG_P));
+  CU_ASSERT(FLAG_CY != (cpu.flags & FLAG_CY));
+  CU_ASSERT(FLAG_AC != (cpu.flags & FLAG_AC));
+}
+
 int
 main(void)
 {
@@ -239,7 +262,8 @@ main(void)
       || (NULL == CU_add_test(pSuite, "test of test_opcode_0x29()", test_opcode_0x29))
       || (NULL == CU_add_test(pSuite, "test of test_opcode_0x3a()", test_opcode_0x3a))
       || (NULL == CU_add_test(pSuite, "test of test_opcode_0x66()", test_opcode_0x66))
-      || (NULL == CU_add_test(pSuite, "test of test_opcode_0x7b()", test_opcode_0x7b)))
+      || (NULL == CU_add_test(pSuite, "test of test_opcode_0x7b()", test_opcode_0x7b))
+      || (NULL == CU_add_test(pSuite, "test of test_opcode_0xaf()", test_opcode_0xaf)))
     {
       CU_cleanup_registry();
       return CU_get_error();

@@ -120,12 +120,10 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       printf("MVI M");
       break;
     case 0x3a: // NOLINT
-      { // TODO LDA adr
+      { // LDA adr
         uint16_t addr = cpu_read_mem(cpu, cpu->pc + 2);
         addr = (addr << 8) + cpu_read_mem(cpu, cpu->pc + 1); 
-        printf("\naddress is %0x\n", addr);
         cpu->a = cpu_read_mem(cpu, addr); 
-        printf("\ncpu->a is %0x\n", cpu->a);
 	cpu->pc += 2;
         break;
       }
@@ -139,9 +137,12 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       printf("MOV E,M");
       break;
     case 0x66: // NOLINT
-      // TODO
-      printf("MOV H,M");
-      break;
+      { // MOV H,M
+        uint16_t addr = cpu->l;  
+        addr = (addr << 8) + cpu->h; // NOLINT
+        cpu->h = cpu_read_mem(cpu, addr);
+        break;
+      }
     case 0x6f: // NOLINT
       printf("MOV L,A");
       break;
@@ -152,9 +153,10 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       printf("MOV A,D");
       break;
     case 0x7b: // NOLINT
-      // TODO
-      printf("MOV A,E");
-      break;
+      { // MOV A,E 
+        cpu->a = cpu->e; 	
+        break;
+      }
     case 0x7c: // NOLINT
       printf("MOV A,H");
       break;
@@ -165,9 +167,17 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       printf("ANA A");
       break;
     case 0xaf: // NOLINT
-      // TODO 
-      printf("XRA A");
-      break;
+      { // TODO XRA A
+        uint8_t result = cpu->a ^ cpu->a;
+	update_sign_flag(cpu, result);
+	update_zero_flag(cpu, result);
+	update_parity_flag(cpu, result);
+	update_carry_flag(cpu, false);
+	update_aux_carry_flag(cpu, result, 0xFF);
+
+	cpu->a = result;
+        break;
+      }
     case 0xc1: // NOLINT
       printf("POP B");
       break;
