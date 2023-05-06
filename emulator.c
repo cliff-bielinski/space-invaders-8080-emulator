@@ -38,7 +38,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       {        // RRC
 
         // keep bit 0
-        uint8_t tmp = cpu->a << 7;
+        uint8_t tmp = cpu->a << 7; // NOLINT
 
         // right shift register a
         cpu->a = cpu->a >> 1;
@@ -99,8 +99,8 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
     case 0x29: // NOLINT
       {        // DAD H
         uint32_t sum = cpu->l;
-        sum = (sum << 8) + cpu->h;
-        sum = sum << 1; // double hl
+        sum = (sum << 8) + cpu->h; // NOLINT
+        sum = sum << 1;            // double hl
 
         // update carry flag
         update_carry_flag(cpu, sum > 0xffff); // NOLINT
