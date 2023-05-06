@@ -20,7 +20,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       printf("DCR B");
       break;
     case 0x06: // NOLINT
-      { // MVI B, mem8
+      {        // MVI B, mem8
         cpu->b = cpu_read_mem(cpu, cpu->pc + 1);
         cpu->pc += 1;
         break;
@@ -35,25 +35,25 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       printf("MVI C");
       break;
     case 0x0f: // NOLINT
-      { // RRC  
+      {        // RRC
 
-	// keep bit 0
-	uint8_t tmp = cpu->a << 7;
-        
-	// right shift register a
-	cpu->a = cpu->a >> 1;
+        // keep bit 0
+        uint8_t tmp = cpu->a << 7;
 
-	// replace wrapped bit & set cy flag
-	if (cpu->a ^ tmp)
-	{
-          cpu->a = (cpu->a ^ tmp); 
-          cpu->flags = (cpu->flags | FLAG_CY); 
-        }
-	else // set cy flag to 0
-	{
-	  cpu->flags = (cpu->flags & 0x1F7); // NOLINT
-	}
-	
+        // right shift register a
+        cpu->a = cpu->a >> 1;
+
+        // replace wrapped bit & set cy flag
+        if (cpu->a ^ tmp)
+          {
+            cpu->a = (cpu->a ^ tmp);
+            cpu->flags = (cpu->flags | FLAG_CY);
+          }
+        else // set cy flag to 0
+          {
+            cpu->flags = (cpu->flags & 0x1F7); // NOLINT
+          }
+
         break;
       }
     case 0x11: // NOLINT
@@ -74,17 +74,17 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       printf("DAD D");
       break;
     case 0x1a: // NOLINT
-      { // LDAX D
-        // get addr
-	uint16_t addr = cpu->e;
-	addr = addr << 8; 
-	addr += cpu->d;
+      {        // LDAX D
+               // get addr
+        uint16_t addr = cpu->e;
+        addr = addr << 8;
+        addr += cpu->d;
 
         // get value at addr
         uint8_t val = cpu_read_mem(cpu, addr);
 
         // put value in d
-        cpu->d = val;  
+        cpu->d = val;
         break;
       }
     case 0x21: // NOLINT
@@ -97,7 +97,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       printf("MVI H");
       break;
     case 0x29: // NOLINT
-      { // DAD H
+      {        // DAD H
         uint32_t sum = cpu->l;
         sum = (sum << 8) + cpu->h;
         sum = sum << 1; // double hl
@@ -105,9 +105,9 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         // update carry flag
         update_carry_flag(cpu, sum > 0xffff); // NOLINT
 
-	// put values back in registers
+        // put values back in registers
         cpu->h = sum;
-        cpu->l = (sum >> 8); 
+        cpu->l = (sum >> 8);
         break;
       }
     case 0x31: // NOLINT
@@ -120,11 +120,11 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       printf("MVI M");
       break;
     case 0x3a: // NOLINT
-      { // LDA adr
+      {        // LDA adr
         uint16_t addr = cpu_read_mem(cpu, cpu->pc + 2);
-        addr = (addr << 8) + cpu_read_mem(cpu, cpu->pc + 1); 
-        cpu->a = cpu_read_mem(cpu, addr); 
-	cpu->pc += 2;
+        addr = (addr << 8) + cpu_read_mem(cpu, cpu->pc + 1);
+        cpu->a = cpu_read_mem(cpu, addr);
+        cpu->pc += 2;
         break;
       }
     case 0x3e: // NOLINT
@@ -137,8 +137,8 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       printf("MOV E,M");
       break;
     case 0x66: // NOLINT
-      { // MOV H,M
-        uint16_t addr = cpu->l;  
+      {        // MOV H,M
+        uint16_t addr = cpu->l;
         addr = (addr << 8) + cpu->h; // NOLINT
         cpu->h = cpu_read_mem(cpu, addr);
         break;
@@ -153,8 +153,8 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       printf("MOV A,D");
       break;
     case 0x7b: // NOLINT
-      { // MOV A,E 
-        cpu->a = cpu->e; 	
+      {        // MOV A,E
+        cpu->a = cpu->e;
         break;
       }
     case 0x7c: // NOLINT
@@ -167,15 +167,15 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       printf("ANA A");
       break;
     case 0xaf: // NOLINT
-      { // XRA A
+      {        // XRA A
         uint8_t result = cpu->a ^ cpu->a;
-	update_sign_flag(cpu, result);
-	update_zero_flag(cpu, result);
-	update_parity_flag(cpu, result);
-	update_carry_flag(cpu, false);
-	update_aux_carry_flag(cpu, result, 0xFF);
+        update_sign_flag(cpu, result);
+        update_zero_flag(cpu, result);
+        update_parity_flag(cpu, result);
+        update_carry_flag(cpu, false);
+        update_aux_carry_flag(cpu, result, 0xFF);
 
-	cpu->a = result;
+        cpu->a = result;
         break;
       }
     case 0xc1: // NOLINT
@@ -188,10 +188,10 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       printf("JMP ");
       break;
     case 0xc5: // NOLINT
-      { // TODO PUSH B
-        cpu_write_mem(cpu, cpu->sp-1, cpu->b); 
+      {        // PUSH B
+        cpu_write_mem(cpu, cpu->sp - 1, cpu->b);
         cpu->sp -= 1;
-        cpu_write_mem(cpu, cpu->sp-1, cpu->c); 
+        cpu_write_mem(cpu, cpu->sp - 1, cpu->c);
         cpu->sp -= 1;
         break;
       }
@@ -205,9 +205,14 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       printf("CALL ");
       break;
     case 0xd1: // NOLINT
-      // TODO
-      printf("POP D");
-      break;
+      {
+        // POP D
+        cpu->e = cpu_read_mem(cpu, cpu->sp);
+        cpu->sp += 1;
+        cpu->d = cpu_read_mem(cpu, cpu->sp);
+        cpu->sp += 1;
+        break;
+      }
     case 0xd3: // NOLINT
       printf("OUT ");
       break;
@@ -218,9 +223,13 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       printf("POP H");
       break;
     case 0xe5: // NOLINT
-      // TODO
-      printf("PUSH H");
-      break;
+      {        // PUSH H
+        cpu_write_mem(cpu, cpu->sp - 1, cpu->h);
+        cpu->sp -= 1;
+        cpu_write_mem(cpu, cpu->sp - 1, cpu->l);
+        cpu->sp -= 1;
+        break;
+      }
     case 0xe6: // NOLINT
       printf("ANI ");
       break;
@@ -231,8 +240,13 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       printf("POP PSW");
       break;
     case 0xf5: // NOLINT
-      // TODO
-      printf("PUSH PSW");
+      {        // PUSH PSW
+        cpu_write_mem(cpu, cpu->sp - 1, cpu->a);
+        cpu->sp -= 1;
+        cpu_write_mem(cpu, cpu->sp - 1, cpu->flags);
+        cpu->sp -= 1;
+        break;
+      }
       break;
     case 0xfb: // NOLINT
       printf("EI");
