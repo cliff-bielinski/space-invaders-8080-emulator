@@ -66,6 +66,7 @@ void
 test_opcode_0x0f(void) // NOLINT
 {                      // RRC
 
+  /* no carry test */
   // setup
   i8080 cpu;
   cpu_init(&cpu);
@@ -78,6 +79,19 @@ test_opcode_0x0f(void) // NOLINT
   CU_ASSERT(0 == code_found);
   CU_ASSERT(1 == cpu.pc);
   CU_ASSERT(0x66 == cpu.a); // NOLINT
+  CU_ASSERT(FLAG_CY != (cpu.flags & FLAG_CY));
+
+  /* carry test */
+  // setup
+  cpu.a = 0x3D; // NOLINT
+
+  // execute
+  code_found = execute_instruction(&cpu, 0x0f); // NOLINT
+
+  // verify
+  CU_ASSERT(0 == code_found);
+  CU_ASSERT(2 == cpu.pc);
+  CU_ASSERT(0x9E == cpu.a); // NOLINT
   CU_ASSERT(FLAG_CY == (cpu.flags & FLAG_CY));
 }
 

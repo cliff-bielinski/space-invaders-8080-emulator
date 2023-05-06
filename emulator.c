@@ -43,17 +43,18 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         // right shift register a
         cpu->a = cpu->a >> 1;
 
-        // replace wrapped bit & set cy flag
-        if (cpu->a ^ tmp)
-          {
-            cpu->a = (cpu->a ^ tmp);
-            cpu->flags = (cpu->flags | FLAG_CY);
-          }
-        else // set cy flag to 0
-          {
-            cpu->flags = (cpu->flags & 0x1F7); // NOLINT
-          }
+        // replace wrapped bit
+        cpu->a ^= tmp;
 
+        // set cy flag to prev bit 0
+        if (tmp != 0)
+          {
+            update_carry_flag(cpu, true);
+          }
+        else
+          {
+            update_carry_flag(cpu, false);
+          }
         break;
       }
     case 0x11: // NOLINT
