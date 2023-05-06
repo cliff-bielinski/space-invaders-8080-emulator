@@ -167,7 +167,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       printf("ANA A");
       break;
     case 0xaf: // NOLINT
-      { // TODO XRA A
+      { // XRA A
         uint8_t result = cpu->a ^ cpu->a;
 	update_sign_flag(cpu, result);
 	update_zero_flag(cpu, result);
@@ -188,9 +188,13 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       printf("JMP ");
       break;
     case 0xc5: // NOLINT
-      // TODO
-      printf("PUSH B");
-      break;
+      { // TODO PUSH B
+        cpu_write_mem(cpu, cpu->sp-1, cpu->b); 
+        cpu->sp -= 1;
+        cpu_write_mem(cpu, cpu->sp-1, cpu->c); 
+        cpu->sp -= 1;
+        break;
+      }
     case 0xc6: // NOLINT
       printf("ADI ");
       break;

@@ -232,6 +232,28 @@ test_opcode_0xaf(void) // NOLINT
   CU_ASSERT(FLAG_AC != (cpu.flags & FLAG_AC));
 }
 
+void
+test_opcode_0xc5(void) // NOLINT
+{ // PUSH B 
+
+  // setup
+  i8080 cpu;
+  cpu_init(&cpu);
+  cpu.b = 0xcd; 
+  cpu.c = 0xab;
+  cpu.sp = 0xcccc; // say the sp is here
+
+  // execute
+  int code_found = execute_instruction(&cpu, 0xc5); // NOLINT
+
+  // verify 
+  CU_ASSERT(0 == code_found);
+  CU_ASSERT(1 == cpu.pc);
+  CU_ASSERT(0xccca == cpu.sp);
+  CU_ASSERT(cpu.b == cpu_read_mem(&cpu, cpu.sp + 1));
+  CU_ASSERT(cpu.c == cpu_read_mem(&cpu, cpu.sp));
+}
+
 int
 main(void)
 {
@@ -263,7 +285,8 @@ main(void)
       || (NULL == CU_add_test(pSuite, "test of test_opcode_0x3a()", test_opcode_0x3a))
       || (NULL == CU_add_test(pSuite, "test of test_opcode_0x66()", test_opcode_0x66))
       || (NULL == CU_add_test(pSuite, "test of test_opcode_0x7b()", test_opcode_0x7b))
-      || (NULL == CU_add_test(pSuite, "test of test_opcode_0xaf()", test_opcode_0xaf)))
+      || (NULL == CU_add_test(pSuite, "test of test_opcode_0xaf()", test_opcode_0xaf))
+      || (NULL == CU_add_test(pSuite, "test of test_opcode_0xc5()", test_opcode_0xc5)))
     {
       CU_cleanup_registry();
       return CU_get_error();
