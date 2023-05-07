@@ -348,7 +348,7 @@ test_opcode_0xf5(void) // NOLINT
 
   // cleanup
   cpu_write_mem(&cpu, cpu.sp, 0x00);     // NOLINT
-  cpu_write_mem(&cpu, cpu.sp + 1, 0x00);     // NOLINT
+  cpu_write_mem(&cpu, cpu.sp + 1, 0x00); // NOLINT
 }
 
 int
