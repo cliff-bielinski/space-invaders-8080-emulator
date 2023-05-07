@@ -759,7 +759,7 @@ main(void)
                          test_opcode_0xeb))                         
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0xf5()",
-                         test_opcode_0xf5)))
+                         test_opcode_0xf5))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0xfe()",
                          test_opcode_0xfe)))
