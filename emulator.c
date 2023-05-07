@@ -37,11 +37,6 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
     case 0x09: // NOLINT
       printf("DAD B");
       break;
-<<<<<<< HEAD
-    case 0x0d: // NOLINTgit
-      printf("DCR C");
-      break;
-=======
     case 0x0d: // NOLINT
       {        // DCR C
         uint8_t result = cpu->c - 1;
@@ -52,7 +47,6 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         cpu->c = result;
         break;
       }
->>>>>>> 1209fd6dde715aab7460498e39b055a01e26fb62
     case 0x0e: // NOLINT
       {        // MVI C
         cpu->c = cpu_read_mem(cpu, (cpu->pc + 1));
@@ -82,7 +76,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
 
         cpu->h = sum >> 8;
         cpu->l = sum & 255;
-        update_carry_flag(&cpu, sum > 65535);
+        update_carry_flag(cpu, sum > 65535);
 
         break;
       }
