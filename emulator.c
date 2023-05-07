@@ -99,16 +99,16 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       break;
     case 0x29: // NOLINT
       {        // DAD H
-        uint32_t sum = cpu->l;
-        sum = (sum << 8) + cpu->h; // NOLINT
+        uint32_t sum = cpu->h;
+        sum = (sum << 8) + cpu->l; // NOLINT
         sum = sum << 1;            // double hl
 
         // update carry flag
         update_carry_flag(cpu, sum > 0xffff); // NOLINT
 
         // put values back in registers
-        cpu->h = sum;
-        cpu->l = (sum >> 8); // NOLINT
+        cpu->l = sum;
+        cpu->h = (sum >> 8); // NOLINT
         break;
       }
     case 0x31: // NOLINT

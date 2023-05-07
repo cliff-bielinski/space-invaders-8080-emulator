@@ -126,8 +126,8 @@ test_opcode_0x29(void) // NOLINT
   // setup
   i8080 cpu;
   cpu_init(&cpu);
-  cpu.h = 0xaa; // NOLINT
-  cpu.l = 0x11; // NOLINT
+  cpu.h = 0x11; // NOLINT
+  cpu.l = 0xaa; // NOLINT
 
   // execute
   int code_found = execute_instruction(&cpu, 0x29); // NOLINT
@@ -135,14 +135,14 @@ test_opcode_0x29(void) // NOLINT
   // verify
   CU_ASSERT(0 == code_found);
   CU_ASSERT(1 == cpu.pc);
-  CU_ASSERT(0x54 == cpu.h); // NOLINT
-  CU_ASSERT(0x23 == cpu.l); // NOLINT
+  CU_ASSERT(0x23 == cpu.h); // NOLINT
+  CU_ASSERT(0x54 == cpu.l); // NOLINT
   CU_ASSERT(FLAG_CY != (cpu.flags & FLAG_CY));
 
   /* carry test */
   // setup
-  cpu.h = 0x00; // NOLINT
-  cpu.l = 0x80; // NOLINT
+  cpu.h = 0x80; // NOLINT
+  cpu.l = 0x00; // NOLINT
 
   // execute
   code_found = execute_instruction(&cpu, 0x29); // NOLINT
