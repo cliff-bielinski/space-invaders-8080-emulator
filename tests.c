@@ -417,8 +417,10 @@ main(void)
                          test_opcode_0x05))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x19()",
-                         test_opcode_0x19)))
-       == CU_add_test(pSuite, "test of test_opcode_0x01()", test_opcode_0x01))
+                         test_opcode_0x19))
+      || (NULL
+       == CU_add_test(pSuite, "test of test_opcode_0x01()", 
+          test_opcode_0x01))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x0d()",
                          test_opcode_0x0d))
@@ -455,10 +457,10 @@ main(void)
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0xfe()",
                          test_opcode_0xfe)))
-    {
-      CU_cleanup_registry();
-      return CU_get_error();
-    }
+      {
+        CU_cleanup_registry();
+        return CU_get_error();
+      }
 
   CU_basic_set_mode(CU_BRM_VERBOSE);
   CU_basic_run_tests();
