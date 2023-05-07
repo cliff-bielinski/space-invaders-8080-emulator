@@ -123,6 +123,7 @@ test_opcode_0x13(void) // NOLINT
 void
 test_opcode_0x19(void) // NOLINT
 {
+  // DAD D
   i8080 cpu;
   cpu_init(&cpu);
 
@@ -136,6 +137,21 @@ test_opcode_0x19(void) // NOLINT
   CU_ASSERT(cpu.h == 64);
   CU_ASSERT(cpu.l == 199);
   CU_ASSERT((cpu.flags & FLAG_CY) == 0);
+}
+
+void
+test_opcode_0x7a(void) // NOLINT
+{
+  // MOV A,D
+  i8080 cpu;
+  cpu_init(&cpu);
+
+  cpu.d = 100;
+
+  int code_found = execute_instruction(&cpu, 0x7a);
+
+  CU_ASSERT(code_found == 0);
+  CU_ASSERT(cpu.a == 100);
 }
 
 test_opcode_0x23(void) // NOLINT
@@ -419,8 +435,8 @@ main(void)
           == CU_add_test(pSuite, "test of test_opcode_0x19()",
                          test_opcode_0x19))
       || (NULL
-       == CU_add_test(pSuite, "test of test_opcode_0x01()", 
-          test_opcode_0x01))
+          == CU_add_test(pSuite, "test of test_opcode_0x01()",
+                         test_opcode_0x01))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x0d()",
                          test_opcode_0x0d))
@@ -456,11 +472,14 @@ main(void)
                          test_opcode_0xeb))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0xfe()",
-                         test_opcode_0xfe)))
-      {
-        CU_cleanup_registry();
-        return CU_get_error();
-      }
+                         test_opcode_0xfe))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0x7a()",
+                         test_opcode_0x7a)))
+    {
+      CU_cleanup_registry();
+      return CU_get_error();
+    }
 
   CU_basic_set_mode(CU_BRM_VERBOSE);
   CU_basic_run_tests();

@@ -145,7 +145,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       {        // MOV E,M
         uint16_t address
             = (cpu->h << 8) | cpu->l; // Address is stored in reg h,l.
-        
+
         cpu->e = cpu_read_mem(cpu, address);
 
         break;
@@ -164,8 +164,10 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         break;
       }
     case 0x7a: // NOLINT
-      printf("MOV A,D");
-      break;
+      {        // MOV A,D
+        cpu->a = cpu->d;
+        break;
+      }
     case 0x7b: // NOLINT
       printf("MOV A,E");
       break;
