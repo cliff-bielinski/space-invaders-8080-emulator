@@ -139,8 +139,8 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       break;
     case 0x66: // NOLINT
       {        // MOV H,M
-        uint16_t addr = cpu->l;
-        addr = (addr << 8) + cpu->h; // NOLINT
+        uint16_t addr = cpu->h;
+        addr = (addr << 8) + cpu->l; // NOLINT
         cpu->h = cpu_read_mem(cpu, addr);
         break;
       }

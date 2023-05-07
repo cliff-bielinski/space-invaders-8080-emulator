@@ -188,8 +188,8 @@ test_opcode_0x66(void) // NOLINT
   i8080 cpu;
   cpu_init(&cpu);
   cpu_write_mem(&cpu, 0x1234, 0x31); // NOLINT
-  cpu.h = 0x34;                      // NOLINT
-  cpu.l = 0x12;                      // NOLINT
+  cpu.h = 0x12;                      // NOLINT
+  cpu.l = 0x34;                      // NOLINT
 
   // execute
   int code_found = execute_instruction(&cpu, 0x66); // NOLINT
