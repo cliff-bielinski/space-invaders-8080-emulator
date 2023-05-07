@@ -457,7 +457,6 @@ test_opcode_0xf5(void) // NOLINT
   cpu_write_mem(&cpu, cpu.sp + 1, 0x00); // NOLINT
 }
 
-
 void
 test_opcode_0x56(void) // NOLINT
 {
@@ -689,10 +688,9 @@ main(void)
    * argument with the test function name.
    */
   if ((NULL
-       == CU_add_test(pSuite, "test of test_opcode_0x01()", 
-                         test_opcode_0x01))
+       == CU_add_test(pSuite, "test of test_opcode_0x01()", test_opcode_0x01))
       || (NULL
-       == CU_add_test(pSuite, "test of test_opcode_0x06()", 
+          == CU_add_test(pSuite, "test of test_opcode_0x06()",
                          test_opcode_0x06))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x0d()",
@@ -720,43 +718,43 @@ main(void)
                          test_opcode_0x3a))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x56()",
-                         test_opcode_0x56))    
+                         test_opcode_0x56))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x66()",
                          test_opcode_0x66))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x77()",
-                         test_opcode_0x77))                        
+                         test_opcode_0x77))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x7b()",
                          test_opcode_0x7b))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x7e()",
-                         test_opcode_0x7e))                          
+                         test_opcode_0x7e))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0xaf()",
                          test_opcode_0xaf))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0xc2()",
-                         test_opcode_0xc2))                     
+                         test_opcode_0xc2))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0xc5()",
                          test_opcode_0xc5))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0xc9()",
-                         test_opcode_0xc9))                             
+                         test_opcode_0xc9))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0xd1()",
                          test_opcode_0xd1))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0xd5()",
-                         test_opcode_0xd5))                         
+                         test_opcode_0xd5))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0xe5()",
                          test_opcode_0xe5))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0xeb()",
-                         test_opcode_0xeb))                         
+                         test_opcode_0xeb))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0xf5()",
                          test_opcode_0xf5))
