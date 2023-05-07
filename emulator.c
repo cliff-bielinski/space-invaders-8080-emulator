@@ -77,9 +77,9 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
     case 0x1a: // NOLINT
       {        // LDAX D
                // get addr
-        uint16_t addr = cpu->e;
+        uint16_t addr = cpu->d;
         addr = addr << 8; // NOLINT
-        addr += cpu->d;
+        addr += cpu->e;
 
         // get value at addr
         uint8_t val = cpu_read_mem(cpu, addr);

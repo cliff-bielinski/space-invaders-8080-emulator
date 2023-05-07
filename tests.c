@@ -103,8 +103,8 @@ test_opcode_0x1a(void) // NOLINT
   i8080 cpu;
   cpu_init(&cpu);
   cpu_write_mem(&cpu, 0x0001, 0xCC); // NOLINT
-  cpu.d = 0x01;                      // NOLINT
-  cpu.e = 0x00;                      // NOLINT
+  cpu.d = 0x00;                      // NOLINT
+  cpu.e = 0x01;                      // NOLINT
 
   // execute
   int code_found = execute_instruction(&cpu, 0x1a); // NOLINT
