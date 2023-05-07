@@ -265,6 +265,12 @@ test_opcode_0xc5(void) // NOLINT
   CU_ASSERT(0xccca == cpu.sp); // NOLINT
   CU_ASSERT(cpu.b == cpu_read_mem(&cpu, cpu.sp + 1));
   CU_ASSERT(cpu.c == cpu_read_mem(&cpu, cpu.sp));
+
+  // cleanup
+  cpu_write_mem(&cpu, cpu.sp, 0x00);
+  cpu_write_mem(&cpu, cpu.sp + 1, 0x00);
+  CU_ASSERT(0 == cpu_read_mem(&cpu, cpu.sp + 1));
+  CU_ASSERT(0 == cpu_read_mem(&cpu, cpu.sp));
 }
 
 void
@@ -287,6 +293,10 @@ test_opcode_0xd1(void) // NOLINT
   CU_ASSERT(0xcccc == cpu.sp); // NOLINT
   CU_ASSERT(0xcd == cpu.d);    // NOLINT
   CU_ASSERT(0x23 == cpu.e);    // NOLINT
+
+  // cleanup
+  cpu_write_mem(&cpu, cpu.sp, 0x00);     // NOLINT
+  cpu_write_mem(&cpu, cpu.sp + 1, 0x00); // NOLINT
 }
 
 void
@@ -309,6 +319,10 @@ test_opcode_0xe5(void) // NOLINT
   CU_ASSERT(0xddb9 == cpu.sp); // NOLINT
   CU_ASSERT(cpu.h == cpu_read_mem(&cpu, cpu.sp + 1));
   CU_ASSERT(cpu.l == cpu_read_mem(&cpu, cpu.sp));
+
+  // cleanup
+  cpu_write_mem(&cpu, cpu.sp, 0x00);     // NOLINT
+  cpu_write_mem(&cpu, cpu.sp + 1, 0x00); // NOLINT
 }
 
 void
@@ -331,6 +345,10 @@ test_opcode_0xf5(void) // NOLINT
   CU_ASSERT(0x4442 == cpu.sp); // NOLINT
   CU_ASSERT(cpu.a == cpu_read_mem(&cpu, cpu.sp + 1));
   CU_ASSERT(cpu.flags == cpu_read_mem(&cpu, cpu.sp));
+
+  // cleanup
+  cpu_write_mem(&cpu, cpu.sp, 0x00);     // NOLINT
+  cpu_write_mem(&cpu, cpu.sp + 1, 0x00);     // NOLINT
 }
 
 int
