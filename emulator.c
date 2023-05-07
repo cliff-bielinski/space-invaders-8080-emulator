@@ -96,7 +96,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         break;
       }
     case 0x26: // NOLINT
-      {        // MVI H
+      {        // MVI H, D8
         cpu->h = cpu_read_mem(cpu, cpu->pc + 1);
         cpu->pc += 1;
         break;
@@ -118,8 +118,14 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         break;
       }
     case 0x36: // NOLINT
-      printf("MVI M");
-      break;
+      { // MVI M, D8
+        uint16_t address = (cpu->h << 8) | cpu->l;  //Address is stored in reg h,l.
+
+        cpu_write_mem(cpu, address, cpu_read_mem(cpu, cpu->pc + 1));
+
+        cpu->pc += 1;
+        break;
+      }
     case 0x3a: // NOLINT
       printf("LDA ");
       break;
