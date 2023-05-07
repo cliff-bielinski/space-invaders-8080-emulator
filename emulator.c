@@ -61,13 +61,14 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       }
     case 0x19: // NOLINT
       {        // DAD D
-        uint16_t sum = (cpu->h << 8) | (cpu->l); //convert reg pair h,l to 16 bit int
+        uint16_t sum
+            = (cpu->h << 8) | (cpu->l); // convert reg pair h,l to 16 bit int
         sum = sum + cpu->d;
 
         cpu->h = sum >> 8;
         cpu->l = sum & 255;
         update_carry_flag(&cpu, sum > 65535);
-      
+
         break;
       }
     case 0x1a: // NOLINT
@@ -80,8 +81,10 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       printf("INX H");
       break;
     case 0x26: // NOLINT
-      printf("MVI H");
-      break;
+      {        // MVI H
+
+        break;
+      }
     case 0x29: // NOLINT
       printf("DAD H");
       break;
