@@ -97,7 +97,8 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       }
     case 0x26: // NOLINT
       {        // MVI H
-
+        cpu->h = cpu_read_mem(cpu, cpu->pc + 1);
+        cpu->pc += 1;
         break;
       }
     case 0x29: // NOLINT
