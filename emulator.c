@@ -33,7 +33,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
     case 0x09: // NOLINT
       printf("DAD B");
       break;
-    case 0x0d: // NOLINTgit 
+    case 0x0d: // NOLINTgit
       printf("DCR C");
       break;
     case 0x0e: // NOLINT
@@ -60,8 +60,16 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         break;
       }
     case 0x19: // NOLINT
-      printf("DAD D");
-      break;
+      {        // DAD D
+        uint16_t sum = (cpu->h << 8) | (cpu->l); //convert reg pair h,l to 16 bit int
+        sum = sum + cpu->d;
+
+        cpu->h = sum >> 8;
+        cpu->l = sum & 255;
+        update_carry_flag(&cpu, sum > 65535);
+      
+        break;
+      }
     case 0x1a: // NOLINT
       printf("LDAX D");
       break;
