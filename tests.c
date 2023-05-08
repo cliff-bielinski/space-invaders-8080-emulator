@@ -110,7 +110,7 @@ test_opcode_0x05(void) // NOLINT
   i8080 cpu;
   cpu_init(&cpu);
 
-  cpu.b = 0xF;
+  cpu.b = 0xF;                                      // NOLINT
   int code_found = execute_instruction(&cpu, 0x05); // NOLINT
 
   CU_ASSERT(code_found == 0);
