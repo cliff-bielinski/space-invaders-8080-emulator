@@ -239,10 +239,15 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       }
     case 0xcd: // NOLINT
       {        // CALL ADDR
-        uint16_t pc_addr = cpu_read_mem(cpu, cpu->pc + 2);
-        cpu_write_mem(cpu, cpu->sp - 1, (pc_addr >> 8) & 255);
-        cpu_write_mem(cpu, cpu->sp - 2, (pc_addr & 255));        
-        break;
+        uint16_t pc_addr
+            = cpu_read_mem(cpu, cpu->pc); // get next instruction address.
+        cpu_write_mem(cpu, cpu->sp - 1, (pc_addr >> 8));  // NOLINT
+        cpu_write_mem(cpu, cpu->sp - 2, (pc_addr & 255)); // NOLINT
+
+        cpu->sp -= 2;
+        cpu->pc = (cpu_read_mem(cpu, cpu->pc + 2) << 8)
+                  | (cpu_read_mem(cpu, cpu->pc + 1));
+        return 0;
       }
     case 0xd1: // NOLINT
       printf("POP D");
@@ -258,7 +263,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         break;
       }
     case 0xe1: // NOLINT
-      { //POP H
+      {        // POP H
         cpu->l = cpu_read_mem(cpu, cpu->sp);
         cpu->h = cpu_read_mem(cpu, cpu->sp + 1);
         cpu->sp += 2;
@@ -284,7 +289,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         break;
       }
     case 0xf1: // NOLINT
-      { //POP PSW
+      {        // POP PSW
         cpu->flags = cpu_read_mem(cpu, cpu->sp);
         cpu->a = cpu_read_mem(cpu, cpu->sp + 1);
         cpu->sp += 2;
