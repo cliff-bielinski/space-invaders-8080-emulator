@@ -284,8 +284,12 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         break;
       }
     case 0xf1: // NOLINT
-      printf("POP PSW");
-      break;
+      { //POP PSW
+        cpu->flags = cpu_read_mem(cpu, cpu->sp);
+        cpu->a = cpu_read_mem(cpu, cpu->sp + 1);
+        cpu->sp += 2;
+        break;
+      }
     case 0xf5: // NOLINT
       printf("PUSH PSW");
       break;
