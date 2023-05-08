@@ -20,22 +20,6 @@ clean_suite(void)
 }
 
 /* Add tests here */
-void
-test_opcode_0x05(void) // NOLINT
-{
-  i8080 cpu;
-  cpu_init(&cpu);
-
-  cpu.b = 0xF;
-  int code_found = execute_instruction(&cpu, 0x05); // NOLINT
-
-  CU_ASSERT(code_found == 0);
-  CU_ASSERT_EQUAL(cpu.b, 14);
-  CU_ASSERT((cpu.flags & FLAG_Z) == 0);
-  CU_ASSERT((cpu.flags & FLAG_S) == 0);
-  CU_ASSERT((cpu.flags & FLAG_P) == 0);
-  CU_ASSERT((cpu.flags & FLAG_AC) == FLAG_AC);
-}
 
 test_opcode_0x01(void) // NOLINT
 {
@@ -121,6 +105,39 @@ test_opcode_0x13(void) // NOLINT
 }
 
 void
+test_opcode_0x05(void) // NOLINT
+{
+  i8080 cpu;
+  cpu_init(&cpu);
+
+  cpu.b = 0xF;
+  int code_found = execute_instruction(&cpu, 0x05); // NOLINT
+
+  CU_ASSERT(code_found == 0);
+  CU_ASSERT_EQUAL(cpu.b, 14);
+  CU_ASSERT((cpu.flags & FLAG_Z) == 0);
+  CU_ASSERT((cpu.flags & FLAG_S) == 0);
+  CU_ASSERT((cpu.flags & FLAG_P) == 0);
+  CU_ASSERT((cpu.flags & FLAG_AC) == FLAG_AC);
+}
+
+void
+test_opcode_0x0e(void)
+{
+  // MVI C, D8
+  i8080 cpu;
+  cpu_init(&cpu);
+
+  cpu.pc = 0x4341;                       // NOLINT
+  cpu_write_mem(&cpu, cpu.pc + 1, 0x19); // NOLINT
+
+  int code_found = execute_instruction(&cpu, 0x0e);
+
+  CU_ASSERT(code_found == 0);
+  CU_ASSERT_EQUAL(cpu.c, 0x19); // NOLINT
+}
+
+void
 test_opcode_0x19(void) // NOLINT
 {
   // DAD D
@@ -146,7 +163,7 @@ test_opcode_0x26(void)
   i8080 cpu;
   cpu_init(&cpu);
 
-  cpu.pc = 0x4563;                   // NOLINT
+  cpu.pc = 0x4563;                       // NOLINT
   cpu_write_mem(&cpu, cpu.pc + 1, 0x65); // NOLINT
 
   int code_found = execute_instruction(&cpu, 0x26);
@@ -581,6 +598,9 @@ main(void)
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x05()",
                          test_opcode_0x05))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0x0e()",
+                         test_opcode_0x0e))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x19()",
                          test_opcode_0x19))

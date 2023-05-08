@@ -48,7 +48,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         break;
       }
     case 0x0e: // NOLINT
-      {        // MVI C
+      {        // MVI C, D8
         cpu->c = cpu_read_mem(cpu, (cpu->pc + 1));
         cpu->pc += 1;
         break;
