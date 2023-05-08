@@ -234,7 +234,7 @@ test_opcode_0xa7(void) // NOLINT
   // S and CY flag set.
   cpu.flags = 136; // NOLINT
 
-  int code_found = execute_instruction(&cpu, 0xa7);
+  int code_found = execute_instruction(&cpu, 0xa7); // NOLINT
 
   CU_ASSERT(code_found == 0);
   CU_ASSERT(cpu.a == 85);
@@ -252,16 +252,16 @@ test_opcode_0xe1(void) // NOLINT
   i8080 cpu;
   cpu_init(&cpu);
 
-  cpu.sp = 56030;
+  cpu.sp = 56030; // NOLINT
   cpu_write_mem(&cpu, cpu.sp, 188);
   cpu_write_mem(&cpu, cpu.sp + 1, 254);
 
-  int code_found = execute_instruction(&cpu, 0xe1);
+  int code_found = execute_instruction(&cpu, 0xe1); // NOLINT
 
   CU_ASSERT(code_found == 0);
-  CU_ASSERT(cpu.l == 188);
-  CU_ASSERT(cpu.h == 254);
-  CU_ASSERT(cpu.sp == 56032);
+  CU_ASSERT(cpu.l == 188);    // NOLINT
+  CU_ASSERT(cpu.h == 254);    // NOLINT
+  CU_ASSERT(cpu.sp == 56032); // NOLINT
 }
 
 void
@@ -277,7 +277,7 @@ test_opcode_0xf1(void) // NOLINT
   cpu.flags = 0x50;                      // NOLINT
   cpu.a = 0x19;                          // NOLINT
 
-  int code_found = execute_instruction(&cpu, 0xf1);
+  int code_found = execute_instruction(&cpu, 0xf1); // NOLINT
 
   CU_ASSERT(code_found == 0);
   CU_ASSERT_EQUAL(cpu.flags, 0xA8); // NOLINT
@@ -293,7 +293,7 @@ test_opcode_0xcd(void) // NOLINT
 
   cpu.pc = 0xABCD;                       // NOLINT
   cpu.sp = 0xDCBA;                       // NOLINT
-  int16_t temp = cpu.sp;                 // Holds original sp addr
+  uint16_t temp = cpu.sp;                // Holds original sp addr
   cpu_write_mem(&cpu, cpu.pc + 1, 0xFE); // NOLINT
   cpu_write_mem(&cpu, cpu.pc + 2, 0xEF); // NOLINT
 
@@ -323,6 +323,7 @@ test_opcode_0xc3(void) // NOLINT
   CU_ASSERT_EQUAL(cpu.pc, 0x9C1E); // NOLINT
 }
 
+void
 test_opcode_0x23(void) // NOLINT
 {
   i8080 cpu;
