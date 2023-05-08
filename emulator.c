@@ -237,12 +237,10 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         cpu->pc = address;
         return 0;
       }
-    case 0xcd: // NOLINT
-      {        // CALL ADDR
-        uint16_t pc_addr
-            = cpu_read_mem(cpu, cpu->pc); // get next instruction address.
-        cpu_write_mem(cpu, cpu->sp - 1, (pc_addr >> 8));  // NOLINT
-        cpu_write_mem(cpu, cpu->sp - 2, (pc_addr & 255)); // NOLINT
+    case 0xcd:                                            // NOLINT
+      {                                                   // CALL ADDR
+        cpu_write_mem(cpu, cpu->sp - 1, (cpu->pc >> 8));  // NOLINT
+        cpu_write_mem(cpu, cpu->sp - 2, (cpu->pc & 255)); // NOLINT
 
         cpu->sp -= 2;
         cpu->pc = (cpu_read_mem(cpu, cpu->pc + 2) << 8)

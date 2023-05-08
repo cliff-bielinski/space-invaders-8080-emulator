@@ -223,16 +223,34 @@ test_opcode_0xcd(void) // NOLINT
 
   cpu.pc = 0xABCD;                       // NOLINT
   cpu.sp = 0xDCBA;                       // NOLINT
+  int16_t temp = cpu.sp;                 // Holds original sp addr
   cpu_write_mem(&cpu, cpu.pc + 1, 0xFE); // NOLINT
   cpu_write_mem(&cpu, cpu.pc + 2, 0xEF); // NOLINT
 
   int code_found = execute_instruction(&cpu, 0xcd); // NOLINT
 
   CU_ASSERT(code_found == 0);
-  CU_ASSERT_EQUAL(cpu.sp - 1, 0xAB);   // NOLINT
-  CU_ASSERT_EQUAL(cpu.sp - 2, 0xCD);   // NOLINT
-  CU_ASSERT_EQUAL(cpu.sp, 0xDCBA - 2); // NOLINT
-  CU_ASSERT_EQUAL(cpu.pc, 0xEFFE);     // NOLINT
+  CU_ASSERT_EQUAL(cpu_read_mem(&cpu, temp - 1), 0xAB); // NOLINT
+  CU_ASSERT_EQUAL(cpu_read_mem(&cpu, temp - 2), 0xCD); // NOLINT
+  CU_ASSERT_EQUAL(cpu.sp, 0xDCBA - 2);                 // NOLINT
+  CU_ASSERT_EQUAL(cpu.pc, 0xEFFE);                     // NOLINT
+}
+
+void
+test_opcode_0xc3(void) // NOLINT
+{
+  // JMP
+  i8080 cpu;
+  cpu_init(&cpu);
+
+  cpu.pc = 0xCDEB;                       // NOLINT
+  cpu_write_mem(&cpu, cpu.pc + 1, 0x1E); // NOLINT
+  cpu_write_mem(&cpu, cpu.pc + 2, 0x9c); // NOLINT
+
+  int code_found = execute_instruction(&cpu, 0xc3); // NOLINT
+
+  CU_ASSERT(code_found == 0);
+  CU_ASSERT_EQUAL(cpu.pc, 0x9C1E); // NOLINT
 }
 
 test_opcode_0x23(void) // NOLINT
@@ -562,7 +580,13 @@ main(void)
                          test_opcode_0xe1))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0xf1()",
-                         test_opcode_0xf1)))
+                         test_opcode_0xf1))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0xcd()",
+                         test_opcode_0xcd))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0xc3()",
+                         test_opcode_0xc3)))
     {
       CU_cleanup_registry();
       return CU_get_error();
