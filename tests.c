@@ -175,6 +175,25 @@ test_opcode_0xa7(void) // NOLINT
   CU_ASSERT((cpu.flags & FLAG_CY) == 0);
 }
 
+void
+test_opcode_0xe1(void) // NOLINT
+{
+  // POP H
+  i8080 cpu;
+  cpu_init(&cpu);
+
+  cpu.sp = 56030;
+  cpu_write_mem(&cpu, cpu.sp, 188);
+  cpu_write_mem(&cpu, cpu.sp + 1, 254);
+
+  int code_found = execute_instruction(&cpu, 0xe1);
+
+  CU_ASSERT(code_found == 0);
+  CU_ASSERT(cpu.l == 188);
+  CU_ASSERT(cpu.h == 254);
+  CU_ASSERT(cpu.sp == 56032);
+}
+
 test_opcode_0x23(void) // NOLINT
 {
   i8080 cpu;
@@ -496,7 +515,10 @@ main(void)
                          test_opcode_0xfe))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x7a()",
-                         test_opcode_0x7a)))
+                         test_opcode_0x7a))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0xe1()",
+                         test_opcode_0xe1)))
     {
       CU_cleanup_registry();
       return CU_get_error();

@@ -239,7 +239,9 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       }
     case 0xcd: // NOLINT
       {        // CALL ADDR
-        
+        uint16_t pc_addr = cpu_read_mem(cpu, cpu->pc + 2);
+        cpu_write_mem(cpu, cpu->sp - 1, (pc_addr >> 8) & 255);
+        cpu_write_mem(cpu, cpu->sp - 2, (pc_addr & 255));        
         break;
       }
     case 0xd1: // NOLINT
@@ -256,8 +258,12 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         break;
       }
     case 0xe1: // NOLINT
-      printf("POP H");
-      break;
+      { //POP H
+        cpu->l = cpu_read_mem(cpu, cpu->sp);
+        cpu->h = cpu_read_mem(cpu, cpu->sp + 1);
+        cpu->sp += 2;
+        break;
+      }
     case 0xe5: // NOLINT
       printf("PUSH H");
       break;
