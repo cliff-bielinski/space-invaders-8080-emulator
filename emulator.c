@@ -215,8 +215,13 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         break;
       }
     case 0xc3: // NOLINT
-      printf("JMP ");
-      break;
+      {        // JMP
+        // address format is instruction byte 3 byte 2 little endian.
+        uint16_t address = cpu_read_mem(cpu, cpu->pc + 2);
+        address = (address << 8) | cpu_read_mem(cpu, cpu->pc + 1);
+        cpu->pc = address;
+        return 0; // no PC increment due to JMP.
+      }
     case 0xc5: // NOLINT
       printf("PUSH B");
       break;
@@ -233,8 +238,10 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         return 0;
       }
     case 0xcd: // NOLINT
-      printf("CALL ");
-      break;
+      {        // CALL ADDR
+        
+        break;
+      }
     case 0xd1: // NOLINT
       printf("POP D");
       break;
