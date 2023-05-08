@@ -94,13 +94,13 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
     case 0x19: // NOLINT
       {        // DAD D
         uint16_t sum
-            = (cpu->h << 8)
-              | (cpu->l); // convert reg pair h,l to 16 bit int // NOLINT
+            = (cpu->h << 8) // NOLINT
+              | (cpu->l);   // convert reg pair h,l to 16 bit int // NOLINT
         sum = sum + cpu->d;
 
-        cpu->h = sum >> 8;
-        cpu->l = sum & 255;
-        update_carry_flag(cpu, sum > 65535);
+        cpu->h = sum >> 8;                   // NOLINT
+        cpu->l = sum & 255;                  // NOLINT
+        update_carry_flag(cpu, sum > 65535); // NOLINT
 
         break;
       }
