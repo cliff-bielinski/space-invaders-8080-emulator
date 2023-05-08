@@ -94,7 +94,8 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
     case 0x19: // NOLINT
       {        // DAD D
         uint16_t sum
-            = (cpu->h << 8) | (cpu->l); // convert reg pair h,l to 16 bit int
+            = (cpu->h << 8)
+              | (cpu->l); // convert reg pair h,l to 16 bit int // NOLINT
         sum = sum + cpu->d;
 
         cpu->h = sum >> 8;
@@ -164,8 +165,8 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       }
     case 0x36: // NOLINT
       {        // MVI M, D8
-        uint16_t address
-            = (cpu->h << 8) | cpu->l; // Address is stored in reg h,l.
+               // Address is stored in reg h,l.
+        uint16_t address = (cpu->h << 8) | cpu->l; // NOLINT
 
         cpu_write_mem(cpu, address, cpu_read_mem(cpu, cpu->pc + 1));
 
@@ -193,8 +194,8 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       }
     case 0x5e: // NOLINT
       {        // MOV E,M
-        uint16_t address
-            = (cpu->h << 8) | cpu->l; // Address is stored in reg h,l.
+        // Address is stored in reg h,l.
+        uint16_t address = (cpu->h << 8) | cpu->l; // NOLINT
 
         cpu->e = cpu_read_mem(cpu, address);
 
@@ -283,7 +284,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       {        // JMP
         // address format is instruction byte 3 byte 2 little endian.
         uint16_t address = cpu_read_mem(cpu, cpu->pc + 2);
-        address = (address << 8) | cpu_read_mem(cpu, cpu->pc + 1);
+        address = (address << 8) | cpu_read_mem(cpu, cpu->pc + 1); // NOLINT
         cpu->pc = address;
         return 0; // no PC increment due to JMP.
       }
@@ -313,7 +314,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         cpu_write_mem(cpu, cpu->sp - 2, (cpu->pc & 255)); // NOLINT
 
         cpu->sp -= 2;
-        cpu->pc = (cpu_read_mem(cpu, cpu->pc + 2) << 8)
+        cpu->pc = (cpu_read_mem(cpu, cpu->pc + 2) << 8) // NOLINT
                   | (cpu_read_mem(cpu, cpu->pc + 1));
         return 0;
       }

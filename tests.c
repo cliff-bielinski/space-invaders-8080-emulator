@@ -377,6 +377,7 @@ test_opcode_0xc3(void) // NOLINT
   CU_ASSERT_EQUAL(cpu.pc, 0x9C1E); // NOLINT
 }
 
+void
 test_opcode_0x1a(void) // NOLINT
 {                      // LDAX D
 
