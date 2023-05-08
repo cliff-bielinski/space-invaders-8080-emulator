@@ -252,9 +252,9 @@ test_opcode_0xe1(void) // NOLINT
   i8080 cpu;
   cpu_init(&cpu);
 
-  cpu.sp = 56030; // NOLINT
-  cpu_write_mem(&cpu, cpu.sp, 188);
-  cpu_write_mem(&cpu, cpu.sp + 1, 254);
+  cpu.sp = 56030;                       // NOLINT
+  cpu_write_mem(&cpu, cpu.sp, 188);     // NOLINT
+  cpu_write_mem(&cpu, cpu.sp + 1, 254); // NOLINT
 
   int code_found = execute_instruction(&cpu, 0xe1); // NOLINT
 
