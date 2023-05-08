@@ -154,6 +154,27 @@ test_opcode_0x7a(void) // NOLINT
   CU_ASSERT(cpu.a == 100);
 }
 
+void
+test_opcode_0xa7(void) // NOLINT
+{
+  // ANA A
+  i8080 cpu;
+  cpu_init(&cpu);
+
+  cpu.a = 85;
+  cpu.flags = 136; // sign flag and CY flag set.
+
+  int code_found = execute_instruction(&cpu, 0xa7);
+
+  CU_ASSERT(code_found == 0);
+  CU_ASSERT(cpu.a == 85);
+  CU_ASSERT((cpu.flags & FLAG_Z) == 0);
+  CU_ASSERT((cpu.flags & FLAG_S) == 0);
+  CU_ASSERT((cpu.flags & FLAG_P) == FLAG_P);
+  CU_ASSERT((cpu.flags & FLAG_AC) == 0);
+  CU_ASSERT((cpu.flags & FLAG_CY) == 0);
+}
+
 test_opcode_0x23(void) // NOLINT
 {
   i8080 cpu;

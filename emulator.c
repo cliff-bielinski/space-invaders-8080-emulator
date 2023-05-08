@@ -182,8 +182,18 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         break;
       }
     case 0xa7: // NOLINT
-      printf("ANA A");
-      break;
+      {        // ANA A
+        uint8_t temp = cpu->a;
+        cpu->a = cpu->a & cpu->a;
+
+        update_zero_flag(cpu, cpu->a);
+        update_sign_flag(cpu, cpu->a);
+        update_parity_flag(cpu, cpu->a);
+        update_aux_carry_flag(cpu, temp, cpu->a);
+        update_carry_flag(cpu, false);
+
+        break;
+      }
     case 0xaf: // NOLINT
       printf("XRA A");
       break;
