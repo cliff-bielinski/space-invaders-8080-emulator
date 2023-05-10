@@ -93,14 +93,18 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       }
     case 0x19: // NOLINT
       {        // DAD D
-        uint16_t sum
+        uint32_t sum
             = (cpu->h << 8) // NOLINT
               | (cpu->l);   // convert reg pair h,l to 16 bit int // NOLINT
-        sum = sum + cpu->d;
 
-        cpu->h = sum >> 8;                   // NOLINT
-        cpu->l = sum & 255;                  // NOLINT
-        update_carry_flag(cpu, sum > 65535); // NOLINT
+        // Convert rep pair d,e to 16 bit int.
+        uint32_t reg_de = (cpu->d << 8) | (cpu->e); // NOLINT
+
+        sum += reg_de;
+
+        cpu->h = sum >> 8;                      // NOLINT
+        cpu->l = sum & 0xFF;                    // NOLINT
+        update_carry_flag(cpu, (sum > 0xFFFF)); // NOLINT
 
         break;
       }
@@ -308,10 +312,10 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         cpu->pc = address;
         return 0;
       }
-    case 0xcd:                                            // NOLINT
-      {                                                   // CALL ADDR
-        cpu_write_mem(cpu, cpu->sp - 1, (cpu->pc >> 8));  // NOLINT
-        cpu_write_mem(cpu, cpu->sp - 2, (cpu->pc & 255)); // NOLINT
+    case 0xcd:                                             // NOLINT
+      {                                                    // CALL ADDR
+        cpu_write_mem(cpu, cpu->sp - 1, (cpu->pc >> 8));   // NOLINT
+        cpu_write_mem(cpu, cpu->sp - 2, (cpu->pc & 0xFF)); // NOLINT
 
         cpu->sp -= 2;
         cpu->pc = (cpu_read_mem(cpu, cpu->pc + 2) << 8) // NOLINT
