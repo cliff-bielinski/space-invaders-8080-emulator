@@ -24,8 +24,8 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       break;
     case 0x09: // NOLINT
       printf("DAD B");
-      uint32_t bc = (cpu->b << 8) | (cpu->c);
-      uint32_t hl = (cpu->h << 8) | (cpu->l);
+      uint32_t bc = (cpu->b << 8) | (cpu->c); //NOLINT
+      uint32_t hl = (cpu->h << 8) | (cpu->l); //NOLINT
       uint32_t result = hl + bc;
       update_carry_flag(cpu, result > 0xFF); //NOLINT
       cpu->h = (result & 0xff00) >> 8; //NOLINT
@@ -175,6 +175,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       printf("OUT ");
       // cpu->a will be byte one and port to write to is port 2
       uint8_t port = cpu_read_mem(cpu, cpu->pc + 1);
+      printf("%u", port)
       cpu->pc += 2;
       break;
     case 0xd5: // NOLINT
