@@ -27,9 +27,9 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       uint32_t bc = (cpu->b << 8) | (cpu->c);
       uint32_t hl = (cpu->h << 8) | (cpu->l);
       uint32_t result = hl + bc;
-      update_carry_flag(cpu, result > 0xFF);
-      cpu->h = (result & 0xff00) >> 8;
-      cpu->l = (result & 0xff);
+      update_carry_flag(cpu, result > 0xFF); //NOLINT
+      cpu->h = (result & 0xff00) >> 8; //NOLINT
+      cpu->l = (result & 0xff); //NOLINT
       break;
     case 0x0d: // NOLINT
       printf("DCR C");
@@ -80,6 +80,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       break;
     case 0x31: // NOLINT
       printf("LXI SP");
+      //NOLINTNEXTLINE
       cpu->sp = cpu_read_mem(cpu, cpu->pc + 1) | (cpu_read_mem(cpu, cpu->pc + 2) << 8);
       cpu->pc += 2;
       break;
@@ -156,7 +157,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       update_zero_flag(cpu, (uint8_t)answer);
       update_sign_flag(cpu, (uint8_t)answer);
       update_parity_flag(cpu, (uint8_t)answer);
-      update_carry_flag(cpu, answer > 0xFF);
+      update_carry_flag(cpu, answer > 0xFF); //NOLINT
       update_aux_carry_flag(cpu, cpu->a, immediate);
       cpu->a = (uint8_t)answer;
       cpu->pc += 2;
