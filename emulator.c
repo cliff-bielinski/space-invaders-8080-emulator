@@ -192,8 +192,8 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       update_zero_flag(cpu, cpu->a);
       update_sign_flag(cpu, cpu->a);
       update_parity_flag(cpu, cpu->a);
-      cpu->flags | FLAG_CY;
-      cpu->flags | FLAG_AC;
+      cpu->flags |= FLAG_CY;
+      cpu->flags |= FLAG_AC;
       cpu->pc += 2;
       break;
     case 0xeb: // NOLINT
