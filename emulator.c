@@ -152,13 +152,13 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       printf("ADI ");
       // Affects Z, S, P, CY, AC
       uint8_t immediate = cpu_read_mem(cpu, cpu->pc + 1);
-      uint16_t result = cpu->a + immediate;
-      update_zero_flag(cpu, (uint8_t)result);
-      update_sign_flag(cpu, (uint8_t)result);
-      update_parity_flag(cpu, (uint8_t)result);
-      update_carry_flag(cpu, result > 0xFF);
+      uint16_t answer = cpu->a + immediate;
+      update_zero_flag(cpu, (uint8_t)answer);
+      update_sign_flag(cpu, (uint8_t)answer);
+      update_parity_flag(cpu, (uint8_t)answer);
+      update_carry_flag(cpu, answer > 0xFF);
       update_aux_carry_flag(cpu, cpu->a, immediate);
-      cpu->a = (uint8_t)result;
+      cpu->a = (uint8_t)answer;
       cpu->pc += 2;
       break;
     case 0xc9: // NOLINT
