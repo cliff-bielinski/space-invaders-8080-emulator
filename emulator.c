@@ -82,7 +82,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       printf("LXI SP");
       // NOLINTNEXTLINE
       cpu->sp = cpu_read_mem(cpu, cpu->pc + 1)
-                | (cpu_read_mem(cpu, cpu->pc + 2) << 8); //NOLINT
+                | (cpu_read_mem(cpu, cpu->pc + 2) << 8); // NOLINT
       cpu->pc += 2;
       break;
     case 0x32: // NOLINT
