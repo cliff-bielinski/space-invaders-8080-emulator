@@ -175,7 +175,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       printf("OUT ");
       // cpu->a will be byte one and port to write to is port 2
       uint8_t port = cpu_read_mem(cpu, cpu->pc + 1);
-      printf("%u", port)
+      printf("%u", port);
       cpu->pc += 2;
       break;
     case 0xd5: // NOLINT
