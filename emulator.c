@@ -21,8 +21,16 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         break;
       }
     case 0x05: // NOLINT
-      printf("DCR B");
-      break;
+      {        // DCR B
+        cpu->b -= 1;
+
+        update_zero_flag(cpu, cpu->b);
+        update_sign_flag(cpu, cpu->b);
+        update_parity_flag(cpu, cpu->b);
+        update_aux_carry_flag(cpu, cpu->b, 0xFF); // NOLINT
+
+        break;
+      }
     case 0x06: // NOLINT
       {        // MVI B, mem8
         cpu->b = cpu_read_mem(cpu, cpu->pc + 1);
@@ -43,8 +51,11 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         break;
       }
     case 0x0e: // NOLINT
-      printf("MVI C");
-      break;
+      {        // MVI C, D8
+        cpu->c = cpu_read_mem(cpu, (cpu->pc + 1));
+        cpu->pc += 1;
+        break;
+      }
     case 0x0f: // NOLINT
       {        // RRC
 
@@ -81,8 +92,22 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         break;
       }
     case 0x19: // NOLINT
-      printf("DAD D");
-      break;
+      {        // DAD D
+        uint32_t sum
+            = (cpu->h << 8) // NOLINT
+              | (cpu->l);   // convert reg pair h,l to 16 bit int // NOLINT
+
+        // Convert rep pair d,e to 16 bit int.
+        uint32_t reg_de = (cpu->d << 8) | (cpu->e); // NOLINT
+
+        sum += reg_de;
+
+        cpu->h = sum >> 8;                      // NOLINT
+        cpu->l = sum & 0xFF;                    // NOLINT
+        update_carry_flag(cpu, (sum > 0xFFFF)); // NOLINT
+
+        break;
+      }
     case 0x1a: // NOLINT
       {        // LDAX D
                // get addr
@@ -110,8 +135,11 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         break;
       }
     case 0x26: // NOLINT
-      printf("MVI H");
-      break;
+      {        // MVI H, D8
+        cpu->h = cpu_read_mem(cpu, cpu->pc + 1);
+        cpu->pc += 1;
+        break;
+      }
     case 0x29: // NOLINT
       {        // DAD H
         uint32_t sum = cpu->h;
@@ -140,8 +168,15 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         break;
       }
     case 0x36: // NOLINT
-      printf("MVI M");
-      break;
+      {        // MVI M, D8
+               // Address is stored in reg h,l.
+        uint16_t address = (cpu->h << 8) | cpu->l; // NOLINT
+
+        cpu_write_mem(cpu, address, cpu_read_mem(cpu, cpu->pc + 1));
+
+        cpu->pc += 1;
+        break;
+      }
     case 0x3a: // NOLINT
       {        // LDA adr
         uint16_t addr = cpu_read_mem(cpu, cpu->pc + 2);
@@ -162,8 +197,14 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         break;
       }
     case 0x5e: // NOLINT
-      printf("MOV E,M");
-      break;
+      {        // MOV E,M
+        // Address is stored in reg h,l.
+        uint16_t address = (cpu->h << 8) | cpu->l; // NOLINT
+
+        cpu->e = cpu_read_mem(cpu, address);
+
+        break;
+      }
     case 0x66: // NOLINT
       {        // MOV H,M
         uint16_t addr = cpu->h;
@@ -182,8 +223,10 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         break;
       }
     case 0x7a: // NOLINT
-      printf("MOV A,D");
-      break;
+      {        // MOV A,D
+        cpu->a = cpu->d;
+        break;
+      }
     case 0x7b: // NOLINT
       {        // MOV A,E
         cpu->a = cpu->e;
@@ -200,8 +243,18 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         break;
       }
     case 0xa7: // NOLINT
-      printf("ANA A");
-      break;
+      {        // ANA A
+        uint8_t temp = cpu->a;
+        cpu->a = cpu->a & cpu->a;
+
+        update_zero_flag(cpu, cpu->a);
+        update_sign_flag(cpu, cpu->a);
+        update_parity_flag(cpu, cpu->a);
+        update_aux_carry_flag(cpu, temp, cpu->a);
+        update_carry_flag(cpu, false);
+
+        break;
+      }
     case 0xaf: // NOLINT
       {        // XRA A
         uint8_t result = cpu->a ^ cpu->a;
@@ -232,8 +285,13 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         break;
       }
     case 0xc3: // NOLINT
-      printf("JMP ");
-      break;
+      {        // JMP
+        // address format is instruction byte 3 byte 2 little endian.
+        uint16_t address = cpu_read_mem(cpu, cpu->pc + 2);
+        address = (address << 8) | cpu_read_mem(cpu, cpu->pc + 1); // NOLINT
+        cpu->pc = address;
+        return 0; // no PC increment due to JMP.
+      }
     case 0xc5: // NOLINT
       {        // PUSH B
         cpu_write_mem(cpu, cpu->sp - 1, cpu->b);
@@ -254,9 +312,16 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         cpu->pc = address;
         return 0;
       }
-    case 0xcd: // NOLINT
-      printf("CALL ");
-      break;
+    case 0xcd:                                             // NOLINT
+      {                                                    // CALL ADDR
+        cpu_write_mem(cpu, cpu->sp - 1, (cpu->pc >> 8));   // NOLINT
+        cpu_write_mem(cpu, cpu->sp - 2, (cpu->pc & 0xFF)); // NOLINT
+
+        cpu->sp -= 2;
+        cpu->pc = (cpu_read_mem(cpu, cpu->pc + 2) << 8) // NOLINT
+                  | (cpu_read_mem(cpu, cpu->pc + 1));
+        return 0;
+      }
     case 0xd1: // NOLINT
       {
         // POP D
@@ -277,8 +342,12 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         break;
       }
     case 0xe1: // NOLINT
-      printf("POP H");
-      break;
+      {        // POP H
+        cpu->l = cpu_read_mem(cpu, cpu->sp);
+        cpu->h = cpu_read_mem(cpu, cpu->sp + 1);
+        cpu->sp += 2;
+        break;
+      }
     case 0xe5: // NOLINT
       {        // PUSH H
         cpu_write_mem(cpu, cpu->sp - 1, cpu->h);
@@ -304,8 +373,12 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         break;
       }
     case 0xf1: // NOLINT
-      printf("POP PSW");
-      break;
+      {        // POP PSW
+        cpu->flags = cpu_read_mem(cpu, cpu->sp);
+        cpu->a = cpu_read_mem(cpu, cpu->sp + 1);
+        cpu->sp += 2;
+        break;
+      }
     case 0xf5: // NOLINT
       {        // PUSH PSW
         cpu_write_mem(cpu, cpu->sp - 1, cpu->a);
@@ -454,6 +527,7 @@ update_carry_flag(i8080 *cpu, bool carry_occurred)
       cpu->flags &= ~FLAG_CY;
     }
 }
+
 int
 count_set_bits(uint8_t value)
 {
@@ -481,6 +555,7 @@ update_parity_flag(i8080 *cpu, uint8_t result)
       cpu->flags &= ~FLAG_P;
     }
 }
+
 bool
 is_sign_flag_set(i8080 *cpu)
 {
