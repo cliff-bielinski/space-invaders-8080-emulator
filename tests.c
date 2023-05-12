@@ -21,7 +21,8 @@ clean_suite(void)
 
 /* Add tests here */
 
-void test_opcode_0x00(void) //NOLINT 
+void
+test_opcode_0x00(void) // NOLINT
 {
   i8080 cpu;
   cpu_init(&cpu);
@@ -73,7 +74,8 @@ test_opcode_0x06(void) // NOLINT
   cpu_write_mem(&cpu, 0x0001, 0x00);
 }
 
-void test_opcode_0x09(void)
+void
+test_opcode_0x09(void)
 {
   i8080 cpu;
   cpu_init(&cpu);
@@ -83,10 +85,10 @@ void test_opcode_0x09(void)
   cpu.h = 0xAB; // NOLINT
   cpu.l = 0xCD; // NOLINT
 
-  uint16_t initial_hl = (cpu.h << 8) | cpu.l; // NOLINT
-  uint16_t initial_bc = (cpu.b << 8) | cpu.c; // NOLINT
-  int code_found = execute_instruction(&cpu, 0x09); // NOLINT
-  uint16_t result_hl = (cpu.h << 8) | cpu.l; // NOLINT
+  uint16_t initial_hl = (cpu.h << 8) | cpu.l;               // NOLINT
+  uint16_t initial_bc = (cpu.b << 8) | cpu.c;               // NOLINT
+  int code_found = execute_instruction(&cpu, 0x09);         // NOLINT
+  uint16_t result_hl = (cpu.h << 8) | cpu.l;                // NOLINT
   bool carry_occurred = (initial_hl + initial_bc) > 0xFFFF; // NOLINT
   CU_ASSERT(code_found == 0);
   CU_ASSERT(cpu.pc == initial_pc + 1);
@@ -97,7 +99,6 @@ void test_opcode_0x09(void)
   cpu.c = 0;
   cpu.h = 0;
   cpu.l = 0;
-
 }
 
 void
@@ -175,14 +176,14 @@ test_opcode_0x0f(void) // NOLINT
   CU_ASSERT(FLAG_CY == (cpu.flags & FLAG_CY));
 }
 
-void test_opcode_0x11(void)
+void
+test_opcode_0x11(void)
 {
   i8080 cpu;
   cpu_init(&cpu);
   uint16_t initial_pc = cpu.pc;
   cpu_write_mem(&cpu, 0x0001, 0x34); // NOLINT
   cpu_write_mem(&cpu, 0x0002, 0x12); // NOLINT
-
 
   int code_found = execute_instruction(&cpu, 0x11); // NOLINT
   CU_ASSERT(code_found == 0);
@@ -194,7 +195,6 @@ void test_opcode_0x11(void)
   cpu.e = 0;
   cpu_write_mem(&cpu, 0x0001, 0x00);
   cpu_write_mem(&cpu, 0x0002, 0x00);
-
 }
 
 void
@@ -287,14 +287,14 @@ test_opcode_0x19(void) // NOLINT
   CU_ASSERT((cpu.flags & FLAG_CY) == 0);
 }
 
-void test_opcode_0x21(void)
+void
+test_opcode_0x21(void)
 {
   i8080 cpu;
   cpu_init(&cpu);
   uint16_t initial_pc = cpu.pc;
   cpu_write_mem(&cpu, 0x0001, 0x78); // NOLINT
   cpu_write_mem(&cpu, 0x0002, 0x56); // NOLINT
-
 
   int code_found = execute_instruction(&cpu, 0x21); // NOLINT
   CU_ASSERT(code_found == 0);
@@ -306,7 +306,6 @@ void test_opcode_0x21(void)
   cpu.l = 0;
   cpu_write_mem(&cpu, 0x0001, 0x00);
   cpu_write_mem(&cpu, 0x0002, 0x00);
-
 }
 
 void
@@ -327,7 +326,8 @@ test_opcode_0x26(void)
   cpu_write_mem(&cpu, 0x4564, 0x00); // NOLINT
 }
 
-void test_opcode_0x31(void)
+void
+test_opcode_0x31(void)
 {
   i8080 cpu;
   cpu_init(&cpu);
@@ -335,17 +335,15 @@ void test_opcode_0x31(void)
   cpu_write_mem(&cpu, 0x0001, 0xAB); // NOLINT
   cpu_write_mem(&cpu, 0x0002, 0xCD); // NOLINT
 
-
   int code_found = execute_instruction(&cpu, 0x31); // NOLINT
   CU_ASSERT(code_found == 0);
   CU_ASSERT(cpu.pc == initial_pc + 3);
 
   CU_ASSERT(cpu.sp == 0xCDAB);
   cpu.sp = 0;
- 
+
   cpu_write_mem(&cpu, 0x0001, 0x00);
   cpu_write_mem(&cpu, 0x0002, 0x00);
-
 }
 
 void
@@ -368,7 +366,8 @@ test_opcode_0x36(void)
   cpu_write_mem(&cpu, 0x4353, 0x00); // NOLINT
 }
 
-void test_opcode_0x3e(void)
+void
+test_opcode_0x3e(void)
 {
   i8080 cpu;
   cpu_init(&cpu);
@@ -381,11 +380,12 @@ void test_opcode_0x3e(void)
 
   CU_ASSERT(cpu.a == 0xEF);
   cpu.a = 0;
- 
+
   cpu_write_mem(&cpu, 0x0001, 0x00);
 }
 
-void test_opcode_0x6f(void)
+void
+test_opcode_0x6f(void)
 {
   i8080 cpu;
   cpu_init(&cpu);
@@ -401,13 +401,14 @@ void test_opcode_0x6f(void)
   cpu.l = 0;
 }
 
-void test_opcode_0xc1(void)
+void
+test_opcode_0xc1(void)
 {
   i8080 cpu;
   cpu_init(&cpu);
   uint16_t initial_pc = cpu.pc;
-  cpu.sp = 0x1000; // NOLINT
-  cpu_write_mem(&cpu, cpu.sp, 0x78); // NOLINT
+  cpu.sp = 0x1000;                       // NOLINT
+  cpu_write_mem(&cpu, cpu.sp, 0x78);     // NOLINT
   cpu_write_mem(&cpu, cpu.sp + 1, 0x56); // NOLINT
 
   int code_found = execute_instruction(&cpu, 0xc1); // NOLINT
@@ -424,19 +425,20 @@ void test_opcode_0xc1(void)
   cpu_write_mem(&cpu, 0x1001, 0x00); // NOLINT
 }
 
-void test_opcode_0xc6(void)
+void
+test_opcode_0xc6(void)
 {
   i8080 cpu;
   cpu_init(&cpu);
   uint16_t initial_pc = cpu.pc;
-  cpu.a = 0x50; // NOLINT
+  cpu.a = 0x50;                      // NOLINT
   cpu_write_mem(&cpu, 0x0001, 0x28); // NOLINT
 
   int code_found = execute_instruction(&cpu, 0xc6); // NOLINT
   CU_ASSERT(code_found == 0);
   CU_ASSERT(cpu.pc == initial_pc + 2);
   CU_ASSERT(cpu.a == 0x78);
-  
+
   // Flags
   CU_ASSERT((cpu.flags & FLAG_Z) == 0);
   CU_ASSERT((cpu.flags & FLAG_S) == 0);
@@ -448,7 +450,8 @@ void test_opcode_0xc6(void)
   cpu_write_mem(&cpu, 0x0001, 0x00);
 }
 
-void test_opcode_0xd3(void)
+void
+test_opcode_0xd3(void)
 {
   i8080 cpu;
   cpu_init(&cpu);
@@ -464,7 +467,8 @@ void test_opcode_0xd3(void)
   cpu_write_mem(&cpu, 0x0001, 0x00);
 }
 
-void test_opcode_0x7c(void)
+void
+test_opcode_0x7c(void)
 {
   i8080 cpu;
   cpu_init(&cpu);
@@ -480,12 +484,13 @@ void test_opcode_0x7c(void)
   cpu.h = 0;
 }
 
-void test_opcode_0xe6(void)
+void
+test_opcode_0xe6(void)
 {
   i8080 cpu;
   cpu_init(&cpu);
   uint16_t initial_pc = cpu.pc;
-  cpu.a = 0x5F; // NOLINT
+  cpu.a = 0x5F;                      // NOLINT
   cpu_write_mem(&cpu, 0x0001, 0x3C); // NOLINT
 
   int code_found = execute_instruction(&cpu, 0xe6); // NOLINT
@@ -500,12 +505,12 @@ void test_opcode_0xe6(void)
   CU_ASSERT((cpu.flags & FLAG_CY) == 0);
   CU_ASSERT((cpu.flags & FLAG_AC) == 0);
 
-
   cpu.a = 0;
   cpu_write_mem(&cpu, 0x0001, 0x00);
 }
 
-void test_opcode_0xfb(void)
+void
+test_opcode_0xfb(void)
 {
   i8080 cpu;
   cpu_init(&cpu);
