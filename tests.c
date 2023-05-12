@@ -78,16 +78,16 @@ void test_opcode_0x09(void)
   i8080 cpu;
   cpu_init(&cpu);
   uint16_t initial_pc = cpu.pc;
-  cpu.b = 0x12;
-  cpu.c = 0x34;
-  cpu.h = 0xAB;
-  cpu.l = 0xCD;
+  cpu.b = 0x12; //nolint
+  cpu.c = 0x34; //nolint
+  cpu.h = 0xAB; //nolint
+  cpu.l = 0xCD; //nolint
 
-  uint16_t initial_hl = (cpu.h << 8) | cpu.l;
-  uint16_t initial_bc = (cpu.b << 8) | cpu.c;
-  int code_found = execute_instruction(&cpu, 0x09);
-  uint16_t result_hl = (cpu.h << 8) | cpu.l;
-  bool carry_occurred = (initial_hl + initial_bc) > 0xFFFF;
+  uint16_t initial_hl = (cpu.h << 8) | cpu.l; //nolint
+  uint16_t initial_bc = (cpu.b << 8) | cpu.c; //nolint
+  int code_found = execute_instruction(&cpu, 0x09); //nolint
+  uint16_t result_hl = (cpu.h << 8) | cpu.l; //nolint
+  bool carry_occurred = (initial_hl + initial_bc) > 0xFFFF; //nolint
   CU_ASSERT(code_found == 0);
   CU_ASSERT(cpu.pc == initial_pc + 1);
 
@@ -180,11 +180,11 @@ void test_opcode_0x11(void)
   i8080 cpu;
   cpu_init(&cpu);
   uint16_t initial_pc = cpu.pc;
-  cpu_write_mem(&cpu, 0x0001, 0x34);
-  cpu_write_mem(&cpu, 0x0002, 0x12);
+  cpu_write_mem(&cpu, 0x0001, 0x34); //nolint
+  cpu_write_mem(&cpu, 0x0002, 0x12); //nolint
 
 
-  int code_found = execute_instruction(&cpu, 0x11);
+  int code_found = execute_instruction(&cpu, 0x11); //nolint
   CU_ASSERT(code_found == 0);
   CU_ASSERT(cpu.pc == initial_pc + 3);
 
@@ -292,11 +292,11 @@ void test_opcode_0x21(void)
   i8080 cpu;
   cpu_init(&cpu);
   uint16_t initial_pc = cpu.pc;
-  cpu_write_mem(&cpu, 0x0001, 0x78);
-  cpu_write_mem(&cpu, 0x0002, 0x56);
+  cpu_write_mem(&cpu, 0x0001, 0x78); //nolint
+  cpu_write_mem(&cpu, 0x0002, 0x56); //nolint
 
 
-  int code_found = execute_instruction(&cpu, 0x21);
+  int code_found = execute_instruction(&cpu, 0x21); //nolint
   CU_ASSERT(code_found == 0);
   CU_ASSERT(cpu.pc == initial_pc + 3);
 
@@ -332,11 +332,11 @@ void test_opcode_0x31(void)
   i8080 cpu;
   cpu_init(&cpu);
   uint16_t initial_pc = cpu.pc;
-  cpu_write_mem(&cpu, 0x0001, 0xAB);
-  cpu_write_mem(&cpu, 0x0002, 0xCD);
+  cpu_write_mem(&cpu, 0x0001, 0xAB); //nolint
+  cpu_write_mem(&cpu, 0x0002, 0xCD); //nolint
 
 
-  int code_found = execute_instruction(&cpu, 0x31);
+  int code_found = execute_instruction(&cpu, 0x31); //nolint
   CU_ASSERT(code_found == 0);
   CU_ASSERT(cpu.pc == initial_pc + 3);
 
@@ -373,9 +373,9 @@ void test_opcode_0x3e(void)
   i8080 cpu;
   cpu_init(&cpu);
   uint16_t initial_pc = cpu.pc;
-  cpu_write_mem(&cpu, 0x0001, 0xEF);
+  cpu_write_mem(&cpu, 0x0001, 0xEF); //nolint
 
-  int code_found = execute_instruction(&cpu, 0x3e);
+  int code_found = execute_instruction(&cpu, 0x3e); //nolint
   CU_ASSERT(code_found == 0);
   CU_ASSERT(cpu.pc == initial_pc + 2);
 
@@ -390,9 +390,9 @@ void test_opcode_0x6f(void)
   i8080 cpu;
   cpu_init(&cpu);
   uint16_t initial_pc = cpu.pc;
-  cpu.a = 0xBD;
+  cpu.a = 0xBD; //nolint
 
-  int code_found = execute_instruction(&cpu, 0x6f);
+  int code_found = execute_instruction(&cpu, 0x6f); //nolint
   CU_ASSERT(code_found == 0);
   CU_ASSERT(cpu.pc == initial_pc + 1);
   CU_ASSERT(cpu.l == 0xBD);
@@ -406,11 +406,11 @@ void test_opcode_0xc1(void)
   i8080 cpu;
   cpu_init(&cpu);
   uint16_t initial_pc = cpu.pc;
-  cpu.sp = 0x1000;
-  cpu_write_mem(&cpu, cpu.sp, 0x78);
-  cpu_write_mem(&cpu, cpu.sp + 1, 0x56);
+  cpu.sp = 0x1000; //nolint
+  cpu_write_mem(&cpu, cpu.sp, 0x78); //nolint
+  cpu_write_mem(&cpu, cpu.sp + 1, 0x56); //nolint
 
-  int code_found = execute_instruction(&cpu, 0xc1);
+  int code_found = execute_instruction(&cpu, 0xc1); //nolint
   CU_ASSERT(code_found == 0);
   CU_ASSERT(cpu.pc == initial_pc + 1);
   CU_ASSERT(cpu.sp == 0x1002);
@@ -420,8 +420,8 @@ void test_opcode_0xc1(void)
   cpu.sp = 0;
   cpu.b = 0;
   cpu.c = 0;
-  cpu_write_mem(&cpu, 0x1000, 0x00);
-  cpu_write_mem(&cpu, 0x1001, 0x00);
+  cpu_write_mem(&cpu, 0x1000, 0x00); //nolint
+  cpu_write_mem(&cpu, 0x1001, 0x00); //nolint
 }
 
 void test_opcode_0xc6(void)
@@ -429,10 +429,10 @@ void test_opcode_0xc6(void)
   i8080 cpu;
   cpu_init(&cpu);
   uint16_t initial_pc = cpu.pc;
-  cpu.a = 0x50;
-  cpu_write_mem(&cpu, 0x0001, 0x28);
+  cpu.a = 0x50; //nolint
+  cpu_write_mem(&cpu, 0x0001, 0x28); //nolint
 
-  int code_found = execute_instruction(&cpu, 0xc6);
+  int code_found = execute_instruction(&cpu, 0xc6); //nolint
   CU_ASSERT(code_found == 0);
   CU_ASSERT(cpu.pc == initial_pc + 2);
   CU_ASSERT(cpu.a == 0x78);
@@ -453,10 +453,10 @@ void test_opcode_0xd3(void)
   i8080 cpu;
   cpu_init(&cpu);
   uint16_t initial_pc = cpu.pc;
-  cpu.a = 0x50;
+  cpu.a = 0x50; //nolint
   cpu_write_mem(&cpu, 0x0001, 0x01);
 
-  int code_found = execute_instruction(&cpu, 0xd3);
+  int code_found = execute_instruction(&cpu, 0xd3); //nolint
   CU_ASSERT(code_found == 0);
   CU_ASSERT(cpu.pc == initial_pc + 2);
 
@@ -469,9 +469,9 @@ void test_opcode_0x7c(void)
   i8080 cpu;
   cpu_init(&cpu);
   uint16_t initial_pc = cpu.pc;
-  cpu.h = 0xBD;
+  cpu.h = 0xBD; //nolint
 
-  int code_found = execute_instruction(&cpu, 0x7c);
+  int code_found = execute_instruction(&cpu, 0x7c); //nolint
   CU_ASSERT(code_found == 0);
   CU_ASSERT(cpu.pc == initial_pc + 1);
   CU_ASSERT(cpu.a == 0xBD);
@@ -485,10 +485,10 @@ void test_opcode_0xe6(void)
   i8080 cpu;
   cpu_init(&cpu);
   uint16_t initial_pc = cpu.pc;
-  cpu.a = 0x5F;
-  cpu_write_mem(&cpu, 0x0001, 0x3C);
+  cpu.a = 0x5F; //nolint
+  cpu_write_mem(&cpu, 0x0001, 0x3C); //nolint
 
-  int code_found = execute_instruction(&cpu, 0xe6);
+  int code_found = execute_instruction(&cpu, 0xe6); //nolint
   CU_ASSERT(code_found == 0);
   CU_ASSERT(cpu.pc == initial_pc + 2);
   CU_ASSERT(cpu.a == 0x1C);
@@ -512,7 +512,7 @@ void test_opcode_0xfb(void)
   uint16_t initial_pc = cpu.pc;
   cpu.interrupt_enabled = false;
 
-  int code_found = execute_instruction(&cpu, 0xfb);
+  int code_found = execute_instruction(&cpu, 0xfb); //nolint
   CU_ASSERT(code_found == 0);
   CU_ASSERT(cpu.interrupt_enabled == true);
   CU_ASSERT(cpu.pc == initial_pc);
