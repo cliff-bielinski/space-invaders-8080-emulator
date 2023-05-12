@@ -21,6 +21,16 @@ clean_suite(void)
 
 /* Add tests here */
 
+void test_opcode_0x00(void) //NOLINT 
+{
+  i8080 cpu;
+  cpu_init(&cpu);
+  uint16_t initial_pc = cpu.pc;
+  int code_found = execute_instruction(&cpu, 0x00);
+  CU_ASSERT(code_found == 0);
+  CU_ASSERT(cpu.pc == initial_pc + 1);
+}
+
 void
 test_opcode_0x01(void) // NOLINT
 {
@@ -61,6 +71,33 @@ test_opcode_0x06(void) // NOLINT
 
   // cleanup
   cpu_write_mem(&cpu, 0x0001, 0x00);
+}
+
+void test_opcode_0x09(void)
+{
+  i8080 cpu;
+  cpu_init(&cpu);
+  uint16_t initial_pc = cpu.pc;
+  cpu.b = 0x12;
+  cpu.c = 0x34;
+  cpu.h = 0xAB;
+  cpu.l = 0xCD;
+
+  uint16_t initial_hl = (cpu.h << 8) | cpu.l;
+  uint16_t initial_bc = (cpu.b << 8) | cpu.c;
+  int code_found = execute_instruction(&cpu, 0x09);
+  uint16_t result_hl = (cpu.h << 8) | cpu.l;
+  bool carry_occurred = (initial_hl + initial_bc) > 0xFFFF;
+  CU_ASSERT(code_found == 0);
+  CU_ASSERT(cpu.pc == initial_pc + 1);
+
+  CU_ASSERT(result_hl == initial_hl + initial_bc);
+  CU_ASSERT((cpu.flags & FLAG_CY) == (carry_occurred ? FLAG_CY : 0));
+  cpu.b = 0;
+  cpu.c = 0;
+  cpu.h = 0;
+  cpu.l = 0;
+
 }
 
 void
@@ -136,6 +173,28 @@ test_opcode_0x0f(void) // NOLINT
   CU_ASSERT(2 == cpu.pc);
   CU_ASSERT(0x9E == cpu.a); // NOLINT
   CU_ASSERT(FLAG_CY == (cpu.flags & FLAG_CY));
+}
+
+void test_opcode_0x11(void)
+{
+  i8080 cpu;
+  cpu_init(&cpu);
+  uint16_t initial_pc = cpu.pc;
+  cpu_write_mem(&cpu, 0x0001, 0x34);
+  cpu_write_mem(&cpu, 0x0002, 0x12);
+
+
+  int code_found = execute_instruction(&cpu, 0x11);
+  CU_ASSERT(code_found == 0);
+  CU_ASSERT(cpu.pc == initial_pc + 3);
+
+  CU_ASSERT(cpu.e == 0x34);
+  CU_ASSERT(cpu.d == 0x12);
+  cpu.d = 0;
+  cpu.e = 0;
+  cpu_write_mem(&cpu, 0x0001, 0x00);
+  cpu_write_mem(&cpu, 0x0002, 0x00);
+
 }
 
 void
@@ -228,6 +287,28 @@ test_opcode_0x19(void) // NOLINT
   CU_ASSERT((cpu.flags & FLAG_CY) == 0);
 }
 
+void test_opcode_0x21(void)
+{
+  i8080 cpu;
+  cpu_init(&cpu);
+  uint16_t initial_pc = cpu.pc;
+  cpu_write_mem(&cpu, 0x0001, 0x78);
+  cpu_write_mem(&cpu, 0x0002, 0x56);
+
+
+  int code_found = execute_instruction(&cpu, 0x21);
+  CU_ASSERT(code_found == 0);
+  CU_ASSERT(cpu.pc == initial_pc + 3);
+
+  CU_ASSERT(cpu.l == 0x78);
+  CU_ASSERT(cpu.h == 0x56);
+  cpu.h = 0;
+  cpu.l = 0;
+  cpu_write_mem(&cpu, 0x0001, 0x00);
+  cpu_write_mem(&cpu, 0x0002, 0x00);
+
+}
+
 void
 test_opcode_0x26(void)
 {
@@ -244,6 +325,27 @@ test_opcode_0x26(void)
   CU_ASSERT_EQUAL(cpu.h, 0x65); // NOLINT
 
   cpu_write_mem(&cpu, 0x4564, 0x00); // NOLINT
+}
+
+void test_opcode_0x31(void)
+{
+  i8080 cpu;
+  cpu_init(&cpu);
+  uint16_t initial_pc = cpu.pc;
+  cpu_write_mem(&cpu, 0x0001, 0xAB);
+  cpu_write_mem(&cpu, 0x0002, 0xCD);
+
+
+  int code_found = execute_instruction(&cpu, 0x31);
+  CU_ASSERT(code_found == 0);
+  CU_ASSERT(cpu.pc == initial_pc + 3);
+
+  CU_ASSERT(cpu.sp == 0xCDAB);
+  cpu.sp = 0;
+ 
+  cpu_write_mem(&cpu, 0x0001, 0x00);
+  cpu_write_mem(&cpu, 0x0002, 0x00);
+
 }
 
 void
@@ -264,6 +366,156 @@ test_opcode_0x36(void)
   CU_ASSERT_EQUAL(cpu_read_mem(&cpu, 0x2312), 0xA1); // NOLINT
 
   cpu_write_mem(&cpu, 0x4353, 0x00); // NOLINT
+}
+
+void test_opcode_0x3e(void)
+{
+  i8080 cpu;
+  cpu_init(&cpu);
+  uint16_t initial_pc = cpu.pc;
+  cpu_write_mem(&cpu, 0x0001, 0xEF);
+
+  int code_found = execute_instruction(&cpu, 0x3e);
+  CU_ASSERT(code_found == 0);
+  CU_ASSERT(cpu.pc == initial_pc + 2);
+
+  CU_ASSERT(cpu.a == 0xEF);
+  cpu.a = 0;
+ 
+  cpu_write_mem(&cpu, 0x0001, 0x00);
+}
+
+void test_opcode_0x6f(void)
+{
+  i8080 cpu;
+  cpu_init(&cpu);
+  uint16_t initial_pc = cpu.pc;
+  cpu.a = 0xBD;
+
+  int code_found = execute_instruction(&cpu, 0x6f);
+  CU_ASSERT(code_found == 0);
+  CU_ASSERT(cpu.pc == initial_pc + 1);
+  CU_ASSERT(cpu.l == 0xBD);
+
+  cpu.a = 0;
+  cpu.l = 0;
+}
+
+void test_opcode_0xc1(void)
+{
+  i8080 cpu;
+  cpu_init(&cpu);
+  uint16_t initial_pc = cpu.pc;
+  cpu.sp = 0x1000;
+  cpu_write_mem(&cpu, cpu.sp, 0x78);
+  cpu_write_mem(&cpu, cpu.sp + 1, 0x56);
+
+  int code_found = execute_instruction(&cpu, 0xc1);
+  CU_ASSERT(code_found == 0);
+  CU_ASSERT(cpu.pc == initial_pc + 1);
+  CU_ASSERT(cpu.sp == 0x1002);
+  CU_ASSERT(cpu.c == 0x78);
+  CU_ASSERT(cpu.b == 0x56);
+
+  cpu.sp = 0;
+  cpu.b = 0;
+  cpu.c = 0;
+  cpu_write_mem(&cpu, 0x1000, 0x00);
+  cpu_write_mem(&cpu, 0x1001, 0x00);
+}
+
+void test_opcode_0xc6(void)
+{
+  i8080 cpu;
+  cpu_init(&cpu);
+  uint16_t initial_pc = cpu.pc;
+  cpu.a = 0x50;
+  cpu_write_mem(&cpu, 0x0001, 0x28);
+
+  int code_found = execute_instruction(&cpu, 0xc6);
+  CU_ASSERT(code_found == 0);
+  CU_ASSERT(cpu.pc == initial_pc + 2);
+  CU_ASSERT(cpu.a == 0x78);
+  
+  // Flags
+  CU_ASSERT((cpu.flags & FLAG_Z) == 0);
+  CU_ASSERT((cpu.flags & FLAG_S) == 0);
+  CU_ASSERT((cpu.flags & FLAG_P) != 0);
+  CU_ASSERT((cpu.flags & FLAG_CY) == 0);
+  CU_ASSERT((cpu.flags & FLAG_AC) == 0);
+
+  cpu.a = 0;
+  cpu_write_mem(&cpu, 0x0001, 0x00);
+}
+
+void test_opcode_0xd3(void)
+{
+  i8080 cpu;
+  cpu_init(&cpu);
+  uint16_t initial_pc = cpu.pc;
+  cpu.a = 0x50;
+  cpu_write_mem(&cpu, 0x0001, 0x01);
+
+  int code_found = execute_instruction(&cpu, 0xd3);
+  CU_ASSERT(code_found == 0);
+  CU_ASSERT(cpu.pc == initial_pc + 2);
+
+  cpu.a = 0;
+  cpu_write_mem(&cpu, 0x0001, 0x00);
+}
+
+void test_opcode_0x7c(void)
+{
+  i8080 cpu;
+  cpu_init(&cpu);
+  uint16_t initial_pc = cpu.pc;
+  cpu.h = 0xBD;
+
+  int code_found = execute_instruction(&cpu, 0x7c);
+  CU_ASSERT(code_found == 0);
+  CU_ASSERT(cpu.pc == initial_pc + 1);
+  CU_ASSERT(cpu.a == 0xBD);
+
+  cpu.a = 0;
+  cpu.h = 0;
+}
+
+void test_opcode_0xe6(void)
+{
+  i8080 cpu;
+  cpu_init(&cpu);
+  uint16_t initial_pc = cpu.pc;
+  cpu.a = 0x5F;
+  cpu_write_mem(&cpu, 0x0001, 0x3C);
+
+  int code_found = execute_instruction(&cpu, 0xe6);
+  CU_ASSERT(code_found == 0);
+  CU_ASSERT(cpu.pc == initial_pc + 2);
+  CU_ASSERT(cpu.a == 0x1C);
+
+  // Flag Asserts
+  CU_ASSERT((cpu.flags & FLAG_Z) == 0);
+  CU_ASSERT((cpu.flags & FLAG_S) == 0);
+  CU_ASSERT((cpu.flags & FLAG_P) == 0);
+  CU_ASSERT((cpu.flags & FLAG_CY) == 0);
+  CU_ASSERT((cpu.flags & FLAG_AC) == 0);
+
+
+  cpu.a = 0;
+  cpu_write_mem(&cpu, 0x0001, 0x00);
+}
+
+void test_opcode_0xfb(void)
+{
+  i8080 cpu;
+  cpu_init(&cpu);
+  uint16_t initial_pc = cpu.pc;
+  cpu.interrupt_enabled = false;
+
+  int code_found = execute_instruction(&cpu, 0xfb);
+  CU_ASSERT(code_found == 0);
+  CU_ASSERT(cpu.interrupt_enabled == true);
+  CU_ASSERT(cpu.pc == initial_pc);
 }
 
 void
@@ -956,8 +1208,47 @@ main(void)
           == CU_add_test(pSuite, "test of test_opcode_0x01()",
                          test_opcode_0x01))
       || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0x00()",
+                         test_opcode_0x00))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0x09()",
+                         test_opcode_0x09))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0x11()",
+                         test_opcode_0x11))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0x21()",
+                         test_opcode_0x21))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0x31()",
+                         test_opcode_0x31))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0x3e()",
+                         test_opcode_0x3e))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0x6f()",
+                         test_opcode_0x6f))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0x7c()",
+                         test_opcode_0x7c))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0xc1()",
+                         test_opcode_0xc1))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0xc6()",
+                         test_opcode_0xc6))
+      || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x06()",
                          test_opcode_0x06))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0xd3()",
+                         test_opcode_0xd3))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0xe6()",
+                         test_opcode_0xe6))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0xfb()",
+                         test_opcode_0xfb))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x0d()",
                          test_opcode_0x0d))
