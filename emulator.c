@@ -14,7 +14,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
   switch (opcode)
     {
     case 0x00: // NOLINT
-      //printf("NOP");
+      // printf("NOP");
       break;
     case 0x01: // NOLINT
       {        // LXI B
@@ -464,7 +464,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         // printf("EI");
         cpu->interrupt_enabled = true;
         return 0;
-	//break;
+        // break;
       }
     case 0xfe: // NOLINT
       {        // CPI
@@ -661,6 +661,7 @@ print_instruction(uint8_t opcode)
 void
 print_state(i8080 *cpu)
 {
-  printf("REGISTERS a: 0x%x b: 0x%x c: 0x%x d: 0x%x e: 0x%x h: 0x%x l: 0x%x FLAGS: 0x%x\n",
+  printf("REGISTERS a: 0x%x b: 0x%x c: 0x%x d: 0x%x e: 0x%x h: 0x%x l: 0x%x "
+         "FLAGS: 0x%x\n",
          cpu->a, cpu->b, cpu->c, cpu->d, cpu->e, cpu->h, cpu->l, cpu->flags);
 }
