@@ -670,7 +670,8 @@ test_opcode_0xc3(void) // NOLINT
 }
 
 void
-test_opcode_0x1a(void) // NOLINT
+test_opcode_
+(void) // NOLINT
 {                      // LDAX D
 
   // setup
@@ -686,7 +687,7 @@ test_opcode_0x1a(void) // NOLINT
   // verify
   CU_ASSERT(0 == code_found);
   CU_ASSERT(1 == cpu.pc);
-  CU_ASSERT(0xCC == cpu.d); // NOLINT
+  CU_ASSERT(0xCC == cpu.a); // NOLINT
 
   // cleanup
   cpu_write_mem(&cpu, 0x0001, 0x00); // NOLINT
