@@ -670,8 +670,7 @@ test_opcode_0xc3(void) // NOLINT
 }
 
 void
-test_opcode_
-(void) // NOLINT
+test_opcode_0x1a(void) // NOLINT
 {                      // LDAX D
 
   // setup
