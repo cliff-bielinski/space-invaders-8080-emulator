@@ -130,8 +130,8 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         // get value at addr
         uint8_t val = cpu_read_mem(cpu, addr);
 
-        // put value in d
-        cpu->d = val;
+        // put value in a
+        cpu->a = val;
         break;
       }
     case 0x21: // NOLINT
