@@ -76,3 +76,9 @@ update_carry_flag(cpu, result > 0xFF); result > 0XFF will return true or false
 
 void cpu_set_flag(i8080 *cpu, uint8_t flag, bool value);
 bool cpu_get_flag(i8080 *cpu, uint8_t flag);
+
+/*
+Helper functions to print instruction and cpu state
+*/
+void print_instruction(uint8_t opcode);
+void print_state(i8080 *cpu);
