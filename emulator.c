@@ -14,7 +14,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
   switch (opcode)
     {
     case 0x00: // NOLINT
-      // printf("NOP");
+      // NOP
       break;
     case 0x01: // NOLINT
       {        // LXI B
@@ -464,7 +464,6 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         // printf("EI");
         cpu->interrupt_enabled = true;
         return 0;
-        // break;
       }
     case 0xfe: // NOLINT
       {        // CPI
