@@ -520,7 +520,7 @@ test_opcode_0xfb(void)
   int code_found = execute_instruction(&cpu, 0xfb); // NOLINT
   CU_ASSERT(code_found == 0);
   CU_ASSERT(cpu.interrupt_enabled == true);
-  CU_ASSERT(cpu.pc == initial_pc);
+  CU_ASSERT(cpu.pc == (initial_pc + 1));
 }
 
 void
