@@ -641,7 +641,7 @@ test_opcode_0xcd(void) // NOLINT
 
   CU_ASSERT(code_found == 0);
   CU_ASSERT_EQUAL(cpu_read_mem(&cpu, temp - 1), 0xAB); // NOLINT
-  CU_ASSERT_EQUAL(cpu_read_mem(&cpu, temp - 2), 0xCD); // NOLINT
+  CU_ASSERT_EQUAL(cpu_read_mem(&cpu, temp - 2), 0xD0); // NOLINT
   CU_ASSERT_EQUAL(cpu.sp, 0xDCBA - 2);                 // NOLINT
   CU_ASSERT_EQUAL(cpu.pc, 0xEFFE);                     // NOLINT
 
