@@ -464,6 +464,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         // printf("EI");
         cpu->interrupt_enabled = true;
         return 0;
+        // break;
       }
     case 0xfe: // NOLINT
       {        // CPI
