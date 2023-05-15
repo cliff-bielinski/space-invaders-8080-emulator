@@ -369,8 +369,8 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       }
     case 0xcd:                                             // NOLINT
       {                                                    // CALL ADDR
-        cpu_write_mem(cpu, cpu->sp - 1, (cpu->pc >> 8));   // NOLINT
-        cpu_write_mem(cpu, cpu->sp - 2, (cpu->pc & 0xFF)); // NOLINT
+        cpu_write_mem(cpu, cpu->sp - 1, ((cpu->pc + 3) >> 8));   // NOLINT
+        cpu_write_mem(cpu, cpu->sp - 2, ((cpu->pc +3) & 0xFF)); // NOLINT
 
         cpu->sp -= 2;
         cpu->pc = (cpu_read_mem(cpu, cpu->pc + 2) << 8) // NOLINT
