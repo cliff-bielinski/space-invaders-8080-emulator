@@ -658,7 +658,8 @@ print_instruction(uint8_t opcode)
 void
 print_state(i8080 *cpu)
 {
-  printf("REGISTERS a: 0x%x b: 0x%x c: 0x%x d: 0x%x e: 0x%x h: 0x%x l: 0x%x ",
+  printf("REGISTERS a: 0x%02x b: 0x%02x c: 0x%02x d: 0x%02x e: 0x%02x h: "
+         "0x%02x l: 0x%02x ",
          cpu->a, cpu->b, cpu->c, cpu->d, cpu->e, cpu->h, cpu->l);
 }
 
