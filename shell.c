@@ -14,29 +14,29 @@ main(int argc, char *argv[])
   int opt;
 
   while ((opt = getopt(argc, argv, "pd")) != -1)
-  {
-    switch (opt)
     {
-      case 'p':
-        pflag = 1;
-        break;
-      case 'd':
-        dflag = 1;
-        break;
-      case '?':
-        if (isprint(optopt))
-          {
-            fprintf(stderr, "Unknown option '-%c'.\n", optopt);
-          }
-        else
-          {
-            fprintf(stderr, "Unknown option character '\\x%x.\n", optopt);
-          }
-        exit(EXIT_FAILURE);
-      default:
-        abort();
+      switch (opt)
+        {
+        case 'p':
+          pflag = 1;
+          break;
+        case 'd':
+          dflag = 1;
+          break;
+        case '?':
+          if (isprint(optopt))
+            {
+              fprintf(stderr, "Unknown option '-%c'.\n", optopt);
+            }
+          else
+            {
+              fprintf(stderr, "Unknown option character '\\x%x.\n", optopt);
+            }
+          exit(EXIT_FAILURE);
+        default:
+          abort();
+        }
     }
-  }
 
   // Only accept one non-option argument
   if ((argc - optind) != 1)

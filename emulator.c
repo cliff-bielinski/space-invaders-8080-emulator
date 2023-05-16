@@ -665,7 +665,7 @@ print_state(i8080 *cpu)
 void
 print_flags(uint8_t flags)
 {
-  printf("FLAGS z: %d s: %d p: %d cy: %d ac %d",
-         (flags & FLAG_Z) == FLAG_Z, (flags & FLAG_S) == FLAG_S, (flags & FLAG_P) == FLAG_P,
+  printf("FLAGS z: %d s: %d p: %d cy: %d ac %d", (flags & FLAG_Z) == FLAG_Z,
+         (flags & FLAG_S) == FLAG_S, (flags & FLAG_P) == FLAG_P,
          (flags & FLAG_CY) == FLAG_CY, (flags & FLAG_AC) == FLAG_AC);
 }
