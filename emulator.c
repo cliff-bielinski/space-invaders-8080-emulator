@@ -8,9 +8,6 @@
 int
 execute_instruction(i8080 *cpu, uint8_t opcode)
 {
-  print_instruction(opcode);
-  printf("\nPRE-INSTRUCTION ");
-  print_state(cpu);
   switch (opcode)
     {
     case 0x00: // NOLINT
@@ -484,8 +481,6 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         return -1;
       }
     }
-  printf("POST-INSTRUCTION ");
-  print_state(cpu);
   cpu->pc += 1;
   return 0;
 }
@@ -652,16 +647,26 @@ update_sign_flag(i8080 *cpu, uint8_t result)
     }
 }
 
+// DEBUGGING FUNCTIONS
+
 void
 print_instruction(uint8_t opcode)
 {
-  printf("INSTRUCTION: 0x%x ", opcode);
+  printf("INSTRUCTION: 0x%02x\n", opcode);
 }
 
 void
 print_state(i8080 *cpu)
 {
-  printf("REGISTERS a: 0x%x b: 0x%x c: 0x%x d: 0x%x e: 0x%x h: 0x%x l: 0x%x "
-         "FLAGS: 0x%x\n",
-         cpu->a, cpu->b, cpu->c, cpu->d, cpu->e, cpu->h, cpu->l, cpu->flags);
+  printf("REGISTERS a: 0x%02x b: 0x%02x c: 0x%02x d: 0x%02x e: 0x%02x h: "
+         "0x%02x l: 0x%02x ",
+         cpu->a, cpu->b, cpu->c, cpu->d, cpu->e, cpu->h, cpu->l);
+}
+
+void
+print_flags(uint8_t flags)
+{
+  printf("FLAGS z: %d s: %d p: %d cy: %d ac %d", (flags & FLAG_Z) == FLAG_Z,
+         (flags & FLAG_S) == FLAG_S, (flags & FLAG_P) == FLAG_P,
+         (flags & FLAG_CY) == FLAG_CY, (flags & FLAG_AC) == FLAG_AC);
 }

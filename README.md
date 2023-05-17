@@ -12,6 +12,9 @@ An Intel 8080 emulator to run Space Invaders. OSU Senior Capstone Project - Spri
 - After building the disassembler, run `./disassembler_8080 file_path` to disassemble the ROM with the ROM file path as an argument.
 
 ## Running the Emulator
-- After building the emulator and its shell, run `./shell file_path` to run the emulator with the ROM file path as an argument.
+- After building the emulator and its shell, run `./shell -[options] file_path` to run the emulator with the ROM file path as an argument.
+- Options:
+  - -p to print instructions as they are executed
+  - -d to print cpu state before and after instructions are executed
 
 [![cpp-linter](https://github.com/cpp-linter/cpp-linter-action/actions/workflows/cpp-linter.yml/badge.svg)](https://github.com/cpp-linter/cpp-linter-action/actions/workflows/cpp-linter.yml)
