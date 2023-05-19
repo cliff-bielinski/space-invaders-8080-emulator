@@ -1,0 +1,49 @@
+name: CI
+
+on: [push, pull_request]
+  
+jobs:
+  cpp-linter:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: sudo apt install libcunit1 libcunit1-doc libcunit1-dev 
+      - uses: cpp-linter/cpp-linter-action@v2
+        id: linter
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          style: file
+          extensions: 'c,h,C,H'
+          tidy-checks: 'bugprone-*,readability-*,portability-*,clang-analyzer-*' 
+          ignore: 'disassembler_8080.c'
+
+      - name: static analysis
+        if: steps.linter.outputs.checks-failed > 0
+        run: exit 1
+  
+  build:
+    runs-on: ubuntu-latest
+    steps:
+# checkout branch
+    - uses: actions/checkout@v3
+
+# install dependencies - TODO
+    - name: install cunit
+      run: sudo apt install libcunit1 libcunit1-doc libcunit1-dev
+
+# clean
+    - name: cleaning up
+      run: make clean
+
+# build
+    - name: building applications
+      run: make
+
+# testing - TODO
+    - name: testing build
+      run: make test
+
+# clean up
+    - name: cleaning up
+      run: make clean
