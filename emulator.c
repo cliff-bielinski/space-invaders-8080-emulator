@@ -684,6 +684,11 @@ handle_interrupt(i8080 *cpu, uint8_t rst_instruction)
       return -1;
     }
 
+  if (cpu->interrupt_enabled == false)
+    {
+      return 0;
+    }
+
   // get address for interrupt subroutine
   uint16_t subroutine_address = BYTE * rst_instruction;
 
