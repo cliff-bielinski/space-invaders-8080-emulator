@@ -191,6 +191,19 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         cpu->pc += 2;
         break;
       }
+    case 0x35: // NOLINT
+      {        // DCR M
+        uint16_t address = cpu->l;
+        address += (cpu->h << 8); // NOLINT
+        uint8_t mem_value = cpu_read_mem(cpu, address);
+        uint8_t result = mem_value - 1;
+        update_zero_flag(cpu, result);
+        update_sign_flag(cpu, result);
+        update_parity_flag(cpu, result);
+        update_aux_carry_flag(cpu, mem_value, 0xFF);
+        cpu_write_mem(cpu, address, result);
+        break;
+      }
     case 0x36: // NOLINT
       {        // MVI M, D8
                // Address is stored in reg h,l.
