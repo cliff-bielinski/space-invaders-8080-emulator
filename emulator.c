@@ -4,6 +4,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define BYTE 8
+#define UPPER_8_BIT_MASK 0xFF00
+#define LOWER_8_BIT_MASK 0x00FF
+#define RST_RANGE 7
+
 // Execute Instruction
 int
 execute_instruction(i8080 *cpu, uint8_t opcode)
@@ -673,18 +678,18 @@ print_flags(uint8_t flags)
 int
 handle_interrupt(i8080 *cpu, uint8_t rst_instruction)
 {
-  if (rst_instruction > 0x07)
+  if (rst_instruction > RST_RANGE)
     {
       fprintf(stderr, "Invalid restart instruction %u", rst_instruction);
       return -1;
     }
 
   // get address for interrupt subroutine
-  uint16_t subroutine_address = 0x08 * rst_instruction;
+  uint16_t subroutine_address = BYTE * rst_instruction;
 
   // push program counter to stack
-  cpu_write_mem(cpu, cpu->sp - 1, (uint8_t)((cpu->pc & 0xFF00) >> 8));
-  cpu_write_mem(cpu, cpu->sp - 2, (uint8_t)(cpu->pc & 0x00FF));
+  cpu_write_mem(cpu, cpu->sp - 1, (uint8_t)((cpu->pc & UPPER_8_BIT_MASK) >> BYTE));
+  cpu_write_mem(cpu, cpu->sp - 2, (uint8_t)(cpu->pc & LOWER_8_BIT_MASK));
   cpu->sp -= 2;
 
   // set program counter to start of the interrupt subroutine
