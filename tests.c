@@ -1224,7 +1224,7 @@ test_handle_interrupt_interrupts_disabled(void) // NOLINT
   cpu.pc = 0xAABB; // NOLINT
   cpu.sp = 0xFFFF; // NOLINT
 
-  int interrupt_handled = handle_interrupt(&cpu, 0x08); // NOLINT
+  int interrupt_handled = handle_interrupt(&cpu, 0x01); // NOLINT
 
   CU_ASSERT(interrupt_handled == 0);
   CU_ASSERT(cpu.interrupt_enabled == false);
