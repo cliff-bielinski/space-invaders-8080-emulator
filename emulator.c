@@ -200,7 +200,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         update_zero_flag(cpu, result);
         update_sign_flag(cpu, result);
         update_parity_flag(cpu, result);
-        update_aux_carry_flag(cpu, mem_value, 0xFF);
+        update_aux_carry_flag(cpu, mem_value, 0xFF); // NOLINT
         cpu_write_mem(cpu, address, result);
         break;
       }

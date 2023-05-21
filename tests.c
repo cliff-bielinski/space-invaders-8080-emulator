@@ -777,8 +777,8 @@ test_opcode_0x35(void) // NOLINT
 {
   i8080 cpu;
   cpu_init(&cpu);
-  cpu.h = 0xAA;
-  cpu.l = 0xBB;
+  cpu.h = 0xAA; // NOLINT
+  cpu.l = 0xBB; // NOLINT
 
   cpu_write_mem(&cpu, 0xAABB, 0x02); // NOLINT
 
