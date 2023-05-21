@@ -668,3 +668,30 @@ print_flags(uint8_t flags)
          (flags & FLAG_S) == FLAG_S, (flags & FLAG_P) == FLAG_P,
          (flags & FLAG_CY) == FLAG_CY, (flags & FLAG_AC) == FLAG_AC);
 }
+
+// INTERRUPTS
+int
+handle_interrupt(i8080 *cpu, uint8_t rst_instruction)
+{
+  if (rst_instruction > 0x07)
+    {
+      fprintf(stderr, "Invalid restart instruction %u", rst_instruction);
+      return -1;
+    }
+
+  // get address for interrupt subroutine
+  uint16_t subroutine_address = 0x08 * rst_instruction;
+
+  // push program counter to stack
+  cpu_write_mem(cpu, cpu->sp - 1, (uint8_t)((cpu->pc & 0xFF00) >> 8));
+  cpu_write_mem(cpu, cpu->sp - 2, (uint8_t)(cpu->pc & 0x00FF));
+  cpu->sp -= 2;
+
+  // set program counter to start of the interrupt subroutine
+  cpu->pc = subroutine_address;
+
+  // disable interrupts
+  cpu->interrupt_enabled = false;
+
+  return 0;
+}
