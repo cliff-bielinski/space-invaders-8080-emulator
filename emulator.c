@@ -688,7 +688,8 @@ handle_interrupt(i8080 *cpu, uint8_t rst_instruction)
   uint16_t subroutine_address = BYTE * rst_instruction;
 
   // push program counter to stack
-  cpu_write_mem(cpu, cpu->sp - 1, (uint8_t)((cpu->pc & UPPER_8_BIT_MASK) >> BYTE));
+  cpu_write_mem(cpu, cpu->sp - 1,
+                (uint8_t)((cpu->pc & UPPER_8_BIT_MASK) >> BYTE));
   cpu_write_mem(cpu, cpu->sp - 2, (uint8_t)(cpu->pc & LOWER_8_BIT_MASK));
   cpu->sp -= 2;
 

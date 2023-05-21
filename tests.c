@@ -1181,16 +1181,16 @@ test_handle_interrupt(void) // NOLINT
 {
   i8080 cpu;
   cpu_init(&cpu);
-  cpu.pc = 0xAABB;                                      // NOLINT
-  cpu.sp = 0xFFFF;                                      // NOLINT
+  cpu.pc = 0xAABB; // NOLINT
+  cpu.sp = 0xFFFF; // NOLINT
 
   int interrupt_handled = handle_interrupt(&cpu, 0x01); // NOLINT
 
   CU_ASSERT(interrupt_handled == 0);
-  CU_ASSERT(cpu.pc == 0x0008);                          // NOLINT
-  CU_ASSERT(cpu.sp == 0xFFFD);                          // NOLINT
-  CU_ASSERT(cpu_read_mem(&cpu, cpu.sp) == 0xBB);        // NOLINT
-  CU_ASSERT(cpu_read_mem(&cpu, cpu.sp + 1) == 0xAA);    // NOLINT
+  CU_ASSERT(cpu.pc == 0x0008);                       // NOLINT
+  CU_ASSERT(cpu.sp == 0xFFFD);                       // NOLINT
+  CU_ASSERT(cpu_read_mem(&cpu, cpu.sp) == 0xBB);     // NOLINT
+  CU_ASSERT(cpu_read_mem(&cpu, cpu.sp + 1) == 0xAA); // NOLINT
 
   // clean up
   cpu_write_mem(&cpu, 0xFFFE, 0x00); // NOLINT
@@ -1202,14 +1202,14 @@ test_handle_interrupt_invalid_rst(void) // NOLINT
 {
   i8080 cpu;
   cpu_init(&cpu);
-  cpu.pc = 0xAABB;                                      // NOLINT
-  cpu.sp = 0xFFFF;                                      // NOLINT
+  cpu.pc = 0xAABB; // NOLINT
+  cpu.sp = 0xFFFF; // NOLINT
 
   int interrupt_handled = handle_interrupt(&cpu, 0x08); // NOLINT
 
   CU_ASSERT(interrupt_handled == -1);
-  CU_ASSERT(cpu.pc == 0xAABB);                          // NOLINT
-  CU_ASSERT(cpu.sp == 0xFFFF);                          // NOLINT
+  CU_ASSERT(cpu.pc == 0xAABB); // NOLINT
+  CU_ASSERT(cpu.sp == 0xFFFF); // NOLINT
 }
 
 int
