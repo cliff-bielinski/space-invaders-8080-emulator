@@ -407,7 +407,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
     case 0xda: // NOLINT
       {        // JC ADR
         uint16_t address = cpu_read_mem(cpu, cpu->pc + 2);
-        address = (address << 8) | cpu_read_mem(cpu, cpu->pc + 1); // NOLINT
+        address = (address << BYTE) | cpu_read_mem(cpu, cpu->pc + 1);
         if ((cpu->flags & FLAG_CY) == FLAG_CY) // if CY set JUMP
           {
             cpu->pc = address;
@@ -417,7 +417,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         break;
       }
     case 0xdb: // NOLINT
-      {        // JC
+      {        // IN D8
         uint8_t port = cpu_read_mem(cpu, cpu->pc + 1);
         printf("%u", port);
         cpu->pc += 1;
