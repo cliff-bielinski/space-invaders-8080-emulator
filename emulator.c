@@ -657,7 +657,7 @@ update_aux_carry_flag(i8080 *cpu, uint8_t a, uint8_t b)
   // then adds nibbles to test for AC
   uint16_t result = (a & 0x0F) + (b & 0x0F); // NOLINT
   if (result & 0x10)                         // NOLINT
-    { // Check if carry from bit 3 to bit 4 existss
+    { // Check if carry from bit 3 to bit 4 exists
       cpu->flags |= FLAG_AC;
     }
   else
@@ -729,7 +729,7 @@ is_sign_flag_set(i8080 *cpu)
 bool
 is_zero_flag_set(i8080 *cpu)
 {
-  return (cpu->flags & FLAG_Z) == 0;
+  return (cpu->flags & FLAG_Z) != 0;
 }
 
 void

@@ -457,19 +457,19 @@ test_opcode_0xca(void)
   cpu_init(&cpu);
 
   // case where zero flag not set
-  cpu.pc = 0x4341;                       // NOLINT
-  cpu_write_mem(&cpu, cpu.pc + 1, 0x28); // NOLINT
-  cpu_write_mem(&cpu, cpu.pc + 2, 0xb7); // NOLINT
-  update_zero_flag(&cpu, 0x00);
+  cpu.pc = 0x4341;                                  // NOLINT
+  cpu_write_mem(&cpu, cpu.pc + 1, 0x28);            // NOLINT
+  cpu_write_mem(&cpu, cpu.pc + 2, 0xb7);            // NOLINT
+  update_zero_flag(&cpu, 1);                        // had a remainder
   int code_found = execute_instruction(&cpu, 0xca); // NOLINT
   CU_ASSERT(code_found >= 0);
   CU_ASSERT(cpu.pc == 0x4344); // NOLINT
 
   // case where zero flag set
-  cpu.pc = 0x5441;                       // NOLINT
-  cpu_write_mem(&cpu, cpu.pc + 1, 0x3a); // NOLINT
-  cpu_write_mem(&cpu, cpu.pc + 2, 0xa9); // NOLINT
-  update_zero_flag(&cpu, true);
+  cpu.pc = 0x5441;                              // NOLINT
+  cpu_write_mem(&cpu, cpu.pc + 1, 0x3a);        // NOLINT
+  cpu_write_mem(&cpu, cpu.pc + 2, 0xa9);        // NOLINT
+  update_zero_flag(&cpu, 0);                    // no remainder
   code_found = execute_instruction(&cpu, 0xca); // NOLINT
   CU_ASSERT(code_found >= 0);
   CU_ASSERT(cpu.pc == 0xa93a); // NOLINT
