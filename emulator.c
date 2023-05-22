@@ -379,6 +379,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         uint16_t address = cpu_read_mem(cpu, cpu->pc + 2);
         address = (address << 8) | cpu_read_mem(cpu, cpu->pc + 1); // NOLINT
         cpu->pc = address;
+        // NOLINTNEXTLINE
         return 10; // no PC increment due to JMP, return num cycles
       }
     case 0xc5: // NOLINT
@@ -413,6 +414,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
             address += (cpu_read_mem(cpu, cpu->sp + 1) << 8); // NOLINT
             cpu->sp += 2;
             cpu->pc = address;
+            // NOLINTNEXTLINE
             return 11; // return num cycles
           }
         num_cycles = 5; // NOLINT
@@ -425,6 +427,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         address += (cpu_read_mem(cpu, cpu->sp + 1) << 8); // NOLINT
         cpu->sp += 2;
         cpu->pc = address;
+        // NOLINTNEXTLINE
         return 10; // return num cycles
       }
     case 0xca: // NOLINT
@@ -435,6 +438,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
             address = address << 8;                            // NOLINT
             address += cpu_read_mem(cpu, cpu->pc + 1);
             cpu->pc = address;
+            // NOLINTNEXTLINE
             return 10; // return num cycles
           }
         cpu->pc += 2;    // NOLINT
@@ -449,6 +453,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         cpu->sp -= 2;
         cpu->pc = (cpu_read_mem(cpu, cpu->pc + 2) << 8) // NOLINT
                   | (cpu_read_mem(cpu, cpu->pc + 1));
+        // NOLINTNEXTLINE
         return 17; // return num cycles
       }
     case 0xd1: // NOLINT
@@ -486,6 +491,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         if ((cpu->flags & FLAG_CY) == FLAG_CY) // if CY set JUMP
           {
             cpu->pc = address;
+            // NOLINTNEXTLINE
             return 10; // return cycle number
           }
         cpu->pc += 2;
