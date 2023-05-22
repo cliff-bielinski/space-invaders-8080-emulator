@@ -451,6 +451,36 @@ test_opcode_0xc6(void)
 }
 
 void
+test_opcode_0xc8(void)
+{ // RZ
+  i8080 cpu;
+  cpu_init(&cpu);
+
+  // case where zero flag not set
+  cpu.pc = 0x4341;                                  // NOLINT
+  update_zero_flag(&cpu, 1);                        // had a remainder
+  int code_found = execute_instruction(&cpu, 0xc8); // NOLINT
+  CU_ASSERT(code_found >= 0);
+  CU_ASSERT(cpu.pc == 0x4342); // NOLINT
+
+  // case where zero flag set
+  cpu_write_mem(&cpu, 0x0001, 0xAA); // NOLINT
+  cpu_write_mem(&cpu, 0x0002, 0xBB); // NOLINT
+  cpu.sp = 0x0001;
+  update_zero_flag(&cpu, 0); // no remainder
+
+  code_found = execute_instruction(&cpu, 0xc8); // NOLINT
+
+  CU_ASSERT(code_found >= 0);
+  CU_ASSERT(cpu.pc == 0xBBAA); // NOLINT
+  CU_ASSERT(cpu.sp == 0x0003); // NOLINT
+
+  // clean up
+  cpu_write_mem(&cpu, 0x0001, 0x00); // NOLINT
+  cpu_write_mem(&cpu, 0x0002, 0x00); // NOLINT
+}
+
+void
 test_opcode_0xca(void)
 { // JZ
   i8080 cpu;
@@ -1542,6 +1572,9 @@ main(void)
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0xa7()",
                          test_opcode_0xa7))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0xc8()",
+                         test_opcode_0xc8))
       || (NULL
           == CU_add_test(pSuite, "test of test_handle_interrupt()",
                          test_handle_interrupt))
