@@ -409,10 +409,10 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         uint16_t address = cpu_read_mem(cpu, cpu->pc + 2);
         address = (address << 8) | cpu_read_mem(cpu, cpu->pc + 1); // NOLINT
         if ((cpu->flags & FLAG_CY) == FLAG_CY) // if CY set JUMP
-        {
-          cpu->pc = address;
-          return 0;
-        }
+          {
+            cpu->pc = address;
+            return 0;
+          }
         cpu->pc += 2;
         break;
       }
