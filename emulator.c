@@ -16,17 +16,17 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
   int num_cycles = 0;
   switch (opcode)
     {
-    case 0x00: // NOLINT
-      {        // NOP
-        num_cycles = 4;
+    case 0x00:          // NOLINT
+      {                 // NOP
+        num_cycles = 4; // NOLINT
         break;
       }
     case 0x01: // NOLINT
       {        // LXI B
         cpu->c = cpu_read_mem(cpu, cpu->pc + 1);
         cpu->b = cpu_read_mem(cpu, cpu->pc + 2);
-        cpu->pc += 2;
-        num_cycles = 10;
+        cpu->pc += 2;    // NOLINT
+        num_cycles = 10; // NOLINT
         break;
       }
     case 0x05: // NOLINT
@@ -37,7 +37,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         update_sign_flag(cpu, cpu->b);
         update_parity_flag(cpu, cpu->b);
         update_aux_carry_flag(cpu, cpu->b, 0xFF); // NOLINT
-        num_cycles = 5;
+        num_cycles = 5;                           // NOLINT
 
         break;
       }
@@ -45,7 +45,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       {        // MVI B, mem8
         cpu->b = cpu_read_mem(cpu, cpu->pc + 1);
         cpu->pc += 1;
-        num_cycles = 7;
+        num_cycles = 7; // NOLINT
         break;
       }
     case 0x09: // NOLINT
@@ -57,7 +57,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         update_carry_flag(cpu, result > 0xFFFF); // NOLINT
         cpu->h = (result & 0xff00) >> 8;         // NOLINT
         cpu->l = (result & 0xff);                // NOLINT
-        num_cycles = 10;
+        num_cycles = 10;                         // NOLINT
         break;
       }
     case 0x0d: // NOLINT
@@ -68,14 +68,14 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         update_parity_flag(cpu, result);
         update_aux_carry_flag(cpu, cpu->c, 0xFF); // NOLINT
         cpu->c = result;
-        num_cycles = 5;
+        num_cycles = 5; // NOLINT
         break;
       }
     case 0x0e: // NOLINT
       {        // MVI C, D8
         cpu->c = cpu_read_mem(cpu, (cpu->pc + 1));
         cpu->pc += 1;
-        num_cycles = 7;
+        num_cycles = 7; // NOLINT
         break;
       }
     case 0x0f: // NOLINT
@@ -99,15 +99,15 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
           {
             update_carry_flag(cpu, false);
           }
-        num_cycles = 4;
+        num_cycles = 4; // NOLINT
         break;
       }
     case 0x11: // NOLINT
       {
         cpu->e = cpu_read_mem(cpu, cpu->pc + 1);
         cpu->d = cpu_read_mem(cpu, cpu->pc + 2);
-        cpu->pc += 2;
-        num_cycles = 10;
+        cpu->pc += 2;    // NOLINT
+        num_cycles = 10; // NOLINT
         break;
       }
     case 0x13: // NOLINT
@@ -118,7 +118,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
             cpu->d += 1;
           }
         break;
-        num_cycles = 5;
+        num_cycles = 5; // NOLINT
       }
     case 0x19: // NOLINT
       {        // DAD D
@@ -134,7 +134,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         cpu->h = sum >> 8;                      // NOLINT
         cpu->l = sum & 0xFF;                    // NOLINT
         update_carry_flag(cpu, (sum > 0xFFFF)); // NOLINT
-        num_cycles = 10;
+        num_cycles = 10;                        // NOLINT
 
         break;
       }
@@ -150,7 +150,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
 
         // put value in a
         cpu->a = val;
-        num_cycles = 7;
+        num_cycles = 7; // NOLINT
         break;
       }
     case 0x21: // NOLINT
@@ -158,8 +158,8 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       {
         cpu->l = cpu_read_mem(cpu, cpu->pc + 1);
         cpu->h = cpu_read_mem(cpu, cpu->pc + 2);
-        cpu->pc += 2;
-        num_cycles = 10;
+        cpu->pc += 2;    // NOLINT
+        num_cycles = 10; // NOLINT
         break;
       }
     case 0x23: // NOLINT
@@ -169,14 +169,14 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
           {
             cpu->h += 1;
           }
-        num_cycles = 5;
+        num_cycles = 5; // NOLINT
         break;
       }
     case 0x26: // NOLINT
       {        // MVI H, D8
         cpu->h = cpu_read_mem(cpu, cpu->pc + 1);
         cpu->pc += 1;
-        num_cycles = 7;
+        num_cycles = 7; // NOLINT
         break;
       }
     case 0x29: // NOLINT
@@ -414,7 +414,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
             cpu->pc = address;
             return 11; // return num cycles
           }
-        num_cycles = 5;
+        num_cycles = 5; // NOLINT
         break;
       }
     case 0xc9: // NOLINT
@@ -436,8 +436,8 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
             cpu->pc = address;
             return 10; // return num cycles
           }
-        cpu->pc += 2; // NOLINT
-        num_cycles = 10;
+        cpu->pc += 2;    // NOLINT
+        num_cycles = 10; // NOLINT
         break;
       }
     case 0xcd:                                                   // NOLINT
@@ -457,7 +457,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         cpu->sp += 1;
         cpu->d = cpu_read_mem(cpu, cpu->sp);
         cpu->sp += 1;
-        num_cycles = 10;
+        num_cycles = 10; // NOLINT
         break;
       }
     case 0xd3: // NOLINT
@@ -467,15 +467,15 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         uint8_t port = cpu_read_mem(cpu, cpu->pc + 1);
         printf("%u", port);
         cpu->pc += 1;
-        num_cycles = 10;
+        num_cycles = 10; // NOLINT
         break;
       }
     case 0xd5: // NOLINT
       {        // PUSH D
         cpu_write_mem(cpu, cpu->sp - 2, cpu->e);
         cpu_write_mem(cpu, cpu->sp - 1, cpu->d);
-        cpu->sp -= 2;
-        num_cycles = 11;
+        cpu->sp -= 2;    // NOLINT
+        num_cycles = 11; // NOLINT
         break;
       }
     case 0xda: // NOLINT
@@ -488,7 +488,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
             return 10; // return cycle number
           }
         cpu->pc += 2;
-        num_cycles = 10;
+        num_cycles = 10; // NOLINT
         break;
       }
     case 0xdb: // NOLINT
@@ -496,15 +496,15 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         uint8_t port = cpu_read_mem(cpu, cpu->pc + 1);
         printf("%u", port);
         cpu->pc += 1;
-        num_cycles = 10;
+        num_cycles = 10; // NOLINT
         break;
       }
     case 0xe1: // NOLINT
       {        // POP H
         cpu->l = cpu_read_mem(cpu, cpu->sp);
         cpu->h = cpu_read_mem(cpu, cpu->sp + 1);
-        cpu->sp += 2;
-        num_cycles = 10;
+        cpu->sp += 2;    // NOLINT
+        num_cycles = 10; // NOLINT
         break;
       }
     case 0xe5: // NOLINT
@@ -513,7 +513,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         cpu->sp -= 1;
         cpu_write_mem(cpu, cpu->sp - 1, cpu->l);
         cpu->sp -= 1;
-        num_cycles = 11;
+        num_cycles = 11; // NOLINT
         break;
       }
     case 0xe6: // NOLINT
@@ -526,7 +526,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         update_carry_flag(cpu, false);
         cpu->flags &= ~FLAG_AC;
         cpu->pc += 1;
-        num_cycles = 7;
+        num_cycles = 7; // NOLINT
         break;
       }
     case 0xeb: // NOLINT
@@ -540,7 +540,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         temp = cpu->l;
         cpu->l = cpu->e;
         cpu->e = temp;
-        num_cycles = 5;
+        num_cycles = 5; // NOLINT
         break;
       }
     case 0xf1: // NOLINT
@@ -548,7 +548,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         cpu->flags = cpu_read_mem(cpu, cpu->sp);
         cpu->a = cpu_read_mem(cpu, cpu->sp + 1);
         cpu->sp += 2;
-        num_cycles = 10;
+        num_cycles = 10; // NOLINT
         break;
       }
     case 0xf5: // NOLINT
@@ -557,14 +557,14 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         cpu->sp -= 1;
         cpu_write_mem(cpu, cpu->sp - 1, cpu->flags);
         cpu->sp -= 1;
-        num_cycles = 11;
+        num_cycles = 11; // NOLINT
         break;
       }
       break;
     case 0xfb: // NOLINT
       {
         cpu->interrupt_enabled = true;
-        num_cycles = 4;
+        num_cycles = 4; // NOLINT
         break;
       }
     case 0xfe: // NOLINT
@@ -577,7 +577,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         update_carry_flag(cpu, (data > cpu->a));
         update_aux_carry_flag(cpu, cpu->a, (~data + 1));
         cpu->pc += 1;
-        num_cycles = 7;
+        num_cycles = 7; // NOLINT
         break;
       }
     default:
