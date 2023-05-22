@@ -382,6 +382,19 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         cpu->pc = address;
         return 0;
       }
+    case 0xca: // NOLINT
+      {        // JZ
+        if (is_zero_flag_set(cpu))
+          {
+            uint16_t address = cpu_read_mem(cpu, cpu->pc + 2); // NOLINT
+            address = address << 8;                            // NOLINT
+            address += cpu_read_mem(cpu, cpu->pc + 1);
+            cpu->pc = address;
+            return 0;
+          }
+        cpu->pc += 2; // NOLINT
+        break;
+      }
     case 0xcd:                                                   // NOLINT
       {                                                          // CALL ADDR
         cpu_write_mem(cpu, cpu->sp - 1, ((cpu->pc + 3) >> 8));   // NOLINT
@@ -498,6 +511,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       }
     }
   cpu->pc += 1;
+  printf("cpu->pc: %x\n", cpu->pc);
   return 0;
 }
 
@@ -648,6 +662,12 @@ bool
 is_sign_flag_set(i8080 *cpu)
 {
   return (cpu->flags & FLAG_S) != 0;
+}
+
+bool
+is_zero_flag_set(i8080 *cpu)
+{
+  return (cpu->flags & FLAG_Z) == 0;
 }
 
 void
