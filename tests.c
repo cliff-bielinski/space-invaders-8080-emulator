@@ -475,8 +475,10 @@ test_opcode_0xca(void)
   CU_ASSERT(cpu.pc == 0xa93a); // NOLINT
 
   // cleanup
-  cpu_write_mem(&cpu, 0x0001, 0x00); // NOLINT
-  cpu_write_mem(&cpu, 0x0002, 0x00); // NOLINT
+  cpu_write_mem(&cpu, 0x4342, 0x00); // NOLINT
+  cpu_write_mem(&cpu, 0x4343, 0x00); // NOLINT
+  cpu_write_mem(&cpu, 0x5442, 0x00); // NOLINT
+  cpu_write_mem(&cpu, 0x5443, 0x00); // NOLINT
 }
 
 void
