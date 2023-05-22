@@ -479,6 +479,7 @@ test_opcode_0xdb(void)
   int code_found = execute_instruction(&cpu, 0xdb); // NOLINT
   CU_ASSERT(code_found == 0);
   CU_ASSERT(cpu.pc == initial_pc + 2);
+  // TODO: check contents of A register to see if byte received from port 1
 
   cpu_write_mem(&cpu, 0x0001, 0x00);
 }
