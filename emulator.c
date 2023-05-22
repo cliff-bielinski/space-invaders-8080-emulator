@@ -499,6 +499,16 @@ cpu_init(i8080 *cpu)
   cpu->sp = 0;
   cpu->interrupt_enabled = false;
   cpu->halted = false;
+
+  cpu->port1 = 0;
+  cpu->port2 = 0;
+
+  cpu->shift_msb = 0;
+  cpu->shift_lsb = 0;
+  cpu->shift_offset = 0;
+
+  cpu->last_out_port3 = 0;
+  cpu->last_out_port5 = 0;
 }
 
 uint8_t
@@ -552,6 +562,51 @@ cpu_load_file(i8080 *cpu, const char *file_path, uint16_t address)
     }
 
   return true;
+}
+
+// Input/Output
+
+static uint8_t port_in(i8080 *cpu, uint8_t port) {
+  uint8_t value = 0xFF;
+
+  switch(port) {
+  case 0:
+    break
+  case 1:
+    value = cpu->port1;
+    break;
+  case 2:
+    value = cpu->port2;
+    break;
+  case 3:{
+    const uint16_t shift = (cpu->shift_msb << 8) | cpu->shift_lsb;
+    value = (shift >> (8 - cpu->shift_offset)) & 0xFF;
+  } break;
+  default: fprintf(stderr, "Error: unknown IN port %02x\n", port); break;
+  }
+  return value;
+
+}
+
+static void port_out(i8080 *cpu, uint8_t port, uint8_t value) {
+  switch (port) {
+  case 2:
+    cpu->shift_offset = value & 7;
+    break;
+  case 3:
+    // play sound 1 from sound bank
+    break;
+  case 4:
+    cpu->shift_lsb = cpu->shift_msb;
+    cpu->shift_msb = value;
+    break;
+  case 5:
+    // play sound 2 from sound bank
+    break;
+  case 6:
+    break;
+  default: fprintf(stderr, "Error: Unknown OUT port %02x\n", port); break;
+  }
 }
 
 // FLAGS
