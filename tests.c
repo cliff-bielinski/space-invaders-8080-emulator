@@ -28,7 +28,7 @@ test_opcode_0x00(void) // NOLINT
   cpu_init(&cpu);
   uint16_t initial_pc = cpu.pc;
   int code_found = execute_instruction(&cpu, 0x00);
-  CU_ASSERT(code_found == 0);
+  CU_ASSERT(code_found >= 0);
   CU_ASSERT(cpu.pc == initial_pc + 1);
 }
 
@@ -43,7 +43,7 @@ test_opcode_0x01(void) // NOLINT
 
   int code_found = execute_instruction(&cpu, 0x01); // NOLINT
 
-  CU_ASSERT(code_found == 0);
+  CU_ASSERT(code_found >= 0);
   CU_ASSERT(cpu.pc == 3);
   CU_ASSERT(cpu.c == 0xFF);
   CU_ASSERT(cpu.b == 0x12);
@@ -66,7 +66,7 @@ test_opcode_0x06(void) // NOLINT
   int code_found = execute_instruction(&cpu, 0x06); // NOLINT
 
   // verify
-  CU_ASSERT(0 == code_found);
+  CU_ASSERT(code_found >= 0);
   CU_ASSERT(2 == cpu.pc);
   CU_ASSERT(0xCC == cpu.b);
 
@@ -90,7 +90,7 @@ test_opcode_0x09(void)
   int code_found = execute_instruction(&cpu, 0x09);         // NOLINT
   uint16_t result_hl = (cpu.h << 8) | cpu.l;                // NOLINT
   bool carry_occurred = (initial_hl + initial_bc) > 0xFFFF; // NOLINT
-  CU_ASSERT(code_found == 0);
+  CU_ASSERT(code_found >= 0);
   CU_ASSERT(cpu.pc == initial_pc + 1);
 
   CU_ASSERT(result_hl == initial_hl + initial_bc);
@@ -112,7 +112,7 @@ test_opcode_0x0d(void) // NOLINT
   // decrease C from 2 to 1
   int code_found = execute_instruction(&cpu, 0x0d); // NOLINT
 
-  CU_ASSERT(code_found == 0);
+  CU_ASSERT(code_found >= 0);
   CU_ASSERT(cpu.pc == 1);
   CU_ASSERT(cpu.c == 0x01);
   CU_ASSERT((cpu.flags & FLAG_P) == 0);
@@ -123,7 +123,7 @@ test_opcode_0x0d(void) // NOLINT
   // decrease C from 1 to 0
   code_found = execute_instruction(&cpu, 0x0d); // NOLINT
 
-  CU_ASSERT(code_found == 0);
+  CU_ASSERT(code_found >= 0);
   CU_ASSERT(cpu.pc == 2);
   CU_ASSERT(cpu.c == 0x00);
   CU_ASSERT((cpu.flags & FLAG_P) == FLAG_P);
@@ -134,7 +134,7 @@ test_opcode_0x0d(void) // NOLINT
   // decrease C from 0 to 255
   code_found = execute_instruction(&cpu, 0x0d); // NOLINT
 
-  CU_ASSERT(code_found == 0);
+  CU_ASSERT(code_found >= 0);
   CU_ASSERT(cpu.pc == 3);
   CU_ASSERT(cpu.c == 0xFF);
   CU_ASSERT((cpu.flags & FLAG_P) == FLAG_P);
@@ -157,7 +157,7 @@ test_opcode_0x0f(void) // NOLINT
   int code_found = execute_instruction(&cpu, 0x0f); // NOLINT
 
   // verify
-  CU_ASSERT(0 == code_found);
+  CU_ASSERT(code_found >= 0);
   CU_ASSERT(1 == cpu.pc);
   CU_ASSERT(0x66 == cpu.a); // NOLINT
   CU_ASSERT(FLAG_CY != (cpu.flags & FLAG_CY));
@@ -170,7 +170,7 @@ test_opcode_0x0f(void) // NOLINT
   code_found = execute_instruction(&cpu, 0x0f); // NOLINT
 
   // verify
-  CU_ASSERT(0 == code_found);
+  CU_ASSERT(code_found >= 0);
   CU_ASSERT(2 == cpu.pc);
   CU_ASSERT(0x9E == cpu.a); // NOLINT
   CU_ASSERT(FLAG_CY == (cpu.flags & FLAG_CY));
@@ -186,7 +186,7 @@ test_opcode_0x11(void)
   cpu_write_mem(&cpu, 0x0002, 0x12); // NOLINT
 
   int code_found = execute_instruction(&cpu, 0x11); // NOLINT
-  CU_ASSERT(code_found == 0);
+  CU_ASSERT(code_found >= 0);
   CU_ASSERT(cpu.pc == initial_pc + 3);
 
   CU_ASSERT(cpu.e == 0x34);
@@ -205,14 +205,14 @@ test_opcode_0x13(void) // NOLINT
 
   int code_found = execute_instruction(&cpu, 0x13); // NOLINT
 
-  CU_ASSERT(code_found == 0);
+  CU_ASSERT(code_found >= 0);
   CU_ASSERT(cpu.pc == 1);
   CU_ASSERT(cpu.e == 1);
   CU_ASSERT(cpu.d == 0);
 
   cpu.e = 0xFF;                                 // NOLINT
   code_found = execute_instruction(&cpu, 0x13); // NOLINT
-  CU_ASSERT(code_found == 0);
+  CU_ASSERT(code_found >= 0);
   CU_ASSERT(cpu.pc == 2);
   CU_ASSERT(cpu.e == 0);
   CU_ASSERT(cpu.d == 1);
@@ -227,7 +227,7 @@ test_opcode_0x05(void) // NOLINT
   cpu.b = 0xF;                                      // NOLINT
   int code_found = execute_instruction(&cpu, 0x05); // NOLINT
 
-  CU_ASSERT(code_found == 0);
+  CU_ASSERT(code_found >= 0);
   CU_ASSERT_EQUAL(cpu.b, 14);
   CU_ASSERT((cpu.flags & FLAG_Z) == 0);
   CU_ASSERT((cpu.flags & FLAG_S) == 0);
@@ -247,7 +247,7 @@ test_opcode_0x0e(void)
 
   int code_found = execute_instruction(&cpu, 0x0e); // NOLINT
 
-  CU_ASSERT(code_found == 0);
+  CU_ASSERT(code_found >= 0);
   CU_ASSERT_EQUAL(cpu.c, 0x19); // NOLINT
 
   cpu_write_mem(&cpu, 0x4342, 0x00); // NOLINT
@@ -268,7 +268,7 @@ test_opcode_0x19(void) // NOLINT
   // Carry set test
   int code_found = execute_instruction(&cpu, 0x19); // NOLINT
 
-  CU_ASSERT(code_found == 0);
+  CU_ASSERT(code_found >= 0);
   CU_ASSERT(cpu.h == 0x3F); // NOLINT
   CU_ASSERT(cpu.l == 0x16); // NOLINT
   CU_ASSERT((cpu.flags & FLAG_CY) == FLAG_CY);
@@ -281,7 +281,7 @@ test_opcode_0x19(void) // NOLINT
 
   code_found = execute_instruction(&cpu, 0x19); // NOLINT
 
-  CU_ASSERT(code_found == 0);
+  CU_ASSERT(code_found >= 0);
   CU_ASSERT(cpu.h == 0x62); // NOLINT
   CU_ASSERT(cpu.l == 0xC8); // NOLINT
   CU_ASSERT((cpu.flags & FLAG_CY) == 0);
@@ -297,7 +297,7 @@ test_opcode_0x21(void)
   cpu_write_mem(&cpu, 0x0002, 0x56); // NOLINT
 
   int code_found = execute_instruction(&cpu, 0x21); // NOLINT
-  CU_ASSERT(code_found == 0);
+  CU_ASSERT(code_found >= 0);
   CU_ASSERT(cpu.pc == initial_pc + 3);
 
   CU_ASSERT(cpu.l == 0x78);
@@ -320,7 +320,7 @@ test_opcode_0x26(void)
 
   int code_found = execute_instruction(&cpu, 0x26); // NOLINT
 
-  CU_ASSERT(code_found == 0);
+  CU_ASSERT(code_found >= 0);
   CU_ASSERT_EQUAL(cpu.h, 0x65); // NOLINT
 
   cpu_write_mem(&cpu, 0x4564, 0x00); // NOLINT
@@ -336,7 +336,7 @@ test_opcode_0x31(void)
   cpu_write_mem(&cpu, 0x0002, 0xCD); // NOLINT
 
   int code_found = execute_instruction(&cpu, 0x31); // NOLINT
-  CU_ASSERT(code_found == 0);
+  CU_ASSERT(code_found >= 0);
   CU_ASSERT(cpu.pc == initial_pc + 3);
 
   CU_ASSERT(cpu.sp == 0xCDAB);
@@ -360,7 +360,7 @@ test_opcode_0x36(void)
 
   int code_found = execute_instruction(&cpu, 0x36); // NOLINT
 
-  CU_ASSERT(code_found == 0);
+  CU_ASSERT(code_found >= 0);
   CU_ASSERT_EQUAL(cpu_read_mem(&cpu, 0x2312), 0xA1); // NOLINT
 
   cpu_write_mem(&cpu, 0x4353, 0x00); // NOLINT
@@ -375,7 +375,7 @@ test_opcode_0x3e(void)
   cpu_write_mem(&cpu, 0x0001, 0xEF); // NOLINT
 
   int code_found = execute_instruction(&cpu, 0x3e); // NOLINT
-  CU_ASSERT(code_found == 0);
+  CU_ASSERT(code_found >= 0);
   CU_ASSERT(cpu.pc == initial_pc + 2);
 
   CU_ASSERT(cpu.a == 0xEF);
@@ -393,7 +393,7 @@ test_opcode_0x6f(void)
   cpu.a = 0xBD; // NOLINT
 
   int code_found = execute_instruction(&cpu, 0x6f); // NOLINT
-  CU_ASSERT(code_found == 0);
+  CU_ASSERT(code_found >= 0);
   CU_ASSERT(cpu.pc == initial_pc + 1);
   CU_ASSERT(cpu.l == 0xBD);
 
@@ -412,7 +412,7 @@ test_opcode_0xc1(void)
   cpu_write_mem(&cpu, cpu.sp + 1, 0x56); // NOLINT
 
   int code_found = execute_instruction(&cpu, 0xc1); // NOLINT
-  CU_ASSERT(code_found == 0);
+  CU_ASSERT(code_found >= 0);
   CU_ASSERT(cpu.pc == initial_pc + 1);
   CU_ASSERT(cpu.sp == 0x1002);
   CU_ASSERT(cpu.c == 0x78);
@@ -435,7 +435,7 @@ test_opcode_0xc6(void)
   cpu_write_mem(&cpu, 0x0001, 0x28); // NOLINT
 
   int code_found = execute_instruction(&cpu, 0xc6); // NOLINT
-  CU_ASSERT(code_found == 0);
+  CU_ASSERT(code_found >= 0);
   CU_ASSERT(cpu.pc == initial_pc + 2);
   CU_ASSERT(cpu.a == 0x78);
 
@@ -489,7 +489,7 @@ test_opcode_0xd3(void)
   cpu_write_mem(&cpu, 0x0001, 0x01);
 
   int code_found = execute_instruction(&cpu, 0xd3); // NOLINT
-  CU_ASSERT(code_found == 0);
+  CU_ASSERT(code_found >= 0);
   CU_ASSERT(cpu.pc == initial_pc + 2);
 
   cpu.a = 0;
@@ -522,7 +522,7 @@ test_opcode_0x7c(void)
   cpu.h = 0xBD; // NOLINT
 
   int code_found = execute_instruction(&cpu, 0x7c); // NOLINT
-  CU_ASSERT(code_found == 0);
+  CU_ASSERT(code_found >= 0);
   CU_ASSERT(cpu.pc == initial_pc + 1);
   CU_ASSERT(cpu.a == 0xBD);
 
@@ -540,7 +540,7 @@ test_opcode_0xe6(void)
   cpu_write_mem(&cpu, 0x0001, 0x3C); // NOLINT
 
   int code_found = execute_instruction(&cpu, 0xe6); // NOLINT
-  CU_ASSERT(code_found == 0);
+  CU_ASSERT(code_found >= 0);
   CU_ASSERT(cpu.pc == initial_pc + 2);
   CU_ASSERT(cpu.a == 0x1C);
 
@@ -564,7 +564,7 @@ test_opcode_0xfb(void)
   cpu.interrupt_enabled = false;
 
   int code_found = execute_instruction(&cpu, 0xfb); // NOLINT
-  CU_ASSERT(code_found == 0);
+  CU_ASSERT(code_found >= 0);
   CU_ASSERT(cpu.interrupt_enabled == true);
   CU_ASSERT(cpu.pc == (initial_pc + 1));
 }
@@ -582,7 +582,7 @@ test_opcode_0x5e(void)
 
   int code_found = execute_instruction(&cpu, 0x5e); // NOLINT
 
-  CU_ASSERT(code_found == 0);
+  CU_ASSERT(code_found >= 0);
   CU_ASSERT_EQUAL(cpu.e, 0x45); // NOLINT
 
   cpu_write_mem(&cpu, 0x1231, 0x00); // NOLINT
@@ -599,7 +599,7 @@ test_opcode_0x7a(void) // NOLINT
 
   int code_found = execute_instruction(&cpu, 0x7a); // NOLINT
 
-  CU_ASSERT(code_found == 0);
+  CU_ASSERT(code_found >= 0);
   CU_ASSERT(cpu.a == 100);
 }
 
@@ -616,7 +616,7 @@ test_opcode_0xa7(void) // NOLINT
 
   int code_found = execute_instruction(&cpu, 0xa7); // NOLINT
 
-  CU_ASSERT(code_found == 0);
+  CU_ASSERT(code_found >= 0);
   CU_ASSERT(cpu.a == 85);
   CU_ASSERT((cpu.flags & FLAG_Z) == 0);
   CU_ASSERT((cpu.flags & FLAG_S) == 0);
@@ -638,7 +638,7 @@ test_opcode_0xe1(void) // NOLINT
 
   int code_found = execute_instruction(&cpu, 0xe1); // NOLINT
 
-  CU_ASSERT(code_found == 0);
+  CU_ASSERT(code_found >= 0);
   CU_ASSERT(cpu.l == 0xBC);    // NOLINT
   CU_ASSERT(cpu.h == 0xFE);    // NOLINT
   CU_ASSERT(cpu.sp == 0xDAE0); // NOLINT
@@ -662,7 +662,7 @@ test_opcode_0xf1(void) // NOLINT
 
   int code_found = execute_instruction(&cpu, 0xf1); // NOLINT
 
-  CU_ASSERT(code_found == 0);
+  CU_ASSERT(code_found >= 0);
   CU_ASSERT_EQUAL(cpu.flags, 0xA8); // NOLINT
   CU_ASSERT_EQUAL(cpu.a, 0xDE);     // NOLINT
 
@@ -685,7 +685,7 @@ test_opcode_0xcd(void) // NOLINT
 
   int code_found = execute_instruction(&cpu, 0xcd); // NOLINT
 
-  CU_ASSERT(code_found == 0);
+  CU_ASSERT(code_found >= 0);
   CU_ASSERT_EQUAL(cpu_read_mem(&cpu, temp - 1), 0xAB); // NOLINT
   CU_ASSERT_EQUAL(cpu_read_mem(&cpu, temp - 2), 0xD0); // NOLINT
   CU_ASSERT_EQUAL(cpu.sp, 0xDCBA - 2);                 // NOLINT
@@ -708,7 +708,7 @@ test_opcode_0xc3(void) // NOLINT
 
   int code_found = execute_instruction(&cpu, 0xc3); // NOLINT
 
-  CU_ASSERT(code_found == 0);
+  CU_ASSERT(code_found >= 0);
   CU_ASSERT_EQUAL(cpu.pc, 0x9C1E); // NOLINT
 
   cpu_write_mem(&cpu, 0xCDEC, 0x00); // NOLINT
@@ -730,7 +730,7 @@ test_opcode_0x1a(void) // NOLINT
   int code_found = execute_instruction(&cpu, 0x1a); // NOLINT
 
   // verify
-  CU_ASSERT(0 == code_found);
+  CU_ASSERT(code_found >= 0);
   CU_ASSERT(1 == cpu.pc);
   CU_ASSERT(0xCC == cpu.a); // NOLINT
 
@@ -746,14 +746,14 @@ test_opcode_0x23(void) // NOLINT
 
   int code_found = execute_instruction(&cpu, 0x23); // NOLINT
 
-  CU_ASSERT(code_found == 0);
+  CU_ASSERT(code_found >= 0);
   CU_ASSERT(cpu.pc == 1);
   CU_ASSERT(cpu.l == 1);
   CU_ASSERT(cpu.h == 0);
 
   cpu.l = 0xFF;                                 // NOLINT
   code_found = execute_instruction(&cpu, 0x23); // NOLINT
-  CU_ASSERT(code_found == 0);
+  CU_ASSERT(code_found >= 0);
   CU_ASSERT(cpu.pc == 2);
   CU_ASSERT(cpu.l == 0);
   CU_ASSERT(cpu.h == 1);
@@ -774,7 +774,7 @@ test_opcode_0x29(void) // NOLINT
   int code_found = execute_instruction(&cpu, 0x29); // NOLINT
 
   // verify
-  CU_ASSERT(0 == code_found);
+  CU_ASSERT(code_found >= 0);
   CU_ASSERT(1 == cpu.pc);
   CU_ASSERT(0x23 == cpu.h); // NOLINT
   CU_ASSERT(0x54 == cpu.l); // NOLINT
@@ -789,7 +789,7 @@ test_opcode_0x29(void) // NOLINT
   code_found = execute_instruction(&cpu, 0x29); // NOLINT
 
   // verify
-  CU_ASSERT(0 == code_found);
+  CU_ASSERT(code_found >= 0);
   CU_ASSERT(2 == cpu.pc);
   CU_ASSERT(0x00 == cpu.h); // NOLINT
   CU_ASSERT(0x00 == cpu.l); // NOLINT
@@ -809,7 +809,7 @@ test_opcode_0x32(void) // NOLINT
 
   int code_found = execute_instruction(&cpu, 0x32); // NOLINT
 
-  CU_ASSERT(code_found == 0);
+  CU_ASSERT(code_found >= 0);
   CU_ASSERT(cpu.pc == 3);
   CU_ASSERT(cpu_read_mem(&cpu, 0xBBAA) == cpu.a);
 
@@ -880,7 +880,7 @@ test_opcode_0x3a(void) // NOLINT
   int code_found = execute_instruction(&cpu, 0x3a); // NOLINT
 
   // verify
-  CU_ASSERT(0 == code_found);
+  CU_ASSERT(code_found >= 0);
   CU_ASSERT(3 == cpu.pc);
   CU_ASSERT(0x42 == cpu.a); // NOLINT
 
@@ -905,7 +905,7 @@ test_opcode_0x66(void) // NOLINT
   int code_found = execute_instruction(&cpu, 0x66); // NOLINT
 
   // verify
-  CU_ASSERT(0 == code_found);
+  CU_ASSERT(code_found >= 0);
   CU_ASSERT(1 == cpu.pc);
   CU_ASSERT(0x31 == cpu.h); // NOLINT
 
@@ -926,7 +926,7 @@ test_opcode_0x7b(void) // NOLINT
   int code_found = execute_instruction(&cpu, 0x7b); // NOLINT
 
   // verify
-  CU_ASSERT(0 == code_found);
+  CU_ASSERT(code_found >= 0);
   CU_ASSERT(1 == cpu.pc);
   CU_ASSERT(0x29 == cpu.a); // NOLINT
   CU_ASSERT(0x29 == cpu.e); // NOLINT
@@ -945,7 +945,7 @@ test_opcode_0xaf(void) // NOLINT
   int code_found = execute_instruction(&cpu, 0xaf); // NOLINT
 
   // verify
-  CU_ASSERT(0 == code_found);
+  CU_ASSERT(code_found >= 0);
   CU_ASSERT(1 == cpu.pc);
   CU_ASSERT(0x00 == cpu.a); // NOLINT
   CU_ASSERT(FLAG_S != (cpu.flags & FLAG_S));
@@ -970,7 +970,7 @@ test_opcode_0xc5(void) // NOLINT
   int code_found = execute_instruction(&cpu, 0xc5); // NOLINT
 
   // verify
-  CU_ASSERT(0 == code_found);
+  CU_ASSERT(code_found >= 0);
   CU_ASSERT(1 == cpu.pc);
   CU_ASSERT(0xccca == cpu.sp); // NOLINT
   CU_ASSERT(cpu.b == cpu_read_mem(&cpu, cpu.sp + 1));
@@ -998,7 +998,7 @@ test_opcode_0xd1(void) // NOLINT
   int code_found = execute_instruction(&cpu, 0xd1); // NOLINT
 
   // verify
-  CU_ASSERT(0 == code_found);
+  CU_ASSERT(code_found >= 0);
   CU_ASSERT(1 == cpu.pc);
   CU_ASSERT(0xcccc == cpu.sp); // NOLINT
   CU_ASSERT(0xcd == cpu.d);    // NOLINT
@@ -1055,7 +1055,7 @@ test_opcode_0xe5(void) // NOLINT
   int code_found = execute_instruction(&cpu, 0xe5); // NOLINT
 
   // verify
-  CU_ASSERT(0 == code_found);
+  CU_ASSERT(code_found >= 0);
   CU_ASSERT(1 == cpu.pc);
   CU_ASSERT(0xddb9 == cpu.sp); // NOLINT
   CU_ASSERT(cpu.h == cpu_read_mem(&cpu, cpu.sp + 1));
@@ -1081,7 +1081,7 @@ test_opcode_0xf5(void) // NOLINT
   int code_found = execute_instruction(&cpu, 0xf5); // NOLINT
 
   // verify
-  CU_ASSERT(0 == code_found);
+  CU_ASSERT(code_found >= 0);
   CU_ASSERT(1 == cpu.pc);
   CU_ASSERT(0x4442 == cpu.sp); // NOLINT
   CU_ASSERT(cpu.a == cpu_read_mem(&cpu, cpu.sp + 1));
@@ -1105,7 +1105,7 @@ test_opcode_0x56(void) // NOLINT
 
   int code_found = execute_instruction(&cpu, 0x56); // NOLINT
 
-  CU_ASSERT(code_found == 0);
+  CU_ASSERT(code_found >= 0);
   CU_ASSERT(cpu.pc == 1);
   CU_ASSERT(cpu.d == cpu_read_mem(&cpu, 0xBBAA));
 
@@ -1126,7 +1126,7 @@ test_opcode_0x77(void) // NOLINT
 
   int code_found = execute_instruction(&cpu, 0x77); // NOLINT
 
-  CU_ASSERT(code_found == 0);
+  CU_ASSERT(code_found >= 0);
   CU_ASSERT(cpu.pc == 1);
   CU_ASSERT(cpu_read_mem(&cpu, 0xBBAA) == cpu.a);
 
@@ -1147,7 +1147,7 @@ test_opcode_0x7e(void) // NOLINT
 
   int code_found = execute_instruction(&cpu, 0x7e); // NOLINT
 
-  CU_ASSERT(code_found == 0);
+  CU_ASSERT(code_found >= 0);
   CU_ASSERT(cpu.pc == 1);
   CU_ASSERT(cpu.a == cpu_read_mem(&cpu, 0xBBAA));
 
@@ -1169,7 +1169,7 @@ test_opcode_0xc2(void) // NOLINT
 
   int code_found = execute_instruction(&cpu, 0xc2); // NOLINT
 
-  CU_ASSERT(code_found == 0);
+  CU_ASSERT(code_found >= 0);
   CU_ASSERT(cpu.pc == 3);
   CU_ASSERT((cpu.flags & FLAG_Z) == FLAG_Z);
 
@@ -1179,7 +1179,7 @@ test_opcode_0xc2(void) // NOLINT
 
   code_found = execute_instruction(&cpu, 0xc2); // NOLINT
 
-  CU_ASSERT(code_found == 0);
+  CU_ASSERT(code_found >= 0);
   CU_ASSERT(cpu.pc == 0xBBAA);
   CU_ASSERT((cpu.flags & FLAG_Z) == 0);
 
@@ -1202,7 +1202,7 @@ test_opcode_0xc9(void) // NOLINT
 
   int code_found = execute_instruction(&cpu, 0xc9); // NOLINT
 
-  CU_ASSERT(code_found == 0);
+  CU_ASSERT(code_found >= 0);
   CU_ASSERT(cpu.pc == 0xBBAA);
   CU_ASSERT(cpu.sp == 0x0003);
 
@@ -1223,7 +1223,7 @@ test_opcode_0xd5(void) // NOLINT
 
   int code_found = execute_instruction(&cpu, 0xd5); // NOLINT
 
-  CU_ASSERT(code_found == 0);
+  CU_ASSERT(code_found >= 0);
   CU_ASSERT(cpu.pc == 0x0001);
   CU_ASSERT(cpu.sp == 0xFFFD);
   CU_ASSERT(cpu_read_mem(&cpu, cpu.sp) == cpu.e);
@@ -1247,7 +1247,7 @@ test_opcode_0xeb(void) // NOLINT
 
   int code_found = execute_instruction(&cpu, 0xeb); // NOLINT
 
-  CU_ASSERT(code_found == 0);
+  CU_ASSERT(code_found >= 0);
   CU_ASSERT(cpu.pc == 0x0001);
   CU_ASSERT(cpu.d == 0xCC);
   CU_ASSERT(cpu.e == 0xDD);
@@ -1268,7 +1268,7 @@ test_opcode_0xfe(void) // NOLINT
 
   int code_found = execute_instruction(&cpu, 0xfe); // NOLINT
 
-  CU_ASSERT(code_found == 0);
+  CU_ASSERT(code_found >= 0);
   CU_ASSERT(cpu.pc == 0x0002);
   CU_ASSERT((cpu.flags & FLAG_P) == FLAG_P);
   CU_ASSERT((cpu.flags & FLAG_S) == 0);
@@ -1277,7 +1277,7 @@ test_opcode_0xfe(void) // NOLINT
   CU_ASSERT((cpu.flags & FLAG_CY) == 0);
 
   code_found = execute_instruction(&cpu, 0xfe); // NOLINT
-  CU_ASSERT(code_found == 0);
+  CU_ASSERT(code_found >= 0);
   CU_ASSERT(cpu.pc == 0x0004);
   CU_ASSERT((cpu.flags & FLAG_P) == FLAG_P);
   CU_ASSERT((cpu.flags & FLAG_S) == FLAG_S);
@@ -1286,7 +1286,7 @@ test_opcode_0xfe(void) // NOLINT
   CU_ASSERT((cpu.flags & FLAG_CY) == FLAG_CY);
 
   code_found = execute_instruction(&cpu, 0xfe); // NOLINT
-  CU_ASSERT(code_found == 0);
+  CU_ASSERT(code_found >= 0);
   CU_ASSERT(cpu.pc == 0x0006);
   CU_ASSERT((cpu.flags & FLAG_P) == 0);
   CU_ASSERT((cpu.flags & FLAG_S) == 0);
