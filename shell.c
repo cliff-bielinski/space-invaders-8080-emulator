@@ -79,18 +79,14 @@ main(int argc, char *argv[])
     {
       if ((SDL_GetTicks() - last_tick) > TICK)
         {
-          //printf("Start Time... %lu\n", last_tick);
-
 	  // run first half of tick cycles
           cycle_offset = run_cpu(&cpu, (num_cycles - (abs(cycle_offset) / 2)));
-          //printf("Time after first half... %u\n", SDL_GetTicks());
 
           // first interrupt
 	  handle_interrupt(&cpu, 0x01);  
 
 	  // run second half of tick cycles
           cycle_offset = run_cpu(&cpu, (num_cycles - (abs(cycle_offset) / 2)));
-          //printf("Time after second half... %u\n", SDL_GetTicks());
 
 	  // second interrupt
 	  handle_interrupt(&cpu, 0x02);  
@@ -110,7 +106,6 @@ main(int argc, char *argv[])
 int
 run_cpu(i8080 *cpu, int cycles)
 {
-//printf("num cycles: %d\n", cycles);
 
   // fetch and execute next instruction
   while (cycles > 0)
@@ -149,51 +144,6 @@ run_cpu(i8080 *cpu, int cycles)
           printf("\n");
         } 
     }
-//printf("num cycles out: %d\n", cycles);
   return cycles;
 }
 
-          /*
-                            // 1 Fetch, decode, and execute next instruction
-
-                            // fetch and execute next instruction
-                            uint8_t next_instruction = cpu_read_mem(&cpu,
-             cpu.pc); if (pflag)
-                              {
-                                print_instruction(next_instruction);
-                              }
-                            if (dflag)
-                              {
-                                printf("PRE-INSTRUCTION  ");
-                                print_state(&cpu);
-                                print_flags(cpu.flags);
-                                printf("\n");
-                              }
-
-                            int num_cycles_used
-                                = execute_instruction(&cpu, next_instruction);
-
-                            // execute instruction failed
-                            if (num_cycles_used < 0)
-                              {
-                                fprintf(stderr, "Unimplemented opcode
-             encountered. " "Exiting program.\n"); exit(EXIT_FAILURE);
-                              }
-                            else
-                              {
-                                num_remaining_cycles -= num_cycles_used;
-                              }
-                            if (dflag)
-                              {
-                                printf("POST-INSTRUCTION ");
-                                print_state(&cpu);
-                                print_flags(cpu.flags);
-                                printf("\n");
-                              }
-          */
-          // 2 Handle interrupts
-          // handle_interrupts(&cpu)
-
-          // 3 Update system state for display, input, and sound
-
-          // 4 Check for exit conditions
