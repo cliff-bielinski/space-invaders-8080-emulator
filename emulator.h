@@ -83,3 +83,8 @@ Helper functions to print instruction and cpu state
 void print_instruction(uint8_t opcode);
 void print_state(i8080 *cpu);
 void print_flags(uint8_t flags);
+
+/*
+Interrupt functions
+*/
+int handle_interrupt(i8080 *cpu, uint8_t rst_instruction);

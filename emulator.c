@@ -4,6 +4,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define BYTE 8
+#define UPPER_8_BIT_MASK 0xFF00
+#define LOWER_8_BIT_MASK 0x00FF
+#define RST_RANGE 7
+
 // Execute Instruction
 int
 execute_instruction(i8080 *cpu, uint8_t opcode)
@@ -667,4 +672,37 @@ print_flags(uint8_t flags)
   printf("FLAGS z: %d s: %d p: %d cy: %d ac %d", (flags & FLAG_Z) == FLAG_Z,
          (flags & FLAG_S) == FLAG_S, (flags & FLAG_P) == FLAG_P,
          (flags & FLAG_CY) == FLAG_CY, (flags & FLAG_AC) == FLAG_AC);
+}
+
+// INTERRUPTS
+int
+handle_interrupt(i8080 *cpu, uint8_t rst_instruction)
+{
+  if (rst_instruction > RST_RANGE)
+    {
+      fprintf(stderr, "Invalid restart instruction %u", rst_instruction);
+      return -1;
+    }
+
+  if (cpu->interrupt_enabled == false)
+    {
+      return 0;
+    }
+
+  // get address for interrupt subroutine
+  uint16_t subroutine_address = BYTE * rst_instruction;
+
+  // push program counter to stack
+  cpu_write_mem(cpu, cpu->sp - 1,
+                (uint8_t)((cpu->pc & UPPER_8_BIT_MASK) >> BYTE));
+  cpu_write_mem(cpu, cpu->sp - 2, (uint8_t)(cpu->pc & LOWER_8_BIT_MASK));
+  cpu->sp -= 2;
+
+  // set program counter to start of the interrupt subroutine
+  cpu->pc = subroutine_address;
+
+  // disable interrupts
+  cpu->interrupt_enabled = false;
+
+  return 0;
 }
