@@ -404,6 +404,13 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         cpu->sp -= 2;
         break;
       }
+    case 0xdb: // NOLINT
+      {        // IN D8
+        uint8_t port = cpu_read_mem(cpu, cpu->pc + 1);
+        printf("%u", port);
+        cpu->pc += 1;
+        break;
+      }
     case 0xe1: // NOLINT
       {        // POP H
         cpu->l = cpu_read_mem(cpu, cpu->sp);
