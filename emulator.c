@@ -498,7 +498,6 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       }
     }
   cpu->pc += 1;
-  printf("cpu->pc: %x\n", cpu->pc);
   return 0;
 }
 
