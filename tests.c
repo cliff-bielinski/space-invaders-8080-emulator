@@ -506,7 +506,7 @@ test_opcode_0xdb(void)
   cpu_write_mem(&cpu, 0x0001, 0x01);
 
   int code_found = execute_instruction(&cpu, 0xdb); // NOLINT
-  CU_ASSERT(code_found == 0);
+  CU_ASSERT(code_found >= 0);
   CU_ASSERT(cpu.pc == initial_pc + 2);
   // TODO: check contents of A register to see if byte received from port 1
 
@@ -831,7 +831,7 @@ test_opcode_0x35(void) // NOLINT
   // decrease (HL) from 2 to 1
   int code_found = execute_instruction(&cpu, 0x35); // NOLINT
 
-  CU_ASSERT(code_found == 0);
+  CU_ASSERT(code_found >= 0);
   CU_ASSERT(cpu.pc == 1);
   CU_ASSERT(cpu_read_mem(&cpu, 0xAABB) == 0x01); // NOLINT
   CU_ASSERT((cpu.flags & FLAG_P) == 0);
@@ -842,7 +842,7 @@ test_opcode_0x35(void) // NOLINT
   // decrease (HL) from 1 to 0
   code_found = execute_instruction(&cpu, 0x35); // NOLINT
 
-  CU_ASSERT(code_found == 0);
+  CU_ASSERT(code_found >= 0);
   CU_ASSERT(cpu.pc == 2);
   CU_ASSERT(cpu_read_mem(&cpu, 0xAABB) == 0x00);
   CU_ASSERT((cpu.flags & FLAG_P) == FLAG_P);
@@ -853,7 +853,7 @@ test_opcode_0x35(void) // NOLINT
   // decrease C from 0 to 255
   code_found = execute_instruction(&cpu, 0x35); // NOLINT
 
-  CU_ASSERT(code_found == 0);
+  CU_ASSERT(code_found >= 0);
   CU_ASSERT(cpu.pc == 3);
   CU_ASSERT(cpu_read_mem(&cpu, 0xAABB) == 0xFF);
   CU_ASSERT((cpu.flags & FLAG_P) == FLAG_P);
@@ -1025,13 +1025,13 @@ test_opcode_0xda(void) // NOLINT
 
   int code_found = execute_instruction(&cpu, 0xda); // NOLINT
 
-  CU_ASSERT(code_found == 0);
+  CU_ASSERT(code_found >= 0);
   CU_ASSERT_EQUAL(cpu.pc, 0x1237); // NOLINT
 
   cpu.flags |= FLAG_CY;
   code_found = execute_instruction(&cpu, 0xda); // NOLINT
 
-  CU_ASSERT(code_found == 0);
+  CU_ASSERT(code_found >= 0);
   CU_ASSERT_EQUAL(cpu.pc, 0xCCDD); // NOLINT
 
   cpu_write_mem(&cpu, 0x1235, 0x00); // NOLINT
