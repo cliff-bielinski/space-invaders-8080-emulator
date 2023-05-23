@@ -1,4 +1,5 @@
 #include "emulator.h"
+#include <SDL2/SDL.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -642,6 +643,39 @@ update_sign_flag(i8080 *cpu, uint8_t result)
   else
     {
       cpu->flags &= ~FLAG_S;
+    }
+}
+
+// Interrupts
+
+void
+generate_interrupt(i8080 *cpu, int interrupt_num)
+{
+  // Push PC
+  cpu_write_mem(cpu, cpu->sp - 1, (cpu->pc & 0xFF00) >> 8);
+  cpu_write_mem(cpu, cpu->sp - 2, (cpu->pc & 0xFF));
+
+  // Set pointers
+  cpu->sp -= 2;
+  cpu->pc = 8 * interrupt_num;
+}
+
+// UPDATE GRAPHICS
+
+void
+update_graphics(i8080 *cpu, SDL_Surface *surface)
+{
+  if (SDL_MUSTLOCK(surface))
+    {
+      SDL_LockSurface(surface);
+    }
+
+  uint32_t *out_pixel_data = surface->pixels;
+
+
+  if (SDL_MUSTLOCK(surface))
+    {
+      SDL_UnlockSurface(surface);
     }
 }
 

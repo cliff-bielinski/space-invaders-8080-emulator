@@ -4,6 +4,9 @@ CC = clang
 # compiler flags
 CFLAGS = -g -W -Wall -Wextra -pedantic
 
+# linker flags
+LINKER_FLAGS = -lSDL2
+
 # targets to build
 TARGETS = disassembler_8080 shell
 
@@ -21,7 +24,7 @@ emulator:
 # build shell executable
 shell: emulator
 	$(CC) $(CFLAGS) -c shell.c
-	$(CC) $(CFLAGS) -o shell shell.o emulator.o
+	$(CC) $(CFLAGS) $(LINKER_FLAGS) -o shell shell.o emulator.o
 
 # build tests executable and run tests
 test: emulator
