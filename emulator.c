@@ -676,30 +676,33 @@ update_graphics(i8080 *cpu, SDL_Window *window, SDL_Surface *surface)
   for (int column = 0; column > SCREEN_WIDTH; column++)
     {
       // Start at bottom of screen, decrement by 8 since each bit is a pixel.
-      for (int row = SCREEN_HEIGHT; row > 0; row -= 8)
+      for (int row = SCREEN_HEIGHT; row > 0; row -= 8) // NOLINT
         {
           // Set each pixel based on bit value.
-          for (int pixel = 0; pixel < 8; pixel++)
+          for (int pixel = 0; pixel < 8; pixel++) // NOLINT
             {
               // Calculate surface index.
               int surf_index = (SCREEN_WIDTH * (row - pixel)) + column
                                - (SCREEN_WIDTH - 1);
-              
+
               uint8_t cur_byte = cpu_read_mem(cpu, vram);
 
               // Set pixel to on by changing color to white.
-              if (cur_byte & 1 << pixel) {
-                screen_buff[surf_index] = 0xFFFFFF;
-              } else {
-                // Set pixel to off by changing color to black.
-                screen_buff[surf_index] = 0x000000;
-              }
+              if (cur_byte & 1 << pixel)
+                {
+                  screen_buff[surf_index] = 0xFFFFFF; // NOLINT
+                }
+              else
+                {
+                  // Set pixel to off by changing color to black.
+                  screen_buff[surf_index] = 0x000000; // NOLINT
+                }
             }
         }
-        vram ++; // Increment to next byte in VRAM
+      vram++; // Increment to next byte in VRAM
     }
 
-    SDL_BlitSurface(surface, NULL, window, NULL);
+  SDL_BlitSurface(surface, NULL, window, NULL);
 }
 
 // DEBUGGING FUNCTIONS
