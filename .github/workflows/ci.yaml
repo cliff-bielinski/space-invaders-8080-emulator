@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - run: sudo apt install libcunit1 libcunit1-doc libcunit1-dev 
+      - run: sudo apt install libcunit1 libcunit1-doc libcunit1-dev libsdl2-dev
       - uses: cpp-linter/cpp-linter-action@v2
         id: linter
         env:
