@@ -773,6 +773,53 @@ test_opcode_0x32(void) // NOLINT
 }
 
 void
+test_opcode_0x35(void) // NOLINT
+{
+  i8080 cpu;
+  cpu_init(&cpu);
+  cpu.h = 0xAA; // NOLINT
+  cpu.l = 0xBB; // NOLINT
+
+  cpu_write_mem(&cpu, 0xAABB, 0x02); // NOLINT
+
+  // decrease (HL) from 2 to 1
+  int code_found = execute_instruction(&cpu, 0x35); // NOLINT
+
+  CU_ASSERT(code_found == 0);
+  CU_ASSERT(cpu.pc == 1);
+  CU_ASSERT(cpu_read_mem(&cpu, 0xAABB) == 0x01); // NOLINT
+  CU_ASSERT((cpu.flags & FLAG_P) == 0);
+  CU_ASSERT((cpu.flags & FLAG_S) == 0);
+  CU_ASSERT((cpu.flags & FLAG_Z) == 0);
+  CU_ASSERT((cpu.flags & FLAG_AC) == FLAG_AC);
+
+  // decrease (HL) from 1 to 0
+  code_found = execute_instruction(&cpu, 0x35); // NOLINT
+
+  CU_ASSERT(code_found == 0);
+  CU_ASSERT(cpu.pc == 2);
+  CU_ASSERT(cpu_read_mem(&cpu, 0xAABB) == 0x00);
+  CU_ASSERT((cpu.flags & FLAG_P) == FLAG_P);
+  CU_ASSERT((cpu.flags & FLAG_S) == 0);
+  CU_ASSERT((cpu.flags & FLAG_Z) == FLAG_Z);
+  CU_ASSERT((cpu.flags & FLAG_AC) == FLAG_AC);
+
+  // decrease C from 0 to 255
+  code_found = execute_instruction(&cpu, 0x35); // NOLINT
+
+  CU_ASSERT(code_found == 0);
+  CU_ASSERT(cpu.pc == 3);
+  CU_ASSERT(cpu_read_mem(&cpu, 0xAABB) == 0xFF);
+  CU_ASSERT((cpu.flags & FLAG_P) == FLAG_P);
+  CU_ASSERT((cpu.flags & FLAG_S) == FLAG_S);
+  CU_ASSERT((cpu.flags & FLAG_Z) == 0);
+  CU_ASSERT((cpu.flags & FLAG_AC) == 0);
+
+  // clean up
+  cpu_write_mem(&cpu, 0xAABB, 0x00); // NOLINT
+}
+
+void
 test_opcode_0x3a(void) // NOLINT
 {                      // LDA adr
 
@@ -1331,6 +1378,9 @@ main(void)
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x32()",
                          test_opcode_0x32))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0x35()",
+                         test_opcode_0x35))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x3a()",
                          test_opcode_0x3a))
