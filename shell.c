@@ -73,27 +73,31 @@ main(int argc, char *argv[])
 
   // set initial offset value
   int cycle_offset = 0;
-  int num_cycles = CYCLES_PER_TICK;
+  int num_cycles = CYCLES_PER_TICK / 2;
 
   while (true)
     {
       if ((SDL_GetTicks() - last_tick) > TICK) // NOLINT
         {
-          printf("Current tick is: %d\n", SDL_GetTicks());
+          if (pflag)
+            {
+              printf("Current Tick: %d\n", SDL_GetTicks());
+            }
+
           // run first half of tick cycles
-          cycle_offset = run_cpu(&cpu, (num_cycles - (abs(cycle_offset) / 2)));
+          cycle_offset = run_cpu(&cpu, num_cycles - abs(cycle_offset));
 
           // first interrupt
           handle_interrupt(&cpu, 0x01);
 
           // run second half of tick cycles
-          cycle_offset = run_cpu(&cpu, (num_cycles - (abs(cycle_offset) / 2)));
+          cycle_offset = run_cpu(&cpu, num_cycles - abs(cycle_offset));
 
           // second interrupt
           handle_interrupt(&cpu, 0x02);
 
           // set number of cycles for next tick
-          num_cycles = CYCLES_PER_TICK - cycle_offset;
+          num_cycles = CYCLES_PER_TICK / 2 - cycle_offset;
 
           // 3 Update system state for display, input, and sound
 
