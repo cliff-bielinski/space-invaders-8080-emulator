@@ -369,7 +369,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
             cpu->sp += 2;
             cpu->pc = address;
             // NOLINTNEXTLINE
-	    return 0;
+            return 0;
           }
         break;
       }
