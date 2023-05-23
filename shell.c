@@ -1,8 +1,8 @@
 #include "emulator.h"
 #include <ctype.h>
 
-#include <SDL.h>
-#include "SDL_nmix.h"
+
+//#include "SDL_nmix.h"
 #include <unistd.h>
 #define JOYSTICK_DEAD_ZONE 8000
 
@@ -11,9 +11,11 @@ static SDL_Renderer* renderer = NULL;
 static SDL_Texture* texture = NULL;
 static SDL_Event e;
 
+static int speed = 1;
 static bool should_quit = false;
 static uint32_t curr_time = 0;
 static uint32_t last_time = 0;
+static uint32_t dt = 0;
 
 void io_loop(i8080* cpu) {
   curr_time = SDL_GetTicks();
@@ -23,9 +25,8 @@ void io_loop(i8080* cpu) {
     if (e.type == SDL_QUIT) {
       should_quit = true;
     } else if (e.type == SDL_KEYDOWN) {
-      SDL_ScanCode key = e.key.keysym.scancode;
-    }
-    if (key == SDL_SCANCODE_C) {
+      SDL_Scancode key = e.key.keysym.scancode;
+      if (key == SDL_SCANCODE_C) {
       cpu->port1 |= 1 << 0;
     } else if (key == SDL_SCANCODE_2) {
       cpu->port1 |= 1 << 1;
@@ -52,7 +53,7 @@ void io_loop(i8080* cpu) {
       speed = 5;
     }
   } else if (e.type == SDL_KEYUP) {
-    SDL_Scancode key = e.key.keysm.scancode;
+    SDL_Scancode key = e.key.keysym.scancode;
     if (key == SDL_SCANCODE_C) {
       cpu->port1 &= 0b11111110;
     } else if (key == SDL_SCANCODE_2) {
@@ -107,7 +108,7 @@ void io_loop(i8080* cpu) {
       } else if (e.jbutton.button == 4) {
         break;
       }
-    } else if (e.type = SDL_JOYBUTTONUP) {
+    } else if (e.type == SDL_JOYBUTTONUP) {
       if (e.jbutton.button == 1) {
         cpu->port1 &= 0b11111110;
       } else if (e.jbutton.button == 0) {
@@ -126,6 +127,8 @@ void io_loop(i8080* cpu) {
       }
     }
   }
+    }
+    
   // update
   SDL_RenderClear(renderer);
   SDL_RenderCopy(renderer, texture, NULL, NULL);
@@ -188,7 +191,7 @@ main(int argc, char *argv[])
   }
 */
   SDL_Joystick* joystick = NULL;
-  if (SDL_NumJoySticks() > 0) {
+  if (SDL_NumJoysticks() > 0) {
     joystick = SDL_JoystickOpen(0);
     if (joystick) {
       SDL_Log("Joystick successfully found");

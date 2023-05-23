@@ -4,9 +4,10 @@
 #include <stdlib.h>
 
 // SDL Files
-#include <SDL.h>
-#include "SDL_nmix.h"
-#include "SDL_nmix_file.h"
+#include <SDL2/SDL.h>
+
+//#include "SDL_nmix.h"
+//#include "SDL_nmix_file.h"
 
 
 // Flags Defined

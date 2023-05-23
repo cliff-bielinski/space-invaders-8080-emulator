@@ -571,7 +571,7 @@ static uint8_t port_in(i8080 *cpu, uint8_t port) {
 
   switch(port) {
   case 0:
-    break
+    break;
   case 1:
     value = cpu->port1;
     break;
