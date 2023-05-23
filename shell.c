@@ -16,7 +16,7 @@ static uint32_t last_time = 0;
 static uint32_t dt = 0;
 
 void
-io_loop(i8080 *cpu)
+io_loop(i8080 *cpu) // NOLINT(readability-function-cognitive-complexity)
 {
   curr_time = SDL_GetTicks();
   dt = curr_time - last_time;
