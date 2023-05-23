@@ -663,7 +663,7 @@ generate_interrupt(i8080 *cpu, int interrupt_num)
 // UPDATE GRAPHICS
 
 void
-update_graphics(i8080 *cpu, SDL_Surface *surface)
+update_graphics(i8080 *cpu, SDL_Window *window, SDL_Surface *surface)
 {
 
   uint32_t *screen_buff = surface->pixels;
@@ -698,6 +698,8 @@ update_graphics(i8080 *cpu, SDL_Surface *surface)
         }
         vram ++; // Increment to next byte in VRAM
     }
+
+    SDL_BlitSurface(surface, NULL, window, NULL);
 }
 
 // DEBUGGING FUNCTIONS

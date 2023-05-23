@@ -141,7 +141,7 @@ main(int argc, char *argv[])
               printf("inside interrupt loop.\n");
               generate_interrupt(&cpu, 2);
               last_interrupt = SDL_GetTicks();
-              update_graphics(&cpu, buffer);
+              update_graphics(&cpu, window, buffer);
             }
         }
 
