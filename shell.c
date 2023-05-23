@@ -15,11 +15,11 @@
 int run_cpu(i8080 *cpu, int cycles);
 int pflag = 0;
 int dflag = 0;
-int opt;
 
 int
 main(int argc, char *argv[])
 {
+  int opt;
 
   while ((opt = getopt(argc, argv, "pd")) != -1)
     {

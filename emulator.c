@@ -777,7 +777,7 @@ void
 print_state(i8080 *cpu)
 {
   printf("REGISTERS a: 0x%02x b: 0x%02x c: 0x%02x d: 0x%02x e: 0x%02x h: "
-         "0x%02x l: 0x%02x sp: 0x%02x pc: 0x%02x ",
+         "0x%02x l: 0x%02x sp: 0x%04x pc: 0x%04x ",
          cpu->a, cpu->b, cpu->c, cpu->d, cpu->e, cpu->h, cpu->l, cpu->sp,
          cpu->pc);
 }
