@@ -9,7 +9,7 @@
 #include <unistd.h>
 
 #define CLOCK_SPEED_MS 2000
-#define (TICK 1000 * (1.0 / 60.0))
+#define TICK (1000 * (1.0 / 60.0))
 #define CYCLES_PER_TICK (CLOCK_SPEED_MS * TICK)
 
 int run_cpu(i8080 *cpu, int cycles);
