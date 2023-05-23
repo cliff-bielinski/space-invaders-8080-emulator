@@ -21,7 +21,7 @@ io_loop(i8080 *cpu)
   curr_time = SDL_GetTicks();
   dt = curr_time - last_time;
 
-  while (SDL_PollEvent(&e) != 0)
+  while (SDL_PollEvent(&e) != 0) // NOLINT
     {
       if (e.type == SDL_QUIT)
         {
@@ -32,34 +32,34 @@ io_loop(i8080 *cpu)
           SDL_Scancode key = e.key.keysym.scancode;
           if (key == SDL_SCANCODE_C)
             {
-              cpu->port1 |= 1 << 0;
+              cpu->port1 |= 1 << 0; // NOLINT
             }
           else if (key == SDL_SCANCODE_2)
             {
-              cpu->port1 |= 1 << 1;
+              cpu->port1 |= 1 << 1; // NOLINT
             }
           else if (key == SDL_SCANCODE_RETURN)
             {
-              cpu->port1 |= 1 << 2;
+              cpu->port1 |= 1 << 2; // NOLINT
             }
           else if (key == SDL_SCANCODE_SPACE)
             {
-              cpu->port1 |= 1 << 4;
-              cpu->port2 |= 1 << 4;
+              cpu->port1 |= 1 << 4; // NOLINT
+              cpu->port2 |= 1 << 4; // NOLINT
             }
           else if (key == SDL_SCANCODE_LEFT)
             {
-              cpu->port1 |= 1 << 5;
-              cpu->port2 |= 1 << 5;
+              cpu->port1 |= 1 << 5; // NOLINT
+              cpu->port2 |= 1 << 5; // NOLINT
             }
           else if (key == SDL_SCANCODE_RIGHT)
             {
-              cpu->port1 |= 1 << 6;
-              cpu->port2 |= 1 << 6;
+              cpu->port1 |= 1 << 6; // NOLINT
+              cpu->port2 |= 1 << 6; // NOLINT
             }
           else if (key == SDL_SCANCODE_T)
             {
-              cpu->port2 |= 1 << 2;
+              cpu->port2 |= 1 << 2; // NOLINT
             }
           else if (key == SDL_SCANCODE_ESCAPE)
             {
@@ -71,7 +71,7 @@ io_loop(i8080 *cpu)
             }
           else if (key == SDL_SCANCODE_TAB)
             {
-              speed = 5;
+              speed = 5; // NOLINT 
             }
         }
       else if (e.type == SDL_KEYUP)
@@ -79,34 +79,34 @@ io_loop(i8080 *cpu)
           SDL_Scancode key = e.key.keysym.scancode;
           if (key == SDL_SCANCODE_C)
             {
-              cpu->port1 &= 0b11111110;
+              cpu->port1 &= 0b11111110; // NOLINT
             }
           else if (key == SDL_SCANCODE_2)
             {
-              cpu->port1 &= 0b11111101;
+              cpu->port1 &= 0b11111101; // NOLINT
             }
           else if (key == SDL_SCANCODE_RETURN)
             {
-              cpu->port1 &= 0b11111011;
+              cpu->port1 &= 0b11111011; // NOLINT
             }
           else if (key == SDL_SCANCODE_SPACE)
             {
-              cpu->port1 &= 0b11101111;
-              cpu->port2 &= 0b11101111;
+              cpu->port1 &= 0b11101111; // NOLINT
+              cpu->port2 &= 0b11101111; // NOLINT
             }
           else if (key == SDL_SCANCODE_LEFT)
             {
-              cpu->port1 &= 0b11011111;
-              cpu->port2 &= 0b11011111;
+              cpu->port1 &= 0b11011111; // NOLINT
+              cpu->port2 &= 0b11011111; // NOLINT
             }
           else if (key == SDL_SCANCODE_RIGHT)
             {
-              cpu->port1 &= 0b10111111;
-              cpu->port2 &= 0b10111111;
+              cpu->port1 &= 0b10111111; // NOLINT
+              cpu->port2 &= 0b10111111; // NOLINT
             }
           else if (key == SDL_SCANCODE_T)
             {
-              cpu->port2 &= 0b11111011;
+              cpu->port2 &= 0b11111011; // NOLINT
             }
           else if (key == SDL_SCANCODE_TAB)
             {
@@ -115,89 +115,89 @@ io_loop(i8080 *cpu)
         }
       else if (e.type == SDL_JOYAXISMOTION)
         {
-          if (e.jaxis.axis == 0)
+          if (e.jaxis.axis == 0) // NOLINT
             {
               if (e.jaxis.value < -JOYSTICK_DEAD_ZONE)
                 {
-                  cpu->port1 |= 1 << 5;
-                  cpu->port2 |= 1 << 5;
+                  cpu->port1 |= 1 << 5; // NOLINT
+                  cpu->port2 |= 1 << 5; // NOLINT
                 }
               else if (e.jaxis.value > JOYSTICK_DEAD_ZONE)
                 {
-                  cpu->port1 |= 1 << 6;
-                  cpu->port2 |= 1 << 6;
+                  cpu->port1 |= 1 << 6; // NOLINT
+                  cpu->port2 |= 1 << 6; // NOLINT
                 }
               else
                 {
-                  cpu->port1 &= 0b11011111;
-                  cpu->port2 &= 0b11011111;
-
-                  cpu->port1 &= 0b10111111;
-                  cpu->port2 &= 0b10111111;
+                  cpu->port1 &= 0b11011111; // NOLINT
+                  cpu->port2 &= 0b11011111; // NOLINT
+ 
+                  cpu->port1 &= 0b10111111; // NOLINT
+                  cpu->port2 &= 0b10111111; // NOLINT
                 }
             }
           else if (e.type == SDL_JOYBUTTONDOWN)
             {
-              if (e.jbutton.button == 1)
+              if (e.jbutton.button == 1) // NOLINT
                 {
-                  cpu->port1 |= 1 << 0;
+                  cpu->port1 |= 1 << 0; // NOLINT
                 }
-              else if (e.jbutton.button == 0)
+              else if (e.jbutton.button == 0) // NOLINT
                 {
-                  cpu->port1 |= 1 << 4;
-                  cpu->port2 |= 1 << 4;
+                  cpu->port1 |= 1 << 4; // NOLINT
+                  cpu->port2 |= 1 << 4; // NOLINT
                 }
-              else if (e.jbutton.button == 8)
+              else if (e.jbutton.button == 8) // NOLINT
                 {
-                  cpu->port1 |= 1 << 2;
+                  cpu->port1 |= 1 << 2; // NOLINT
                 }
-              else if (e.jbutton.button == 9)
+              else if (e.jbutton.button == 9) // NOLINT
                 {
-                  cpu->port1 |= 1 << 1;
+                  cpu->port1 |= 1 << 1; // NOLINT
                 }
-              else if (e.jbutton.button == 13)
+              else if (e.jbutton.button == 13) // NOLINT
                 {
-                  cpu->port1 |= 1 << 5;
-                  cpu->port2 |= 1 << 5;
+                  cpu->port1 |= 1 << 5; // NOLINT
+                  cpu->port2 |= 1 << 5; // NOLINT
                 }
-              else if (e.jbutton.button == 14)
+              else if (e.jbutton.button == 14) // NOLINT
                 {
-                  cpu->port1 |= 1 << 6;
-                  cpu->port2 |= 1 << 6;
+                  cpu->port1 |= 1 << 6; // NOLINT
+                  cpu->port2 |= 1 << 6; // NOLINT
                 }
-              else if (e.jbutton.button == 4)
+              else if (e.jbutton.button == 4) // NOLINT
                 {
                   break;
                 }
             }
           else if (e.type == SDL_JOYBUTTONUP)
             {
-              if (e.jbutton.button == 1)
+              if (e.jbutton.button == 1) // NOLINT
                 {
-                  cpu->port1 &= 0b11111110;
+                  cpu->port1 &= 0b11111110; // NOLINT
                 }
-              else if (e.jbutton.button == 0)
+              else if (e.jbutton.button == 0) // NOLINT
                 {
-                  cpu->port1 &= 0b11101111;
-                  cpu->port2 &= 0b11101111;
+                  cpu->port1 &= 0b11101111; // NOLINT
+                  cpu->port2 &= 0b11101111; // NOLINT
                 }
-              else if (e.jbutton.button == 8)
+              else if (e.jbutton.button == 8) // NOLINT
                 {
-                  cpu->port1 &= 0b11111011;
+                  cpu->port1 &= 0b11111011; // NOLINT
                 }
-              else if (e.jbutton.button == 9)
+              else if (e.jbutton.button == 9) // NOLINT
                 {
-                  cpu->port1 &= 0b11111101;
+                  cpu->port1 &= 0b11111101; // NOLINT
                 }
-              else if (e.jbutton.button == 13)
+              else if (e.jbutton.button == 13) // NOLINT
                 {
-                  cpu->port1 &= 0b11011111;
-                  cpu->port2 &= 0b11011111;
+                  cpu->port1 &= 0b11011111; // NOLINT
+                  cpu->port2 &= 0b11011111; // NOLINT
                 }
-              else if (e.jbutton.button == 14)
+              else if (e.jbutton.button == 14) // NOLINT
                 {
-                  cpu->port1 &= 0b10111111;
-                  cpu->port2 &= 0b10111111;
+                  cpu->port1 &= 0b10111111; // NOLINT
+                  cpu->port2 &= 0b10111111; // NOLINT
                 }
             }
         }
