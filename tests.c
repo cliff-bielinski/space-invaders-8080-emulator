@@ -468,6 +468,23 @@ test_opcode_0xd3(void)
 }
 
 void
+test_opcode_0xdb(void)
+{
+  i8080 cpu;
+  cpu_init(&cpu);
+  uint16_t initial_pc = cpu.pc;
+  cpu.a = 0x50; // NOLINT
+  cpu_write_mem(&cpu, 0x0001, 0x01);
+
+  int code_found = execute_instruction(&cpu, 0xdb); // NOLINT
+  CU_ASSERT(code_found == 0);
+  CU_ASSERT(cpu.pc == initial_pc + 2);
+  // TODO: check contents of A register to see if byte received from port 1
+
+  cpu_write_mem(&cpu, 0x0001, 0x00);
+}
+
+void
 test_opcode_0x7c(void)
 {
   i8080 cpu;
@@ -964,6 +981,37 @@ test_opcode_0xd1(void) // NOLINT
 }
 
 void
+test_opcode_0xda(void) // NOLINT
+{
+  // JMP CY
+  i8080 cpu;
+  cpu_init(&cpu);
+
+  cpu.pc = 0x1234;                       // NOLINT
+  cpu.flags = 0;                         // NOLINT
+  cpu_write_mem(&cpu, cpu.pc + 1, 0xBB); // NOLINT
+  cpu_write_mem(&cpu, cpu.pc + 2, 0xAA); // NOLINT
+  cpu_write_mem(&cpu, cpu.pc + 4, 0xDD); // NOLINT
+  cpu_write_mem(&cpu, cpu.pc + 5, 0xCC); // NOLINT
+
+  int code_found = execute_instruction(&cpu, 0xda); // NOLINT
+
+  CU_ASSERT(code_found == 0);
+  CU_ASSERT_EQUAL(cpu.pc, 0x1237); // NOLINT
+
+  cpu.flags |= FLAG_CY;
+  code_found = execute_instruction(&cpu, 0xda); // NOLINT
+
+  CU_ASSERT(code_found == 0);
+  CU_ASSERT_EQUAL(cpu.pc, 0xCCDD); // NOLINT
+
+  cpu_write_mem(&cpu, 0x1235, 0x00); // NOLINT
+  cpu_write_mem(&cpu, 0x1236, 0x00); // NOLINT
+  cpu_write_mem(&cpu, 0x1237, 0x00); // NOLINT
+  cpu_write_mem(&cpu, 0x1238, 0x00); // NOLINT
+}
+
+void
 test_opcode_0xe5(void) // NOLINT
 {                      // PUSH H
 
@@ -1352,6 +1400,9 @@ main(void)
           == CU_add_test(pSuite, "test of test_opcode_0xd3()",
                          test_opcode_0xd3))
       || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0xdb()",
+                         test_opcode_0xdb))
+      || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0xe6()",
                          test_opcode_0xe6))
       || (NULL
@@ -1417,6 +1468,9 @@ main(void)
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0xd5()",
                          test_opcode_0xd5))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0xda()",
+                         test_opcode_0xda))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0xe5()",
                          test_opcode_0xe5))
