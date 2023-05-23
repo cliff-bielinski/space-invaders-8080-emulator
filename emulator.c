@@ -665,17 +665,38 @@ generate_interrupt(i8080 *cpu, int interrupt_num)
 void
 update_graphics(i8080 *cpu, SDL_Surface *surface)
 {
-  if (SDL_MUSTLOCK(surface))
+
+  uint32_t *screen_buff = surface->pixels;
+
+  // Graphics data is rotated 90 degrees in memory counter-clockwise.  Reading
+  // byte by byte starting at 0x2400 we need to fill in the screen left to
+  // right, bottom to top.
+  int vram = 0x2400;
+  // Start at the left edge
+  for (int column = 0; column > SCREEN_WIDTH; column++)
     {
-      SDL_LockSurface(surface);
-    }
+      // Start at bottom of screen, decrement by 8 since each bit is a pixel.
+      for (int row = SCREEN_HEIGHT; row > 0; row -= 8)
+        {
+          // Set each pixel based on bit value.
+          for (int pixel = 0; pixel < 8; pixel++)
+            {
+              // Calculate surface index.
+              int surf_index = (SCREEN_WIDTH * (row - pixel)) + column
+                               - (SCREEN_WIDTH - 1);
+              
+              uint8_t cur_byte = cpu_read_mem(cpu, vram);
 
-  uint32_t *out_pixel_data = surface->pixels;
-
-
-  if (SDL_MUSTLOCK(surface))
-    {
-      SDL_UnlockSurface(surface);
+              // Set pixel to on by changing color to white.
+              if (cur_byte & 1 << pixel) {
+                screen_buff[surf_index] = 0xFFFFFF;
+              } else {
+                // Set pixel to off by changing color to black.
+                screen_buff[surf_index] = 0x000000;
+              }
+            }
+        }
+        vram ++; // Increment to next byte in VRAM
     }
 }
 

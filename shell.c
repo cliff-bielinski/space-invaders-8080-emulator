@@ -11,7 +11,6 @@
 uint32_t start_time = 0;
 uint32_t last_interrupt = 0;
 
-
 int
 main(int argc, char *argv[])
 {
@@ -67,23 +66,24 @@ main(int argc, char *argv[])
     }
 
   // Render window
-  SDL_Window* window = NULL;
+  SDL_Window *window = NULL;
 
   // The surface contained by the window
-  SDL_Surface* screenSurface = NULL;
+  SDL_Surface *screenSurface = NULL;
+  SDL_Surface *buffer = NULL;
 
   // Initialize SDL
-  if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) < 0)
+  if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_JOYSTICK) < 0)
     {
       printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
     }
   else
     {
       // Create window
-      window
-          = SDL_CreateWindow("Space Invaders Emulator",
-                             SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-                             SCREEN_WIDTH * 2, SCREEN_HEIGHT * 2, SDL_WINDOW_SHOWN);
+      window = SDL_CreateWindow("Space Invaders Emulator",
+                                SDL_WINDOWPOS_UNDEFINED,
+                                SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH * 2,
+                                SCREEN_HEIGHT * 2, SDL_WINDOW_RESIZABLE);
       if (window == NULL)
         {
           printf("Window could not be created! SDL_Error: %s\n",
@@ -93,6 +93,8 @@ main(int argc, char *argv[])
         {
           // Get window surface
           screenSurface = SDL_GetWindowSurface(window);
+          buffer = SDL_CreateRGBSurface(0, SCREEN_WIDTH, SCREEN_HEIGHT, 32, 0,
+                                        0, 0, 0);
         }
     }
 
@@ -131,17 +133,17 @@ main(int argc, char *argv[])
       // 2 Handle interrupts
       // handle_interrupts(&cpu)
       printf("time since initialization %u\n", SDL_GetTicks());
-      if ((SDL_GetTicks() - last_interrupt) > 1.0/60.0)
-      {
-        printf("interrupt?\n");
-        if (cpu.interrupt_enabled)
+      if ((SDL_GetTicks() - last_interrupt) > 1.0 / 60.0)
         {
-          printf("inside interrupt loop.\n");
-          generate_interrupt(&cpu, 2);
-          last_interrupt = SDL_GetTicks();
-          update_graphics(&cpu, screenSurface);
+          printf("interrupt?\n");
+          if (cpu.interrupt_enabled)
+            {
+              printf("inside interrupt loop.\n");
+              generate_interrupt(&cpu, 2);
+              last_interrupt = SDL_GetTicks();
+              update_graphics(&cpu, buffer);
+            }
         }
-      }
 
       // 3 Update system state for display, input, and sound
 
