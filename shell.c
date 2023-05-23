@@ -1,7 +1,7 @@
 #include "emulator.h"
 #include <ctype.h>
 
-//#include "SDL_nmix.h"
+// #include "SDL_nmix.h"
 #include <unistd.h>
 #define JOYSTICK_DEAD_ZONE 8000
 
@@ -71,7 +71,7 @@ io_loop(i8080 *cpu) // NOLINT(readability-function-cognitive-complexity)
             }
           else if (key == SDL_SCANCODE_TAB)
             {
-              speed = 5; // NOLINT 
+              speed = 5; // NOLINT
             }
         }
       else if (e.type == SDL_KEYUP)
@@ -131,7 +131,7 @@ io_loop(i8080 *cpu) // NOLINT(readability-function-cognitive-complexity)
                 {
                   cpu->port1 &= 0b11011111; // NOLINT
                   cpu->port2 &= 0b11011111; // NOLINT
- 
+
                   cpu->port1 &= 0b10111111; // NOLINT
                   cpu->port2 &= 0b10111111; // NOLINT
                 }
