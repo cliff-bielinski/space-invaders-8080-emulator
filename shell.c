@@ -1,18 +1,18 @@
 #include "emulator.h"
 #include <SDL2/SDL.h>
 #include <ctype.h>
+#include <math.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <math.h>
 
 #define CLOCK_SPEED_MS 2000
-#define TICK 1000 * (1.0 / 60.0)
-#define CYCLES_PER_TICK (CLOCK_SPEED_MS * TICK)  
+#define(TICK 1000 * (1.0 / 60.0))
+#define CYCLES_PER_TICK (CLOCK_SPEED_MS * TICK)
 
-int run_cpu(i8080*, int);
+int run_cpu(i8080 *cpu, int cycles);
 int pflag = 0;
 int dflag = 0;
 int opt;
@@ -77,27 +77,28 @@ main(int argc, char *argv[])
 
   while (true)
     {
-      if ((SDL_GetTicks() - last_tick) > TICK)
+      if ((SDL_GetTicks() - last_tick) > TICK) // NOLINT
         {
-	  // run first half of tick cycles
+          printf("Current tick is: %d\n", SDL_GetTicks());
+          // run first half of tick cycles
           cycle_offset = run_cpu(&cpu, (num_cycles - (abs(cycle_offset) / 2)));
 
           // first interrupt
-	  handle_interrupt(&cpu, 0x01);  
+          handle_interrupt(&cpu, 0x01);
 
-	  // run second half of tick cycles
+          // run second half of tick cycles
           cycle_offset = run_cpu(&cpu, (num_cycles - (abs(cycle_offset) / 2)));
 
-	  // second interrupt
-	  handle_interrupt(&cpu, 0x02);  
+          // second interrupt
+          handle_interrupt(&cpu, 0x02);
 
-	  // set number of cycles for next tick
-	  num_cycles = CYCLES_PER_TICK - cycle_offset; 
+          // set number of cycles for next tick
+          num_cycles = CYCLES_PER_TICK - cycle_offset;
 
           // 3 Update system state for display, input, and sound
 
           // 4 Check for exit conditions
-	   
+
           last_tick = SDL_GetTicks();
         }
     }
@@ -121,7 +122,7 @@ run_cpu(i8080 *cpu, int cycles)
           print_state(cpu);
           print_flags(cpu->flags);
           printf("\n");
-        } 
+        }
 
       int num_cycles_used = execute_instruction(cpu, next_instruction);
 
@@ -142,8 +143,7 @@ run_cpu(i8080 *cpu, int cycles)
           print_state(cpu);
           print_flags(cpu->flags);
           printf("\n");
-        } 
+        }
     }
   return cycles;
 }
-
