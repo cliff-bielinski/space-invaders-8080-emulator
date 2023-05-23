@@ -8,8 +8,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - run: sudo apt install pkg-config libcunit1 libcunit1-doc libcunit1-dev libsdl2-dev
-      - run: sudo export PKG_CONFIG_PATH=/usr/lib/aarch64-linux-gnu/pkgconfig/sdl2.pc:$PKG_CONFIG_PATH
-
       - uses: cpp-linter/cpp-linter-action@v2
         id: linter
         env:
@@ -33,6 +31,8 @@ jobs:
 # install dependencies - TODO
     - name: install cunit
       run: sudo apt install libcunit1 libcunit1-doc libcunit1-dev
+    - name: install sdl2
+      run: sudo apt install libsdl2-dev
 
 # clean
     - name: cleaning up
