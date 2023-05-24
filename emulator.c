@@ -248,6 +248,18 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         num_cycles = 13; // NOLINT
         break;
       }
+    case 0x3d: // NOLINT
+      {        // DCR A
+        cpu->a -= 1;
+
+        update_zero_flag(cpu, cpu->a);
+        update_sign_flag(cpu, cpu->a);
+        update_parity_flag(cpu, cpu->a);
+        update_aux_carry_flag(cpu, cpu->a, 0xFF); // NOLINT
+        num_cycles = 5;                           // NOLINT
+
+        break;
+      }
     case 0x3e: // NOLINT
       {
         cpu->a = cpu_read_mem(cpu, cpu->pc + 1);
