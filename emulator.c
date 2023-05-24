@@ -373,6 +373,19 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         cpu->pc += 1;
         break;
       }
+    case 0xc8:                               // NOLINT
+      {                                      // RZ
+        if ((cpu->flags & FLAG_Z) == FLAG_Z) // if Z set, RET
+          {
+            uint16_t address = cpu_read_mem(cpu, cpu->sp);
+            address += (cpu_read_mem(cpu, cpu->sp + 1) << 8); // NOLINT
+            cpu->sp += 2;
+            cpu->pc = address;
+            // NOLINTNEXTLINE
+            return 0;
+          }
+        break;
+      }
     case 0xc9: // NOLINT
       {        // RET
         // returns rather than breaks to avoid pc increment at end of function
