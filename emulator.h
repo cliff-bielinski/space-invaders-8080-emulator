@@ -67,6 +67,8 @@ void update_zero_flag(i8080 *cpu, uint8_t result);
 // Sign Flag
 void update_sign_flag(i8080 *cpu, uint8_t result);
 bool is_sign_flag_set(i8080 *cpu);
+bool is_zero_flag_set(i8080 *cpu);
+
 // Carry Flag
 void update_carry_flag(i8080 *cpu, bool carry_occurred);
 /*

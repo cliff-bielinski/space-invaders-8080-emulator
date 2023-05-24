@@ -395,6 +395,19 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         cpu->pc = address;
         return 0;
       }
+    case 0xca: // NOLINT
+      {        // JZ
+        if (is_zero_flag_set(cpu))
+          {
+            uint16_t address = cpu_read_mem(cpu, cpu->pc + 2); // NOLINT
+            address = address << 8;                            // NOLINT
+            address += cpu_read_mem(cpu, cpu->pc + 1);
+            cpu->pc = address;
+            return 0;
+          }
+        cpu->pc += 2; // NOLINT
+        break;
+      }
     case 0xcd:                                                   // NOLINT
       {                                                          // CALL ADDR
         cpu_write_mem(cpu, cpu->sp - 1, ((cpu->pc + 3) >> 8));   // NOLINT
@@ -613,7 +626,7 @@ update_aux_carry_flag(i8080 *cpu, uint8_t a, uint8_t b)
   // then adds nibbles to test for AC
   uint16_t result = (a & 0x0F) + (b & 0x0F); // NOLINT
   if (result & 0x10)                         // NOLINT
-    { // Check if carry from bit 3 to bit 4 existss
+    { // Check if carry from bit 3 to bit 4 exists
       cpu->flags |= FLAG_AC;
     }
   else
@@ -680,6 +693,12 @@ bool
 is_sign_flag_set(i8080 *cpu)
 {
   return (cpu->flags & FLAG_S) != 0;
+}
+
+bool
+is_zero_flag_set(i8080 *cpu)
+{
+  return (cpu->flags & FLAG_Z) != 0;
 }
 
 void
