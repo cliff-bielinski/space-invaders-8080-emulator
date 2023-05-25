@@ -1,21 +1,26 @@
 #include "emulator.h"
-#include <SDL2/SDL.h>
 #include <ctype.h>
+#include <math.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 
-// Screen dimension constants
-uint32_t start_time = 0;
-uint32_t last_interrupt = 0;
+#define CLOCK_SPEED_MS 2000
+#define TICK (1000 * (1.0 / 60.0))
+#define CYCLES_PER_TICK (CLOCK_SPEED_MS * TICK)
+
+int run_cpu(i8080 *cpu, int cycles);
+int pflag = 0;
+int dflag = 0;
+SDL_Window *window = NULL;
+SDL_Surface *screen_surface = NULL;
+SDL_Surface *buffer = NULL;
 
 int
 main(int argc, char *argv[])
 {
-  int pflag = 0;
-  int dflag = 0;
   int opt;
 
   while ((opt = getopt(argc, argv, "pd")) != -1)
@@ -65,12 +70,14 @@ main(int argc, char *argv[])
       exit(EXIT_FAILURE);
     }
 
-  // Render window
-  SDL_Window *window = NULL;
+  // start timer
+  uint64_t last_tick = SDL_GetTicks();
+
+  // set initial offset value
+  int cycle_offset = 0;
+  int num_cycles = CYCLES_PER_TICK / 2;
 
   // The surface contained by the window
-  SDL_Surface *screenSurface = NULL;
-  SDL_Surface *buffer = NULL;
 
   // Initialize SDL
   if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_JOYSTICK) < 0)
@@ -92,7 +99,7 @@ main(int argc, char *argv[])
       else
         {
           // Get window surface
-          screenSurface = SDL_GetWindowSurface(window);
+          screen_surface = SDL_GetWindowSurface(window);
           buffer = SDL_CreateRGBSurface(0, SCREEN_WIDTH, SCREEN_HEIGHT, 32, 0,
                                         0, 0, 0);
         }
@@ -100,11 +107,48 @@ main(int argc, char *argv[])
 
   while (true)
     {
-      // 1 Fetch, decode, and execute next instruction
-      // fetch_decode_execute(&cpu)
+      if ((SDL_GetTicks() - last_tick) > TICK) // NOLINT
+        {
+          if (pflag)
+            {
+              printf("Current Tick: %d\n", SDL_GetTicks());
+            }
 
-      // fetch and execute next instruction
-      uint8_t next_instruction = cpu_read_mem(&cpu, cpu.pc);
+          // run first half of tick cycles
+          cycle_offset = run_cpu(&cpu, num_cycles - abs(cycle_offset));
+
+          // first interrupt
+          handle_interrupt(&cpu, 0x01);
+
+          // run second half of tick cycles
+          cycle_offset = run_cpu(&cpu, num_cycles - abs(cycle_offset));
+
+          // second interrupt
+          handle_interrupt(&cpu, 0x02);
+
+          // set number of cycles for next tick
+          num_cycles = CYCLES_PER_TICK / 2 - cycle_offset;
+
+          // 3 Update system state for display, input, and sound
+          // Update graphics after VBLANK int
+          update_graphics(&cpu, buffer, screen_surface);
+          SDL_UpdateWindowSurface(window);
+
+          // 4 Check for exit conditions
+
+          last_tick = SDL_GetTicks();
+        }
+    }
+}
+
+int
+run_cpu(i8080 *cpu, int cycles)
+{
+
+  // fetch and execute next instruction
+  while (cycles > 0)
+    {
+      uint8_t next_instruction = cpu_read_mem(cpu, cpu->pc);
       if (pflag)
         {
           print_instruction(next_instruction);
@@ -112,51 +156,36 @@ main(int argc, char *argv[])
       if (dflag)
         {
           printf("PRE-INSTRUCTION  ");
-          print_state(&cpu);
-          print_flags(cpu.flags);
+          print_state(cpu);
+          print_flags(cpu->flags);
           printf("\n");
         }
-      if (execute_instruction(&cpu, next_instruction) < 0)
+
+      int num_cycles_used = execute_instruction(cpu, next_instruction);
+
+      // execute instruction failed
+      if (num_cycles_used < 0)
         {
-          fprintf(stderr,
-                  "Unimplemented opcode encountered. Exiting program.\n");
+          fprintf(stderr, "Unimplemented opcode encountered. "
+                          "Exiting program.\n");
           exit(EXIT_FAILURE);
+        }
+      else
+        {
+          cycles -= num_cycles_used;
         }
       if (dflag)
         {
           printf("POST-INSTRUCTION ");
-          print_state(&cpu);
-          print_flags(cpu.flags);
+          print_state(cpu);
+          print_flags(cpu->flags);
           printf("\n");
         }
-
-      // 2 Handle interrupts
-      // handle_interrupts(&cpu)
-      printf("time since initialization %u\n", SDL_GetTicks());
-      if ((SDL_GetTicks() - last_interrupt) > 1.0 / 60.0)
-        {
-          printf("interrupt?\n");
-          if (cpu.interrupt_enabled)
-            {
-              printf("inside interrupt loop.\n");
-              generate_interrupt(&cpu, 2);
-              last_interrupt = SDL_GetTicks();
-              update_graphics(&cpu, window, buffer);
-            }
-        }
-
-      // 3 Update system state for display, input, and sound
-
-      // Update the surface
-      SDL_UpdateWindowSurface(window);
-
-      // 4 Check for exit conditions
     }
+  return cycles;
 
-  // Clean up resources and exit
   // Destroy window
   SDL_DestroyWindow(window);
-
   // Quit SDL subsystems
   SDL_Quit();
 }

@@ -2,10 +2,7 @@
 CC = clang
 
 # compiler flags
-CFLAGS = -g -W -Wall -Wextra -pedantic
-
-# linker flags
-LINKER_FLAGS = -lSDL2
+CFLAGS = -g -W -Wall -Wextra -pedantic `pkg-config --cflags --libs sdl2`
 
 # targets to build
 TARGETS = disassembler_8080 shell
@@ -24,7 +21,7 @@ emulator:
 # build shell executable
 shell: emulator
 	$(CC) $(CFLAGS) -c shell.c
-	$(CC) $(CFLAGS) $(LINKER_FLAGS) -o shell shell.o emulator.o
+	$(CC) $(CFLAGS) -o shell shell.o emulator.o
 
 # build tests executable and run tests
 test: emulator
