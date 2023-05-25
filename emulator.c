@@ -466,6 +466,20 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         num_cycles = 10; // NOLINT
         break;
       }
+    case 0xd2: // NOLINT
+      {        // JNC ADR
+        uint16_t address = cpu_read_mem(cpu, cpu->pc + 2);
+        address = (address << BYTE) | cpu_read_mem(cpu, cpu->pc + 1);
+        if ((cpu->flags & FLAG_CY) != FLAG_CY) // if CY not set JUMP
+          {
+            cpu->pc = address;
+            // NOLINTNEXTLINE
+            return 10; // return cycle number
+          }
+        cpu->pc += 2;
+        num_cycles = 10; // NOLINT
+        break;
+      }
     case 0xd3: // NOLINT
       {
         // printf("OUT ");
