@@ -367,6 +367,23 @@ test_opcode_0x36(void)
 }
 
 void
+test_opcode_0x3d(void) // NOLINT
+{                      // DCR A
+  i8080 cpu;
+  cpu_init(&cpu);
+
+  cpu.a = 0xd;                                      // NOLINT
+  int code_found = execute_instruction(&cpu, 0x3d); // NOLINT
+
+  CU_ASSERT(code_found >= 0);
+  CU_ASSERT_EQUAL(cpu.a, 0xc);
+  CU_ASSERT((cpu.flags & FLAG_Z) == 0);
+  CU_ASSERT((cpu.flags & FLAG_S) == 0);
+  CU_ASSERT((cpu.flags & FLAG_P) == FLAG_P);
+  CU_ASSERT((cpu.flags & FLAG_AC) == FLAG_AC);
+}
+
+void
 test_opcode_0x3e(void)
 {
   i8080 cpu;
@@ -1470,6 +1487,9 @@ main(void)
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x31()",
                          test_opcode_0x31))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0x3d()",
+                         test_opcode_0x3d))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x3e()",
                          test_opcode_0x3e))
