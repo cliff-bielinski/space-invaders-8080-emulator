@@ -60,6 +60,21 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         num_cycles = 10;                         // NOLINT
         break;
       }
+    case 0x0a: // NOLINT
+      {        // LDAX B
+               // get addr
+        uint16_t addr = cpu->b;
+        addr = addr << 8; // NOLINT
+        addr += cpu->c;
+
+        // get value at addr
+        uint8_t val = cpu_read_mem(cpu, addr);
+
+        // put value in a
+        cpu->a = val;
+        num_cycles = 7; // NOLINT
+        break;
+      }
     case 0x0d: // NOLINT
       {        // DCR C
         uint8_t result = cpu->c - 1;

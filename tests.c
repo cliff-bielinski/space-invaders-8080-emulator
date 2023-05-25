@@ -765,6 +765,29 @@ test_opcode_0xc8(void)
 }
 
 void
+test_opcode_0x0a(void) // NOLINT
+{                      // LDAX B
+
+  // setup
+  i8080 cpu;
+  cpu_init(&cpu);
+  cpu_write_mem(&cpu, 0x0001, 0xDD); // NOLINT
+  cpu.b = 0x00;                      // NOLINT
+  cpu.c = 0x01;                      // NOLINT
+
+  // execute
+  int code_found = execute_instruction(&cpu, 0x0a); // NOLINT
+
+  // verify
+  CU_ASSERT(code_found >= 0);
+  CU_ASSERT(1 == cpu.pc);
+  CU_ASSERT(0xDD == cpu.a); // NOLINT
+
+  // cleanup
+  cpu_write_mem(&cpu, 0x0001, 0x00); // NOLINT
+}
+
+void
 test_opcode_0x1a(void) // NOLINT
 {                      // LDAX D
 
@@ -1529,6 +1552,9 @@ main(void)
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x0f()",
                          test_opcode_0x0f))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0x0a()",
+                         test_opcode_0x0a))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x1a()",
                          test_opcode_0x1a))
