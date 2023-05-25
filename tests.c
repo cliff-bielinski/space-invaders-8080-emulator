@@ -1042,6 +1042,37 @@ test_opcode_0xd1(void) // NOLINT
 }
 
 void
+test_opcode_0xd2(void) // NOLINT
+{
+  // JMP CNY
+  i8080 cpu;
+  cpu_init(&cpu);
+
+  cpu.pc = 0x2235; // NOLINT
+  cpu.flags |= FLAG_CY;
+  cpu_write_mem(&cpu, cpu.pc + 1, 0xBB); // NOLINT
+  cpu_write_mem(&cpu, cpu.pc + 2, 0xAA); // NOLINT
+  cpu_write_mem(&cpu, cpu.pc + 4, 0xDD); // NOLINT
+  cpu_write_mem(&cpu, cpu.pc + 5, 0xCC); // NOLINT
+
+  int code_found = execute_instruction(&cpu, 0xd2); // NOLINT
+
+  CU_ASSERT(code_found >= 0);
+  CU_ASSERT_EQUAL(cpu.pc, 0x2238); // NOLINT
+
+  cpu.flags = 0;                                // NOLINT
+  code_found = execute_instruction(&cpu, 0xd2); // NOLINT
+
+  CU_ASSERT(code_found >= 0);
+  CU_ASSERT_EQUAL(cpu.pc, 0xCCDD); // NOLINT
+
+  cpu_write_mem(&cpu, 0x1235, 0x00); // NOLINT
+  cpu_write_mem(&cpu, 0x1236, 0x00); // NOLINT
+  cpu_write_mem(&cpu, 0x1237, 0x00); // NOLINT
+  cpu_write_mem(&cpu, 0x1238, 0x00); // NOLINT
+}
+
+void
 test_opcode_0xda(void) // NOLINT
 {
   // JMP CY
@@ -1526,6 +1557,9 @@ main(void)
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0xd1()",
                          test_opcode_0xd1))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0xd2()",
+                         test_opcode_0xda))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0xd5()",
                          test_opcode_0xd5))
