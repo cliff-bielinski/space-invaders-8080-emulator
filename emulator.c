@@ -306,6 +306,12 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         num_cycles = 7; // NOLINT
         break;
       }
+    case 0x57: // NOLINT
+      {        // MOV D,A
+        cpu->d = cpu->a;
+        num_cycles = 5; // NOLINT
+        break;
+      }
     case 0x5e: // NOLINT
       {        // MOV E,M
         // Address is stored in reg h,l.
