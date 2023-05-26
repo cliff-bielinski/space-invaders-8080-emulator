@@ -843,7 +843,7 @@ update_graphics(i8080 *cpu, SDL_Surface *buffer, SDL_Surface *surface)
               uint8_t cur_byte = cpu_read_mem(cpu, vram);
 
               // Set pixel to on by changing color to white.
-              if (cur_byte & 1 << pixel)
+              if ((cur_byte >> pixel) & 1)
                 {
                   screen_buff[surf_index] = 0xFFFFFF; // NOLINT
                 }
@@ -857,6 +857,7 @@ update_graphics(i8080 *cpu, SDL_Surface *buffer, SDL_Surface *surface)
       vram++; // Increment to next byte in VRAM
     }
 
+  // Copy buffer to screen surface.
   SDL_BlitSurface(buffer, NULL, surface, NULL);
 }
 

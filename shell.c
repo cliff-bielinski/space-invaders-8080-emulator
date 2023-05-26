@@ -82,19 +82,22 @@ main(int argc, char *argv[])
   // Initialize SDL
   if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_JOYSTICK) < 0)
     {
-      printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
+      fprintf(stderr, "SDL could not initialize! SDL_Error: %s\n",
+              SDL_GetError());
+      exit(EXIT_FAILURE);
     }
   else
     {
       // Create window
       window = SDL_CreateWindow("Space Invaders Emulator",
                                 SDL_WINDOWPOS_UNDEFINED,
-                                SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH * 2,
-                                SCREEN_HEIGHT * 2, SDL_WINDOW_RESIZABLE);
+                                SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH,
+                                SCREEN_HEIGHT, SDL_WINDOW_RESIZABLE);
       if (window == NULL)
         {
-          printf("Window could not be created! SDL_Error: %s\n",
+          fprintf(stderr, "Window could not be created! SDL_Error: %s\n",
                  SDL_GetError());
+          exit(EXIT_FAILURE);
         }
       else
         {
