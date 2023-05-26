@@ -314,6 +314,12 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         num_cycles = 7; // NOLINT
         break;
       }
+    case 0x5f: // NOLINT
+      {        // MOV E,A
+        cpu->e = cpu->a;
+        num_cycles = 5; // NOLINT
+        break;
+      }
     case 0x66: // NOLINT
       {        // MOV H,M
         uint16_t addr = cpu->h;
