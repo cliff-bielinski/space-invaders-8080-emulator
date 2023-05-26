@@ -367,6 +367,24 @@ test_opcode_0x36(void)
 }
 
 void
+test_opcode_0x37(void)
+{
+  // MOV M, D8
+  i8080 cpu;
+  cpu_init(&cpu);
+
+  int code_found = execute_instruction(&cpu, 0x37); // NOLINT
+
+  CU_ASSERT(code_found >= 0);
+  CU_ASSERT_EQUAL(cpu.flags & FLAG_CY, FLAG_CY); // NOLINT
+
+  code_found = execute_instruction(&cpu, 0x37); // NOLINT
+
+  CU_ASSERT(code_found >= 0);
+  CU_ASSERT_EQUAL(cpu.flags & FLAG_CY, FLAG_CY); // NOLINT
+}
+
+void
 test_opcode_0x3d(void) // NOLINT
 {                      // DCR A
   i8080 cpu;
@@ -1570,6 +1588,9 @@ main(void)
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x35()",
                          test_opcode_0x35))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0x37()",
+                         test_opcode_0x37))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x3a()",
                          test_opcode_0x3a))

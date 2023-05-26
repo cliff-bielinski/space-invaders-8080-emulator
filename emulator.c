@@ -254,6 +254,12 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         num_cycles = 10; // NOLINT
         break;
       }
+    case 0x37: // NOLINT
+      {        // STC
+        cpu->flags |= FLAG_CY;
+        num_cycles = 4; // NOLINT
+        break;
+      }
     case 0x3a: // NOLINT
       {        // LDA adr
         uint16_t addr = cpu_read_mem(cpu, cpu->pc + 2);
