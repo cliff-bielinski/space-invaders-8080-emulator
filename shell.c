@@ -96,7 +96,7 @@ main(int argc, char *argv[])
       if (window == NULL)
         {
           fprintf(stderr, "Window could not be created! SDL_Error: %s\n",
-                 SDL_GetError());
+                  SDL_GetError());
           exit(EXIT_FAILURE);
         }
       else
