@@ -815,17 +815,6 @@ update_sign_flag(i8080 *cpu, uint8_t result)
 
 // Interrupts
 
-void
-generate_interrupt(i8080 *cpu, int interrupt_num)
-{
-  // Push PC
-  cpu_write_mem(cpu, cpu->sp - 1, (cpu->pc & 0xFF00) >> 8);
-  cpu_write_mem(cpu, cpu->sp - 2, (cpu->pc & 0xFF));
-
-  // Set pointers
-  cpu->sp -= 2;
-  cpu->pc = 8 * interrupt_num;
-}
 
 // UPDATE GRAPHICS
 
