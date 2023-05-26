@@ -100,7 +100,7 @@ main(int argc, char *argv[])
         {
           // Get window surface
           screen_surface = SDL_GetWindowSurface(window);
-           // NEXT line NOLINT
+          // NOLINTNEXTLINE
           buffer = SDL_CreateRGBSurface(0, SCREEN_WIDTH, SCREEN_HEIGHT, 32, 0,
                                         0, 0, 0);
         }
