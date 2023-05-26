@@ -34,7 +34,6 @@ jobs:
       run: sudo apt update
     - name: install cunit
       run: sudo apt install libcunit1 libcunit1-doc libcunit1-dev
-
     - name: install sdl
       run: sudo apt install libsdl2-dev
 
