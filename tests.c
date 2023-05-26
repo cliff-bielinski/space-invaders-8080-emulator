@@ -647,6 +647,21 @@ test_opcode_0x5e(void)
 }
 
 void
+test_opcode_0x67(void) // NOLINT
+{
+  // MOV H,A
+  i8080 cpu;
+  cpu_init(&cpu);
+
+  cpu.a = 0x22; // NOLINT
+
+  int code_found = execute_instruction(&cpu, 0x67); // NOLINT
+
+  CU_ASSERT(code_found >= 0);
+  CU_ASSERT(cpu.h == 0x22);
+}
+
+void
 test_opcode_0x7a(void) // NOLINT
 {
   // MOV A,D
@@ -1675,6 +1690,9 @@ main(void)
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x5e()",
                          test_opcode_0x5e))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0x67()",
+                         test_opcode_0x67))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x7a()",
                          test_opcode_0x7a))
