@@ -815,7 +815,6 @@ update_sign_flag(i8080 *cpu, uint8_t result)
 
 // Interrupts
 
-
 // UPDATE GRAPHICS
 
 void
@@ -827,7 +826,7 @@ update_graphics(i8080 *cpu, SDL_Surface *buffer, SDL_Surface *surface)
   // Graphics data is rotated 90 degrees in memory counter-clockwise.  Reading
   // byte by byte starting at 0x2400 we need to fill in the screen left to
   // right, bottom to top.
-  int vram = 0x2400;
+  int vram = 0x2400; // NOLINT
   // Start at the left edge
   for (int column = 0; column > SCREEN_WIDTH; column++)
     {
