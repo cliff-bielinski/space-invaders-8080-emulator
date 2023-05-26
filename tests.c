@@ -367,6 +367,24 @@ test_opcode_0x36(void)
 }
 
 void
+test_opcode_0x37(void)
+{
+  // MOV M, D8
+  i8080 cpu;
+  cpu_init(&cpu);
+
+  int code_found = execute_instruction(&cpu, 0x37); // NOLINT
+
+  CU_ASSERT(code_found >= 0);
+  CU_ASSERT_EQUAL(cpu.flags & FLAG_CY, FLAG_CY); // NOLINT
+
+  code_found = execute_instruction(&cpu, 0x37); // NOLINT
+
+  CU_ASSERT(code_found >= 0);
+  CU_ASSERT_EQUAL(cpu.flags & FLAG_CY, FLAG_CY); // NOLINT
+}
+
+void
 test_opcode_0x3d(void) // NOLINT
 {                      // DCR A
   i8080 cpu;
@@ -762,6 +780,29 @@ test_opcode_0xc8(void)
   // clean up
   cpu_write_mem(&cpu, 0x0001, 0x00); // NOLINT
   cpu_write_mem(&cpu, 0x0002, 0x00); // NOLINT
+}
+
+void
+test_opcode_0x0a(void) // NOLINT
+{                      // LDAX B
+
+  // setup
+  i8080 cpu;
+  cpu_init(&cpu);
+  cpu_write_mem(&cpu, 0x0001, 0xDD); // NOLINT
+  cpu.b = 0x00;                      // NOLINT
+  cpu.c = 0x01;                      // NOLINT
+
+  // execute
+  int code_found = execute_instruction(&cpu, 0x0a); // NOLINT
+
+  // verify
+  CU_ASSERT(code_found >= 0);
+  CU_ASSERT(1 == cpu.pc);
+  CU_ASSERT(0xDD == cpu.a); // NOLINT
+
+  // cleanup
+  cpu_write_mem(&cpu, 0x0001, 0x00); // NOLINT
 }
 
 void
@@ -1530,6 +1571,9 @@ main(void)
           == CU_add_test(pSuite, "test of test_opcode_0x0f()",
                          test_opcode_0x0f))
       || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0x0a()",
+                         test_opcode_0x0a))
+      || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x1a()",
                          test_opcode_0x1a))
       || (NULL
@@ -1544,6 +1588,9 @@ main(void)
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x35()",
                          test_opcode_0x35))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0x37()",
+                         test_opcode_0x37))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x3a()",
                          test_opcode_0x3a))
