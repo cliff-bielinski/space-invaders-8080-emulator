@@ -143,6 +143,11 @@ main(int argc, char *argv[])
           last_tick = SDL_GetTicks();
         }
     }
+
+  // Destroy window
+  SDL_DestroyWindow(window);
+  // Quit SDL subsystems
+  SDL_Quit();
 }
 
 int
@@ -187,9 +192,4 @@ run_cpu(i8080 *cpu, int cycles)
         }
     }
   return cycles;
-
-  // Destroy window
-  SDL_DestroyWindow(window);
-  // Quit SDL subsystems
-  SDL_Quit();
 }
