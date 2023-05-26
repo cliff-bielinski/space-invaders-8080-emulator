@@ -29,6 +29,16 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         num_cycles = 10; // NOLINT
         break;
       }
+    case 0x03: // NOLINT
+      {        // INX B
+        cpu->c += 1;
+        if (cpu->c == 0)
+          {
+            cpu->b += 1;
+          }
+        num_cycles = 5; // NOLINT
+        break;
+      }
     case 0x05: // NOLINT
       {        // DCR B
         cpu->b -= 1;
@@ -38,7 +48,6 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         update_parity_flag(cpu, cpu->b);
         update_aux_carry_flag(cpu, cpu->b, 0xFF); // NOLINT
         num_cycles = 5;                           // NOLINT
-
         break;
       }
     case 0x06: // NOLINT
@@ -132,8 +141,8 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
           {
             cpu->d += 1;
           }
-        break;
         num_cycles = 5; // NOLINT
+        break;
       }
     case 0x19: // NOLINT
       {        // DAD D
