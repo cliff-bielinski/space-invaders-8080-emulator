@@ -2,8 +2,7 @@
 CC = clang
 
 # compiler flags
-CFLAGS = -Wall -Wextra -g `pkg-config --cflags sdl2`
-LDLIBS = `pkg-config --libs sdl2`
+CFLAGS = -g -W -Wall -Wextra -pedantic `pkg-config --cflags --libs sdl2`
 
 # targets to build
 TARGETS = disassembler_8080 shell

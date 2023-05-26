@@ -1,3 +1,4 @@
+#include <SDL2/SDL.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -18,6 +19,10 @@
 
 // Memory
 #define MEM_SIZE 65536 // NOLINT
+
+// Display
+#define SCREEN_WIDTH 224  // NOLINT
+#define SCREEN_HEIGHT 256 // NOLINT
 
 typedef struct
 {
@@ -64,6 +69,7 @@ uint8_t cpu_read_mem(i8080 *cpu, uint16_t address);
 void cpu_write_mem(i8080 *cpu, uint16_t address, uint8_t data);
 bool cpu_load_file(i8080 *cpu, const char *file_path, uint16_t address);
 int execute_instruction(i8080 *cpu, uint8_t opcode);
+void update_graphics(i8080 *cpu, SDL_Surface *buffer, SDL_Surface *surface);
 
 // Prototypes for Flags
 
@@ -80,6 +86,8 @@ void update_zero_flag(i8080 *cpu, uint8_t result);
 // Sign Flag
 void update_sign_flag(i8080 *cpu, uint8_t result);
 bool is_sign_flag_set(i8080 *cpu);
+bool is_zero_flag_set(i8080 *cpu);
+
 // Carry Flag
 void update_carry_flag(i8080 *cpu, bool carry_occurred);
 /*
@@ -96,3 +104,8 @@ Helper functions to print instruction and cpu state
 void print_instruction(uint8_t opcode);
 void print_state(i8080 *cpu);
 void print_flags(uint8_t flags);
+
+/*
+Interrupt functions
+*/
+int handle_interrupt(i8080 *cpu, uint8_t rst_instruction);

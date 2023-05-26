@@ -1,23 +1,33 @@
 #include "emulator.h"
+#include <SDL2/SDL.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
+#define BYTE 8
+#define UPPER_8_BIT_MASK 0xFF00
+#define LOWER_8_BIT_MASK 0x00FF
+#define RST_RANGE 7
+
 // Execute Instruction
 int
 execute_instruction(i8080 *cpu, uint8_t opcode)
 {
+  int num_cycles = 0;
   switch (opcode)
     {
-    case 0x00: // NOLINT
-      // NOP
-      break;
+    case 0x00:          // NOLINT
+      {                 // NOP
+        num_cycles = 4; // NOLINT
+        break;
+      }
     case 0x01: // NOLINT
       {        // LXI B
         cpu->c = cpu_read_mem(cpu, cpu->pc + 1);
         cpu->b = cpu_read_mem(cpu, cpu->pc + 2);
-        cpu->pc += 2;
+        cpu->pc += 2;    // NOLINT
+        num_cycles = 10; // NOLINT
         break;
       }
     case 0x05: // NOLINT
@@ -28,6 +38,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         update_sign_flag(cpu, cpu->b);
         update_parity_flag(cpu, cpu->b);
         update_aux_carry_flag(cpu, cpu->b, 0xFF); // NOLINT
+        num_cycles = 5;                           // NOLINT
 
         break;
       }
@@ -35,6 +46,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       {        // MVI B, mem8
         cpu->b = cpu_read_mem(cpu, cpu->pc + 1);
         cpu->pc += 1;
+        num_cycles = 7; // NOLINT
         break;
       }
     case 0x09: // NOLINT
@@ -46,6 +58,22 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         update_carry_flag(cpu, result > 0xFFFF); // NOLINT
         cpu->h = (result & 0xff00) >> 8;         // NOLINT
         cpu->l = (result & 0xff);                // NOLINT
+        num_cycles = 10;                         // NOLINT
+        break;
+      }
+    case 0x0a: // NOLINT
+      {        // LDAX B
+               // get addr
+        uint16_t addr = cpu->b;
+        addr = addr << 8; // NOLINT
+        addr += cpu->c;
+
+        // get value at addr
+        uint8_t val = cpu_read_mem(cpu, addr);
+
+        // put value in a
+        cpu->a = val;
+        num_cycles = 7; // NOLINT
         break;
       }
     case 0x0d: // NOLINT
@@ -56,12 +84,14 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         update_parity_flag(cpu, result);
         update_aux_carry_flag(cpu, cpu->c, 0xFF); // NOLINT
         cpu->c = result;
+        num_cycles = 5; // NOLINT
         break;
       }
     case 0x0e: // NOLINT
       {        // MVI C, D8
         cpu->c = cpu_read_mem(cpu, (cpu->pc + 1));
         cpu->pc += 1;
+        num_cycles = 7; // NOLINT
         break;
       }
     case 0x0f: // NOLINT
@@ -85,14 +115,15 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
           {
             update_carry_flag(cpu, false);
           }
+        num_cycles = 4; // NOLINT
         break;
       }
     case 0x11: // NOLINT
-      // printf("LXI D")
       {
         cpu->e = cpu_read_mem(cpu, cpu->pc + 1);
         cpu->d = cpu_read_mem(cpu, cpu->pc + 2);
-        cpu->pc += 2;
+        cpu->pc += 2;    // NOLINT
+        num_cycles = 10; // NOLINT
         break;
       }
     case 0x13: // NOLINT
@@ -103,6 +134,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
             cpu->d += 1;
           }
         break;
+        num_cycles = 5; // NOLINT
       }
     case 0x19: // NOLINT
       {        // DAD D
@@ -118,6 +150,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         cpu->h = sum >> 8;                      // NOLINT
         cpu->l = sum & 0xFF;                    // NOLINT
         update_carry_flag(cpu, (sum > 0xFFFF)); // NOLINT
+        num_cycles = 10;                        // NOLINT
 
         break;
       }
@@ -133,6 +166,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
 
         // put value in a
         cpu->a = val;
+        num_cycles = 7; // NOLINT
         break;
       }
     case 0x21: // NOLINT
@@ -140,7 +174,8 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       {
         cpu->l = cpu_read_mem(cpu, cpu->pc + 1);
         cpu->h = cpu_read_mem(cpu, cpu->pc + 2);
-        cpu->pc += 2;
+        cpu->pc += 2;    // NOLINT
+        num_cycles = 10; // NOLINT
         break;
       }
     case 0x23: // NOLINT
@@ -150,12 +185,14 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
           {
             cpu->h += 1;
           }
+        num_cycles = 5; // NOLINT
         break;
       }
     case 0x26: // NOLINT
       {        // MVI H, D8
         cpu->h = cpu_read_mem(cpu, cpu->pc + 1);
         cpu->pc += 1;
+        num_cycles = 7; // NOLINT
         break;
       }
     case 0x29: // NOLINT
@@ -170,15 +207,16 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         // put values back in registers
         cpu->l = sum;
         cpu->h = (sum >> 8); // NOLINT
+        num_cycles = 10;     // NOLINT
         break;
       }
     case 0x31: // NOLINT
-      // printf("LXI SP");
       {
         // NOLINTNEXTLINE
         cpu->sp = cpu_read_mem(cpu, cpu->pc + 1)
                   | (cpu_read_mem(cpu, cpu->pc + 2) << 8); // NOLINT
         cpu->pc += 2;
+        num_cycles = 10; // NOLINT
         break;
       }
     case 0x32: // NOLINT
@@ -189,6 +227,21 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         address += (cpu_read_mem(cpu, cpu->pc + 2) << 8); // NOLINT
         cpu_write_mem(cpu, address, cpu->a);
         cpu->pc += 2;
+        num_cycles = 13; // NOLINT
+        break;
+      }
+    case 0x35: // NOLINT
+      {        // DCR M
+        uint16_t address = cpu->l;
+        address += (cpu->h << 8); // NOLINT
+        uint8_t mem_value = cpu_read_mem(cpu, address);
+        uint8_t result = mem_value - 1;
+        update_zero_flag(cpu, result);
+        update_sign_flag(cpu, result);
+        update_parity_flag(cpu, result);
+        update_aux_carry_flag(cpu, mem_value, 0xFF); // NOLINT
+        cpu_write_mem(cpu, address, result);
+        num_cycles = 10; // NOLINT
         break;
       }
     case 0x36: // NOLINT
@@ -199,6 +252,13 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         cpu_write_mem(cpu, address, cpu_read_mem(cpu, cpu->pc + 1));
 
         cpu->pc += 1;
+        num_cycles = 10; // NOLINT
+        break;
+      }
+    case 0x37: // NOLINT
+      {        // STC
+        cpu->flags |= FLAG_CY;
+        num_cycles = 4; // NOLINT
         break;
       }
     case 0x3a: // NOLINT
@@ -207,13 +267,26 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         addr = (addr << 8) + cpu_read_mem(cpu, cpu->pc + 1); // NOLINT
         cpu->a = cpu_read_mem(cpu, addr);
         cpu->pc += 2;
+        num_cycles = 13; // NOLINT
+        break;
+      }
+    case 0x3d: // NOLINT
+      {        // DCR A
+        cpu->a -= 1;
+
+        update_zero_flag(cpu, cpu->a);
+        update_sign_flag(cpu, cpu->a);
+        update_parity_flag(cpu, cpu->a);
+        update_aux_carry_flag(cpu, cpu->a, 0xFF); // NOLINT
+        num_cycles = 5;                           // NOLINT
+
         break;
       }
     case 0x3e: // NOLINT
-      // printf("MVI A");
       {
         cpu->a = cpu_read_mem(cpu, cpu->pc + 1);
         cpu->pc += 1;
+        num_cycles = 7; // NOLINT
         break;
       }
     case 0x56: // NOLINT
@@ -222,6 +295,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         uint16_t address = cpu->l;
         address += (cpu->h << 8); // NOLINT
         cpu->d = cpu_read_mem(cpu, address);
+        num_cycles = 7; // NOLINT
         break;
       }
     case 0x5e: // NOLINT
@@ -230,7 +304,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         uint16_t address = (cpu->h << 8) | cpu->l; // NOLINT
 
         cpu->e = cpu_read_mem(cpu, address);
-
+        num_cycles = 7; // NOLINT
         break;
       }
     case 0x66: // NOLINT
@@ -238,12 +312,13 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         uint16_t addr = cpu->h;
         addr = (addr << 8) + cpu->l; // NOLINT
         cpu->h = cpu_read_mem(cpu, addr);
+        num_cycles = 7; // NOLINT
         break;
       }
     case 0x6f: // NOLINT
       {
-        // printf("MOV L,A");
         cpu->l = cpu->a;
+        num_cycles = 5; // NOLINT
         break;
       }
     case 0x77: // NOLINT
@@ -251,22 +326,25 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         uint16_t address = cpu->l;
         address += (cpu->h << 8); // NOLINT
         cpu_write_mem(cpu, address, cpu->a);
+        num_cycles = 7; // NOLINT
         break;
       }
     case 0x7a: // NOLINT
       {        // MOV A,D
         cpu->a = cpu->d;
+        num_cycles = 5; // NOLINT
         break;
       }
     case 0x7b: // NOLINT
       {        // MOV A,E
         cpu->a = cpu->e;
+        num_cycles = 5; // NOLINT
         break;
       }
     case 0x7c: // NOLINT
       {
-        // printf("MOV A,H");
         cpu->a = cpu->h;
+        num_cycles = 5; // NOLINT
         break;
       }
     case 0x7e: // NOLINT
@@ -274,6 +352,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         uint16_t address = cpu->l;
         address += (cpu->h << 8); // NOLINT
         cpu->a = cpu_read_mem(cpu, address);
+        num_cycles = 7; // NOLINT
         break;
       }
     case 0xa7: // NOLINT
@@ -286,6 +365,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         update_parity_flag(cpu, cpu->a);
         update_aux_carry_flag(cpu, temp, cpu->a);
         update_carry_flag(cpu, false);
+        num_cycles = 4; // NOLINT
 
         break;
       }
@@ -299,15 +379,16 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         update_aux_carry_flag(cpu, result, 0xFF); // NOLINT
 
         cpu->a = result;
+        num_cycles = 4; // NOLINT
+
         break;
       }
     case 0xc1: // NOLINT
       {
-        // printf("POP B")
         cpu->c = cpu_read_mem(cpu, cpu->sp);
         cpu->b = cpu_read_mem(cpu, cpu->sp + 1);
-        cpu->sp += 2;
-        // NOT NEEDED cpu->pc += 1;
+        cpu->sp += 2;    // NOLINT
+        num_cycles = 10; // NOLINT
         break;
       }
     case 0xc2: // NOLINT
@@ -319,9 +400,11 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
             // returns rather than breaks to avoid pc increment at end of
             // function
             cpu->pc = address;
-            return 0;
+            // NOLINTNEXTLINE
+            return 10; // return cycle number
           }
         cpu->pc += 2;
+        num_cycles = 10; // NOLINT
         break;
       }
     case 0xc3: // NOLINT
@@ -330,7 +413,8 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         uint16_t address = cpu_read_mem(cpu, cpu->pc + 2);
         address = (address << 8) | cpu_read_mem(cpu, cpu->pc + 1); // NOLINT
         cpu->pc = address;
-        return 0; // no PC increment due to JMP.
+        // NOLINTNEXTLINE
+        return 10; // no PC increment due to JMP, return num cycles
       }
     case 0xc5: // NOLINT
       {        // PUSH B
@@ -338,11 +422,11 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         cpu->sp -= 1;
         cpu_write_mem(cpu, cpu->sp - 1, cpu->c);
         cpu->sp -= 1;
+        num_cycles = 11; // NOLINT
         break;
       }
     case 0xc6: // NOLINT
       {
-        // printf("ADI ");
         // Affects Z, S, P, CY, AC
         uint8_t immediate = cpu_read_mem(cpu, cpu->pc + 1);
         uint16_t answer = cpu->a + immediate;
@@ -353,6 +437,21 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         update_aux_carry_flag(cpu, cpu->a, immediate);
         cpu->a = (uint8_t)answer;
         cpu->pc += 1;
+        num_cycles = 7; // NOLINT
+        break;
+      }
+    case 0xc8:                               // NOLINT
+      {                                      // RZ
+        if ((cpu->flags & FLAG_Z) == FLAG_Z) // if Z set, RET
+          {
+            uint16_t address = cpu_read_mem(cpu, cpu->sp);
+            address += (cpu_read_mem(cpu, cpu->sp + 1) << 8); // NOLINT
+            cpu->sp += 2;
+            cpu->pc = address;
+            // NOLINTNEXTLINE
+            return 11; // return num cycles
+          }
+        num_cycles = 5; // NOLINT
         break;
       }
     case 0xc9: // NOLINT
@@ -362,7 +461,23 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         address += (cpu_read_mem(cpu, cpu->sp + 1) << 8); // NOLINT
         cpu->sp += 2;
         cpu->pc = address;
-        return 0;
+        // NOLINTNEXTLINE
+        return 10; // return num cycles
+      }
+    case 0xca: // NOLINT
+      {        // JZ
+        if (is_zero_flag_set(cpu))
+          {
+            uint16_t address = cpu_read_mem(cpu, cpu->pc + 2); // NOLINT
+            address = address << 8;                            // NOLINT
+            address += cpu_read_mem(cpu, cpu->pc + 1);
+            cpu->pc = address;
+            // NOLINTNEXTLINE
+            return 10; // return num cycles
+          }
+        cpu->pc += 2;    // NOLINT
+        num_cycles = 10; // NOLINT
+        break;
       }
     case 0xcd:                                                   // NOLINT
       {                                                          // CALL ADDR
@@ -372,7 +487,8 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         cpu->sp -= 2;
         cpu->pc = (cpu_read_mem(cpu, cpu->pc + 2) << 8) // NOLINT
                   | (cpu_read_mem(cpu, cpu->pc + 1));
-        return 0;
+        // NOLINTNEXTLINE
+        return 17; // return num cycles
       }
     case 0xd1: // NOLINT
       {
@@ -381,6 +497,21 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         cpu->sp += 1;
         cpu->d = cpu_read_mem(cpu, cpu->sp);
         cpu->sp += 1;
+        num_cycles = 10; // NOLINT
+        break;
+      }
+    case 0xd2: // NOLINT
+      {        // JNC ADR
+        uint16_t address = cpu_read_mem(cpu, cpu->pc + 2);
+        address = (address << BYTE) | cpu_read_mem(cpu, cpu->pc + 1);
+        if ((cpu->flags & FLAG_CY) != FLAG_CY) // if CY not set JUMP
+          {
+            cpu->pc = address;
+            // NOLINTNEXTLINE
+            return 10; // return cycle number
+          }
+        cpu->pc += 2;
+        num_cycles = 10; // NOLINT
         break;
       }
     case 0xd3: // NOLINT
@@ -390,20 +521,45 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         uint8_t port = cpu_read_mem(cpu, cpu->pc + 1);
         printf("%u", port);
         cpu->pc += 1;
+        num_cycles = 10; // NOLINT
         break;
       }
     case 0xd5: // NOLINT
       {        // PUSH D
         cpu_write_mem(cpu, cpu->sp - 2, cpu->e);
         cpu_write_mem(cpu, cpu->sp - 1, cpu->d);
-        cpu->sp -= 2;
+        cpu->sp -= 2;    // NOLINT
+        num_cycles = 11; // NOLINT
+        break;
+      }
+    case 0xda: // NOLINT
+      {        // JC ADR
+        uint16_t address = cpu_read_mem(cpu, cpu->pc + 2);
+        address = (address << BYTE) | cpu_read_mem(cpu, cpu->pc + 1);
+        if ((cpu->flags & FLAG_CY) == FLAG_CY) // if CY set JUMP
+          {
+            cpu->pc = address;
+            // NOLINTNEXTLINE
+            return 10; // return cycle number
+          }
+        cpu->pc += 2;
+        num_cycles = 10; // NOLINT
+        break;
+      }
+    case 0xdb: // NOLINT
+      {        // IN D8
+        uint8_t port = cpu_read_mem(cpu, cpu->pc + 1);
+        printf("%u", port);
+        cpu->pc += 1;
+        num_cycles = 10; // NOLINT
         break;
       }
     case 0xe1: // NOLINT
       {        // POP H
         cpu->l = cpu_read_mem(cpu, cpu->sp);
         cpu->h = cpu_read_mem(cpu, cpu->sp + 1);
-        cpu->sp += 2;
+        cpu->sp += 2;    // NOLINT
+        num_cycles = 10; // NOLINT
         break;
       }
     case 0xe5: // NOLINT
@@ -412,11 +568,11 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         cpu->sp -= 1;
         cpu_write_mem(cpu, cpu->sp - 1, cpu->l);
         cpu->sp -= 1;
+        num_cycles = 11; // NOLINT
         break;
       }
     case 0xe6: // NOLINT
       {
-        // printf("ANI ");
         uint8_t immediate = cpu_read_mem(cpu, cpu->pc + 1);
         cpu->a &= immediate;
         update_zero_flag(cpu, cpu->a);
@@ -425,6 +581,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         update_carry_flag(cpu, false);
         cpu->flags &= ~FLAG_AC;
         cpu->pc += 1;
+        num_cycles = 7; // NOLINT
         break;
       }
     case 0xeb: // NOLINT
@@ -438,6 +595,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         temp = cpu->l;
         cpu->l = cpu->e;
         cpu->e = temp;
+        num_cycles = 5; // NOLINT
         break;
       }
     case 0xf1: // NOLINT
@@ -445,6 +603,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         cpu->flags = cpu_read_mem(cpu, cpu->sp);
         cpu->a = cpu_read_mem(cpu, cpu->sp + 1);
         cpu->sp += 2;
+        num_cycles = 10; // NOLINT
         break;
       }
     case 0xf5: // NOLINT
@@ -453,12 +612,14 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         cpu->sp -= 1;
         cpu_write_mem(cpu, cpu->sp - 1, cpu->flags);
         cpu->sp -= 1;
+        num_cycles = 11; // NOLINT
         break;
       }
       break;
     case 0xfb: // NOLINT
       {
         cpu->interrupt_enabled = true;
+        num_cycles = 4; // NOLINT
         break;
       }
     case 0xfe: // NOLINT
@@ -471,6 +632,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         update_carry_flag(cpu, (data > cpu->a));
         update_aux_carry_flag(cpu, cpu->a, (~data + 1));
         cpu->pc += 1;
+        num_cycles = 7; // NOLINT
         break;
       }
     default:
@@ -480,7 +642,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       }
     }
   cpu->pc += 1;
-  return 0;
+  return num_cycles;
 }
 
 void
@@ -629,7 +791,7 @@ update_aux_carry_flag(i8080 *cpu, uint8_t a, uint8_t b)
   // then adds nibbles to test for AC
   uint16_t result = (a & 0x0F) + (b & 0x0F); // NOLINT
   if (result & 0x10)                         // NOLINT
-    { // Check if carry from bit 3 to bit 4 existss
+    { // Check if carry from bit 3 to bit 4 exists
       cpu->flags |= FLAG_AC;
     }
   else
@@ -698,6 +860,12 @@ is_sign_flag_set(i8080 *cpu)
   return (cpu->flags & FLAG_S) != 0;
 }
 
+bool
+is_zero_flag_set(i8080 *cpu)
+{
+  return (cpu->flags & FLAG_Z) != 0;
+}
+
 void
 update_sign_flag(i8080 *cpu, uint8_t result)
 {
@@ -709,6 +877,54 @@ update_sign_flag(i8080 *cpu, uint8_t result)
     {
       cpu->flags &= ~FLAG_S;
     }
+}
+
+// Interrupts
+
+
+// UPDATE GRAPHICS
+
+void
+update_graphics(i8080 *cpu, SDL_Surface *buffer, SDL_Surface *surface)
+{
+
+  uint32_t *screen_buff = buffer->pixels;
+
+  // Graphics data is rotated 90 degrees in memory counter-clockwise.  Reading
+  // byte by byte starting at 0x2400 we need to fill in the screen left to
+  // right, bottom to top.
+  int vram = 0x2400;
+  // Start at the left edge
+  for (int column = 0; column > SCREEN_WIDTH; column++)
+    {
+      // Start at bottom of screen, decrement by 8 since each bit is a pixel.
+      for (int row = SCREEN_HEIGHT; row > 0; row -= 8) // NOLINT
+        {
+          // Set each pixel based on bit value.
+          for (int pixel = 0; pixel < 8; pixel++) // NOLINT
+            {
+              // Calculate surface index.
+              int surf_index = (SCREEN_WIDTH * (row - pixel)) + column
+                               - (SCREEN_WIDTH - 1);
+
+              uint8_t cur_byte = cpu_read_mem(cpu, vram);
+
+              // Set pixel to on by changing color to white.
+              if (cur_byte & 1 << pixel)
+                {
+                  screen_buff[surf_index] = 0xFFFFFF; // NOLINT
+                }
+              else
+                {
+                  // Set pixel to off by changing color to black.
+                  screen_buff[surf_index] = 0x000000; // NOLINT
+                }
+            }
+        }
+      vram++; // Increment to next byte in VRAM
+    }
+
+  SDL_BlitSurface(buffer, NULL, surface, NULL);
 }
 
 // DEBUGGING FUNCTIONS
@@ -723,8 +939,9 @@ void
 print_state(i8080 *cpu)
 {
   printf("REGISTERS a: 0x%02x b: 0x%02x c: 0x%02x d: 0x%02x e: 0x%02x h: "
-         "0x%02x l: 0x%02x ",
-         cpu->a, cpu->b, cpu->c, cpu->d, cpu->e, cpu->h, cpu->l);
+         "0x%02x l: 0x%02x sp: 0x%04x pc: 0x%04x ",
+         cpu->a, cpu->b, cpu->c, cpu->d, cpu->e, cpu->h, cpu->l, cpu->sp,
+         cpu->pc);
 }
 
 void
@@ -733,4 +950,37 @@ print_flags(uint8_t flags)
   printf("FLAGS z: %d s: %d p: %d cy: %d ac %d", (flags & FLAG_Z) == FLAG_Z,
          (flags & FLAG_S) == FLAG_S, (flags & FLAG_P) == FLAG_P,
          (flags & FLAG_CY) == FLAG_CY, (flags & FLAG_AC) == FLAG_AC);
+}
+
+// INTERRUPTS
+int
+handle_interrupt(i8080 *cpu, uint8_t rst_instruction)
+{
+  if (rst_instruction > RST_RANGE)
+    {
+      fprintf(stderr, "Invalid restart instruction %u", rst_instruction);
+      return -1;
+    }
+
+  if (cpu->interrupt_enabled == false)
+    {
+      return 0;
+    }
+
+  // get address for interrupt subroutine
+  uint16_t subroutine_address = BYTE * rst_instruction;
+
+  // push program counter to stack
+  cpu_write_mem(cpu, cpu->sp - 1,
+                (uint8_t)((cpu->pc & UPPER_8_BIT_MASK) >> BYTE));
+  cpu_write_mem(cpu, cpu->sp - 2, (uint8_t)(cpu->pc & LOWER_8_BIT_MASK));
+  cpu->sp -= 2;
+
+  // set program counter to start of the interrupt subroutine
+  cpu->pc = subroutine_address;
+
+  // disable interrupts
+  cpu->interrupt_enabled = false;
+
+  return 0;
 }
