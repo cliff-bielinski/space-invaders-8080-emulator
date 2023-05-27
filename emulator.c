@@ -6,7 +6,8 @@
 #include <stdlib.h>
 
 // Logical AND with Accumulator
-int ANA(i8080 *cpu, uint8_t *reg)
+int
+ANA(i8080 *cpu, uint8_t *reg)
 {
   uint8_t temp = cpu->a;
   cpu->a = cpu->a & *reg;
@@ -20,27 +21,33 @@ int ANA(i8080 *cpu, uint8_t *reg)
 }
 
 // Call Address
-int CALL(i8080 *cpu, uint16_t address)
+int
+CALL(i8080 *cpu, uint16_t address)
 {
   uint16_t return_address = readRegisterPair(cpu, PC) + 3; // NOLINT
-  cpu_write_mem(cpu, cpu->sp - 1, (uint8_t)((return_address & UPPER_8_BIT_MASK) >> BYTE));
-  cpu_write_mem(cpu, cpu->sp - 2, (uint8_t)(return_address & LOWER_8_BIT_MASK));
+  cpu_write_mem(cpu, cpu->sp - 1,
+                (uint8_t)((return_address & UPPER_8_BIT_MASK) >> BYTE));
+  cpu_write_mem(cpu, cpu->sp - 2,
+                (uint8_t)(return_address & LOWER_8_BIT_MASK));
   cpu->sp -= 2;
   writeRegisterPair(cpu, PC, address);
   return 17;
 }
 
 // Double Add
-int DAD(i8080 *cpu, int pair)
+int
+DAD(i8080 *cpu, int pair)
 {
-  uint32_t result = (uint32_t)(readRegisterPair(cpu, pair) + readRegisterPair(cpu, HL));
+  uint32_t result
+      = (uint32_t)(readRegisterPair(cpu, pair) + readRegisterPair(cpu, HL));
   update_carry_flag(cpu, result > MAX_16_BIT_VALUE);
   writeRegisterPair(cpu, HL, (uint16_t)result);
   return 10;
 }
 
 // Decrement Register
-int DCR(i8080 *cpu, uint8_t *reg)
+int
+DCR(i8080 *cpu, uint8_t *reg)
 {
   update_aux_carry_flag(cpu, *reg, MAX_8_BIT_VALUE);
   *reg -= 1;
@@ -50,21 +57,24 @@ int DCR(i8080 *cpu, uint8_t *reg)
   return 5;
 }
 
-int INX(i8080 *cpu, int pair)
+int
+INX(i8080 *cpu, int pair)
 {
   uint16_t value = readRegisterPair(cpu, pair) + 1;
   writeRegisterPair(cpu, pair, value);
   return 5;
 }
 
-int JMP(i8080 *cpu)
+int
+JMP(i8080 *cpu)
 {
   writeRegisterPair(cpu, PC, getImmediate16BitValue(cpu));
   return 10;
 }
 
 // Load Accumulator
-int LDAX(i8080 *cpu, int pair)
+int
+LDAX(i8080 *cpu, int pair)
 {
   uint16_t address = readRegisterPair(cpu, pair);
   cpu->a = cpu_read_mem(cpu, address);
@@ -72,73 +82,86 @@ int LDAX(i8080 *cpu, int pair)
 }
 
 // Load 16-bit Data to Register Pair
-int LXI(i8080 *cpu, int pair, uint16_t value)
+int
+LXI(i8080 *cpu, int pair, uint16_t value)
 {
   writeRegisterPair(cpu, pair, value);
   return 10;
 }
 
-int MOV(uint8_t *dest, uint8_t *src)
+int
+MOV(uint8_t *dest, uint8_t *src)
 {
   *dest = *src;
   return 5;
 }
 
-int MOV_TO_MEM(i8080 *cpu, uint8_t *reg)
+int
+MOV_TO_MEM(i8080 *cpu, uint8_t *reg)
 {
   cpu_write_mem(cpu, readRegisterPair(cpu, HL), *reg);
   return 7;
 }
 
-int MOV_FROM_MEM(i8080 *cpu, uint8_t *reg)
+int
+MOV_FROM_MEM(i8080 *cpu, uint8_t *reg)
 {
   *reg = cpu_read_mem(cpu, readRegisterPair(cpu, HL));
   return 7;
 }
 
 // Move 8-bit Data to Register
-int MVI(uint8_t *reg, uint8_t value)
+int
+MVI(uint8_t *reg, uint8_t value)
 {
   *reg = value;
   return 7;
 }
 
 // No Operation
-int NOP()
+int
+NOP()
 {
   return 4;
 }
 
 // Pop from Stack
-int POP(i8080 *cpu, int pair)
+int
+POP(i8080 *cpu, int pair)
 {
-  uint16_t value = ((cpu_read_mem(cpu, cpu->sp + 1) << BYTE) | cpu_read_mem(cpu, cpu->sp));
+  uint16_t value = ((cpu_read_mem(cpu, cpu->sp + 1) << BYTE)
+                    | cpu_read_mem(cpu, cpu->sp));
   writeRegisterPair(cpu, pair, value);
   cpu->sp += 2;
   return 10;
 }
 
 // Push to Stack
-int PUSH(i8080 *cpu, int pair)
+int
+PUSH(i8080 *cpu, int pair)
 {
   uint16_t value = readRegisterPair(cpu, pair);
-  cpu_write_mem(cpu, cpu->sp - 1, (uint8_t)((value & UPPER_8_BIT_MASK) >> BYTE));
+  cpu_write_mem(cpu, cpu->sp - 1,
+                (uint8_t)((value & UPPER_8_BIT_MASK) >> BYTE));
   cpu_write_mem(cpu, cpu->sp - 2, (uint8_t)(value & LOWER_8_BIT_MASK));
   cpu->sp -= 2;
   return 11;
 }
 
 // Return to Address
-int RET(i8080 *cpu)
+int
+RET(i8080 *cpu)
 {
-  uint16_t address = ((cpu_read_mem(cpu, cpu->sp + 1) << BYTE) | cpu_read_mem(cpu, cpu->sp));
+  uint16_t address = ((cpu_read_mem(cpu, cpu->sp + 1) << BYTE)
+                      | cpu_read_mem(cpu, cpu->sp));
   cpu->sp += 2;
   writeRegisterPair(cpu, PC, address);
   return 10;
 }
 
 // Logical XOR with Accumulator
-int XRA(i8080 *cpu, uint8_t *reg)
+int
+XRA(i8080 *cpu, uint8_t *reg)
 {
   cpu->a = cpu->a ^ *reg;
   update_zero_flag(cpu, cpu->a);
@@ -150,20 +173,23 @@ int XRA(i8080 *cpu, uint8_t *reg)
 }
 
 // Transform two 8-bit values into a 16-bit value
-uint8_t getImmediate8BitValue(i8080 *cpu)
+uint8_t
+getImmediate8BitValue(i8080 *cpu)
 {
   return cpu_read_mem(cpu, cpu->pc + 1);
 }
 
 // Transform two 8-bit values into a 16-bit value
-uint16_t getImmediate16BitValue(i8080 *cpu)
+uint16_t
+getImmediate16BitValue(i8080 *cpu)
 {
   uint8_t lo = cpu_read_mem(cpu, cpu->pc + 1);
   uint8_t hi = cpu_read_mem(cpu, cpu->pc + 2);
   return (uint16_t)((hi << BYTE) | lo);
 }
 
-uint16_t readRegisterPair(i8080 *cpu, int pair)
+uint16_t
+readRegisterPair(i8080 *cpu, int pair)
 {
   switch (pair)
     {
@@ -199,7 +225,8 @@ uint16_t readRegisterPair(i8080 *cpu, int pair)
     }
 }
 
-void writeRegisterPair(i8080 *cpu, int pair, uint16_t value)
+void
+writeRegisterPair(i8080 *cpu, int pair, uint16_t value)
 {
   switch (pair)
     {
@@ -340,7 +367,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         num_cycles = LDAX(cpu, DE);
         break;
       }
-    case 0x21: // NOLINT 
+    case 0x21: // NOLINT
       {        // LXI H
         num_cycles = LXI(cpu, HL, getImmediate16BitValue(cpu));
         cpu->pc += 2;
@@ -475,14 +502,14 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         num_cycles = ANA(cpu, &cpu->a);
         break;
       }
-    case 0xaf: // NOLINT
-      {        // XRA A
+    case 0xaf:                          // NOLINT
+      {                                 // XRA A
         num_cycles = XRA(cpu, &cpu->a); // NOLINT
         break;
       }
     case 0xc1: // NOLINT
       {        // POP B
-        num_cycles = POP(cpu, BC); 
+        num_cycles = POP(cpu, BC);
         break;
       }
     case 0xc2: // NOLINT
@@ -550,8 +577,8 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         num_cycles = POP(cpu, DE);
         break;
       }
-    case 0xd2: // NOLINT
-      {        // JNC ADR
+    case 0xd2:                                 // NOLINT
+      {                                        // JNC ADR
         if ((cpu->flags & FLAG_CY) != FLAG_CY) // if CY not set JUMP
           {
             return JMP(cpu);
@@ -573,8 +600,8 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         num_cycles = PUSH(cpu, DE);
         break;
       }
-    case 0xda: // NOLINT
-      {        // JC ADR
+    case 0xda:                                 // NOLINT
+      {                                        // JC ADR
         if ((cpu->flags & FLAG_CY) == FLAG_CY) // if CY set JUMP
           {
             return JMP(cpu);

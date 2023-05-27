@@ -38,8 +38,8 @@ test_opcode_0x01(void) // NOLINT
   i8080 cpu;
   cpu_init(&cpu);
 
-  cpu_write_mem(&cpu, 0x0001, 0xFF); // NOLINT
-  cpu_write_mem(&cpu, 0x0002, 0x12); // NOLINT
+  cpu_write_mem(&cpu, 0x0001, 0xFF);                // NOLINT
+  cpu_write_mem(&cpu, 0x0002, 0x12);                // NOLINT
   int code_found = execute_instruction(&cpu, 0x01); // NOLINT
   CU_ASSERT(code_found >= 0);
   CU_ASSERT(cpu.pc == 3);
