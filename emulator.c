@@ -519,7 +519,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         // printf("OUT ");
         // cpu->a will be byte one and port to write to is port 2
         uint8_t port = cpu_read_mem(cpu, cpu->pc + 1);
-        printf("%u", port);
+        port_out(cpu, port, cpu_read_mem(cpu, cpu->pc + 2));
         cpu->pc += 1;
         num_cycles = 10; // NOLINT
         break;

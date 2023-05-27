@@ -263,21 +263,21 @@ main(int argc, char *argv[])
                       "one non-option argument (rom_filepath).\n");
       exit(EXIT_FAILURE);
     }
-
+/*
   // initialize CPU state
   if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) != 0)
     {
       SDL_Log("Unable to initialize SDL: %s", SDL_GetError());
       return 1;
     }
-  /*
+  
   renderer = SDL_CreateRenderer(
     window, -1, SDL_RENDERER,ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
   if (renderer == NULL) {
   SDL_LOG("unable to create renderer: %s", SDL_GetError());
   return 1;
   }
-*/
+
   SDL_Joystick *joystick = NULL;
   if (SDL_NumJoysticks() > 0)
     {
@@ -291,6 +291,7 @@ main(int argc, char *argv[])
           SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Failure opening joystick 0");
         }
     }
+    */
   i8080 cpu;
   cpu_init(&cpu);
 
@@ -338,6 +339,19 @@ main(int argc, char *argv[])
                                         0, 0, 0);
         }
     }
+  SDL_Joystick *joystick = NULL;
+  if (SDL_NumJoysticks() > 0)
+    {
+      joystick = SDL_JoystickOpen(0);
+      if (joystick)
+        {
+          SDL_Log("Joystick successfully found");
+        }
+      else
+        {
+          SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Failure opening joystick 0");
+        }
+    }
 
   while (true)
     {
@@ -365,6 +379,7 @@ main(int argc, char *argv[])
 
           // 3 Update system state for display, input, and sound
           // Update graphics after VBLANK int
+          io_loop(&cpu);
           update_graphics(&cpu, buffer, screen_surface);
           SDL_UpdateWindowSurface(window);
 
