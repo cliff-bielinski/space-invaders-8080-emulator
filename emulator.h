@@ -9,12 +9,30 @@
 #define FLAG_P 0x10  // NOLINT
 #define FLAG_CY 0x08 // NOLINT
 
+// Register Pairs
+#define PSW 0
+#define BC 1
+#define DE 2
+#define HL 3
+#define SP 4
+#define PC 5
+
 // Memory
 #define MEM_SIZE 65536 // NOLINT
 
 // Display
 #define SCREEN_WIDTH 224  // NOLINT
 #define SCREEN_HEIGHT 256 // NOLINT
+
+// Bit Manipulation
+#define BYTE 8
+#define UPPER_8_BIT_MASK 0xFF00
+#define LOWER_8_BIT_MASK 0x00FF
+#define MAX_8_BIT_VALUE 0xFF
+#define MAX_16_BIT_VALUE 0xFFFF
+
+// Opcodes
+#define RST_RANGE 7
 
 typedef struct
 {
@@ -57,6 +75,10 @@ void cpu_write_mem(i8080 *cpu, uint16_t address, uint8_t data);
 bool cpu_load_file(i8080 *cpu, const char *file_path, uint16_t address);
 int execute_instruction(i8080 *cpu, uint8_t opcode);
 void update_graphics(i8080 *cpu, SDL_Surface *buffer, SDL_Surface *surface);
+void writeRegisterPair(i8080 *cpu, int pair, uint16_t value);
+uint16_t readRegisterPair(i8080 *cpu, int pair);
+uint8_t getImmediate8BitValue(i8080 *cpu);
+uint16_t getImmediate16BitValue(i8080 *cpu);
 
 // Prototypes for Flags
 
