@@ -551,8 +551,8 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         num_cycles = 7; // NOLINT
         break;
       }
-    case 0xc8: // NOLINT
-      {        // RZ
+    case 0xc8:                               // NOLINT
+      {                                      // RZ
         if ((cpu->flags & FLAG_Z) == FLAG_Z) // if Z set, RET
           {
             return RET(cpu) + 1; // 11 cycles
@@ -583,8 +583,8 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         num_cycles = POP(cpu, DE);
         break;
       }
-    case 0xd2: // NOLINT
-      {        // JNC ADR
+    case 0xd2:                                 // NOLINT
+      {                                        // JNC ADR
         if ((cpu->flags & FLAG_CY) != FLAG_CY) // if CY not set JUMP
           {
             return JMP(cpu);
@@ -606,8 +606,8 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         num_cycles = PUSH(cpu, DE);
         break;
       }
-    case 0xda: // NOLINT
-      {        // JC ADR
+    case 0xda:                                 // NOLINT
+      {                                        // JC ADR
         if ((cpu->flags & FLAG_CY) == FLAG_CY) // if CY set JUMP
           {
             return JMP(cpu);
