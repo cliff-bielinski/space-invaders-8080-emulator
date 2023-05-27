@@ -97,7 +97,7 @@ MOV(uint8_t *dest, const uint8_t *src)
 }
 
 int
-MOV_TO_MEM(i8080 *cpu, uint8_t *reg)
+MOV_TO_MEM(i8080 *cpu, const uint8_t *reg)
 {
   cpu_write_mem(cpu, readRegisterPair(cpu, HL), *reg);
   return 7; // NOLINT
@@ -161,7 +161,7 @@ RET(i8080 *cpu)
 
 // Logical XOR with Accumulator
 int
-XRA(i8080 *cpu, uint8_t *reg)
+XRA(i8080 *cpu, const uint8_t *reg)
 {
   cpu->a = cpu->a ^ *reg;
   update_zero_flag(cpu, cpu->a);
@@ -270,7 +270,6 @@ writeRegisterPair(i8080 *cpu, int pair, uint16_t value)
         exit(EXIT_FAILURE);
       }
     }
-  return;
 }
 
 // Execute Instruction
