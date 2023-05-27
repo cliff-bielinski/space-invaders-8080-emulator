@@ -57,6 +57,7 @@ DCR(i8080 *cpu, uint8_t *reg)
   return 5; // NOLINT
 }
 
+// Increment Register Pair
 int
 INX(i8080 *cpu, int pair)
 {
@@ -65,6 +66,7 @@ INX(i8080 *cpu, int pair)
   return 5; // NOLINT
 }
 
+// Jump to Address
 int
 JMP(i8080 *cpu)
 {
@@ -89,6 +91,7 @@ LXI(i8080 *cpu, int pair, uint16_t value)
   return 10; // NOLINT
 }
 
+// Move register value
 int
 MOV(uint8_t *dest, const uint8_t *src)
 {
@@ -96,6 +99,7 @@ MOV(uint8_t *dest, const uint8_t *src)
   return 5; // NOLINT
 }
 
+// Move register value to memory
 int
 MOV_TO_MEM(i8080 *cpu, const uint8_t *reg)
 {
@@ -103,6 +107,7 @@ MOV_TO_MEM(i8080 *cpu, const uint8_t *reg)
   return 7; // NOLINT
 }
 
+// Move memory to register
 int
 MOV_FROM_MEM(i8080 *cpu, uint8_t *reg)
 {
@@ -172,14 +177,14 @@ XRA(i8080 *cpu, const uint8_t *reg)
   return 4; // NOLINT
 }
 
-// Transform two 8-bit values into a 16-bit value
+// Get next byte in program counter
 uint8_t
 getImmediate8BitValue(i8080 *cpu)
 {
   return cpu_read_mem(cpu, cpu->pc + 1);
 }
 
-// Transform two 8-bit values into a 16-bit value
+// Get next two bytes in program counter
 uint16_t
 getImmediate16BitValue(i8080 *cpu)
 {
@@ -188,6 +193,7 @@ getImmediate16BitValue(i8080 *cpu)
   return (uint16_t)((hi << BYTE) | lo);
 }
 
+// Get 16-bit value for given register pair
 uint16_t
 readRegisterPair(i8080 *cpu, int pair)
 {
@@ -225,6 +231,7 @@ readRegisterPair(i8080 *cpu, int pair)
     }
 }
 
+// Write 16-bit value to given register pair
 void
 writeRegisterPair(i8080 *cpu, int pair, uint16_t value)
 {
@@ -501,9 +508,9 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         num_cycles = ANA(cpu, &cpu->a);
         break;
       }
-    case 0xaf:                          // NOLINT
-      {                                 // XRA A
-        num_cycles = XRA(cpu, &cpu->a); // NOLINT
+    case 0xaf: // NOLINT
+      {        // XRA A
+        num_cycles = XRA(cpu, &cpu->a);
         break;
       }
     case 0xc1: // NOLINT
@@ -544,8 +551,8 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         num_cycles = 7; // NOLINT
         break;
       }
-    case 0xc8:                               // NOLINT
-      {                                      // RZ
+    case 0xc8: // NOLINT
+      {        // RZ
         if ((cpu->flags & FLAG_Z) == FLAG_Z) // if Z set, RET
           {
             return RET(cpu) + 1; // 11 cycles
@@ -576,8 +583,8 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         num_cycles = POP(cpu, DE);
         break;
       }
-    case 0xd2:                                 // NOLINT
-      {                                        // JNC ADR
+    case 0xd2: // NOLINT
+      {        // JNC ADR
         if ((cpu->flags & FLAG_CY) != FLAG_CY) // if CY not set JUMP
           {
             return JMP(cpu);
@@ -599,8 +606,8 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         num_cycles = PUSH(cpu, DE);
         break;
       }
-    case 0xda:                                 // NOLINT
-      {                                        // JC ADR
+    case 0xda: // NOLINT
+      {        // JC ADR
         if ((cpu->flags & FLAG_CY) == FLAG_CY) // if CY set JUMP
           {
             return JMP(cpu);
@@ -666,7 +673,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       }
       break;
     case 0xfb: // NOLINT
-      {
+      {        // EI
         cpu->interrupt_enabled = true;
         num_cycles = 4; // NOLINT
         break;
