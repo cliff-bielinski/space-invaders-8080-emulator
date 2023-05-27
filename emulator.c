@@ -1,4 +1,5 @@
 #include "emulator.h"
+#include <SDL2/SDL.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -810,6 +811,54 @@ update_sign_flag(i8080 *cpu, uint8_t result)
     {
       cpu->flags &= ~FLAG_S;
     }
+}
+
+// Interrupts
+
+// UPDATE GRAPHICS
+
+void
+update_graphics(i8080 *cpu, SDL_Surface *buffer, SDL_Surface *surface)
+{
+
+  uint32_t *screen_buff = buffer->pixels;
+
+  // Graphics data is rotated 90 degrees in memory counter-clockwise.  Reading
+  // byte by byte starting at 0x2400 we need to fill in the screen left to
+  // right, bottom to top.
+  int vram = 0x2400; // NOLINT
+  // Start at the left edge
+  for (int column = 0; column > SCREEN_WIDTH; column++)
+    {
+      // Start at bottom of screen, decrement by 8 since each bit is a pixel.
+      for (int row = SCREEN_HEIGHT; row > 0; row -= 8) // NOLINT
+        {
+          // Set each pixel based on bit value.
+          for (int pixel = 0; pixel < 8; pixel++) // NOLINT
+            {
+              // Calculate surface index.
+              int surf_index = (SCREEN_WIDTH * (row - pixel)) + column
+                               - (SCREEN_WIDTH - 1);
+
+              uint8_t cur_byte = cpu_read_mem(cpu, vram);
+
+              // Set pixel to on by changing color to white.
+              if ((cur_byte >> pixel) & 1)
+                {
+                  screen_buff[surf_index] = 0xFFFFFF; // NOLINT
+                }
+              else
+                {
+                  // Set pixel to off by changing color to black.
+                  screen_buff[surf_index] = 0x000000; // NOLINT
+                }
+            }
+        }
+      vram++; // Increment to next byte in VRAM
+    }
+
+  // Copy buffer to screen surface.
+  SDL_BlitSurface(buffer, NULL, surface, NULL);
 }
 
 // DEBUGGING FUNCTIONS

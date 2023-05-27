@@ -1,3 +1,4 @@
+#include <SDL2/SDL.h>
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -10,6 +11,10 @@
 
 // Memory
 #define MEM_SIZE 65536 // NOLINT
+
+// Display
+#define SCREEN_WIDTH 224  // NOLINT
+#define SCREEN_HEIGHT 256 // NOLINT
 
 typedef struct
 {
@@ -51,6 +56,7 @@ uint8_t cpu_read_mem(i8080 *cpu, uint16_t address);
 void cpu_write_mem(i8080 *cpu, uint16_t address, uint8_t data);
 bool cpu_load_file(i8080 *cpu, const char *file_path, uint16_t address);
 int execute_instruction(i8080 *cpu, uint8_t opcode);
+void update_graphics(i8080 *cpu, SDL_Surface *buffer, SDL_Surface *surface);
 
 // Prototypes for Flags
 

@@ -1,5 +1,4 @@
 #include "emulator.h"
-#include <SDL2/SDL.h>
 #include <ctype.h>
 #include <math.h>
 #include <stdbool.h>
@@ -15,6 +14,9 @@
 int run_cpu(i8080 *cpu, int cycles);
 int pflag = 0;
 int dflag = 0;
+SDL_Window *window = NULL;
+SDL_Surface *screen_surface = NULL;
+SDL_Surface *buffer = NULL;
 
 int
 main(int argc, char *argv[])
@@ -75,6 +77,38 @@ main(int argc, char *argv[])
   int cycle_offset = 0;
   int num_cycles = CYCLES_PER_TICK / 2;
 
+  // The surface contained by the window
+
+  // Initialize SDL
+  if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_JOYSTICK) < 0)
+    {
+      fprintf(stderr, "SDL could not initialize! SDL_Error: %s\n",
+              SDL_GetError());
+      exit(EXIT_FAILURE);
+    }
+  else
+    {
+      // Create window
+      window = SDL_CreateWindow("Space Invaders Emulator",
+                                SDL_WINDOWPOS_UNDEFINED,
+                                SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH,
+                                SCREEN_HEIGHT, SDL_WINDOW_RESIZABLE);
+      if (window == NULL)
+        {
+          fprintf(stderr, "Window could not be created! SDL_Error: %s\n",
+                  SDL_GetError());
+          exit(EXIT_FAILURE);
+        }
+      else
+        {
+          // Get window surface
+          screen_surface = SDL_GetWindowSurface(window);
+          // NOLINTNEXTLINE
+          buffer = SDL_CreateRGBSurface(0, SCREEN_WIDTH, SCREEN_HEIGHT, 32, 0,
+                                        0, 0, 0);
+        }
+    }
+
   while (true)
     {
       if ((SDL_GetTicks() - last_tick) > TICK) // NOLINT
@@ -100,12 +134,20 @@ main(int argc, char *argv[])
           num_cycles = CYCLES_PER_TICK / 2 - cycle_offset;
 
           // 3 Update system state for display, input, and sound
+          // Update graphics after VBLANK int
+          update_graphics(&cpu, buffer, screen_surface);
+          SDL_UpdateWindowSurface(window);
 
           // 4 Check for exit conditions
 
           last_tick = SDL_GetTicks();
         }
     }
+
+  // Destroy window
+  SDL_DestroyWindow(window);
+  // Quit SDL subsystems
+  SDL_Quit();
 }
 
 int
