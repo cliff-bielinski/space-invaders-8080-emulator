@@ -7,7 +7,7 @@
 
 // Logical AND with Accumulator
 int
-ANA(i8080 *cpu, uint8_t *reg)
+ANA(i8080 *cpu, const uint8_t *reg)
 {
   uint8_t temp = cpu->a;
   cpu->a = cpu->a & *reg;
