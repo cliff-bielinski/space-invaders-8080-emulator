@@ -17,7 +17,7 @@ ANA(i8080 *cpu, const uint8_t *reg)
   update_parity_flag(cpu, cpu->a);
   update_aux_carry_flag(cpu, temp, cpu->a);
   update_carry_flag(cpu, false);
-  return 4;
+  return 4; // NOLINT
 }
 
 // Call Address
@@ -31,7 +31,7 @@ CALL(i8080 *cpu, uint16_t address)
                 (uint8_t)(return_address & LOWER_8_BIT_MASK));
   cpu->sp -= 2;
   writeRegisterPair(cpu, PC, address);
-  return 17;
+  return 17; // NOLINT
 }
 
 // Double Add
@@ -42,7 +42,7 @@ DAD(i8080 *cpu, int pair)
       = (uint32_t)(readRegisterPair(cpu, pair) + readRegisterPair(cpu, HL));
   update_carry_flag(cpu, result > MAX_16_BIT_VALUE);
   writeRegisterPair(cpu, HL, (uint16_t)result);
-  return 10;
+  return 10; // NOLINT
 }
 
 // Decrement Register
@@ -54,7 +54,7 @@ DCR(i8080 *cpu, uint8_t *reg)
   update_zero_flag(cpu, *reg);
   update_sign_flag(cpu, *reg);
   update_parity_flag(cpu, *reg);
-  return 5;
+  return 5; // NOLINT
 }
 
 int
@@ -62,14 +62,14 @@ INX(i8080 *cpu, int pair)
 {
   uint16_t value = readRegisterPair(cpu, pair) + 1;
   writeRegisterPair(cpu, pair, value);
-  return 5;
+  return 5; // NOLINT
 }
 
 int
 JMP(i8080 *cpu)
 {
   writeRegisterPair(cpu, PC, getImmediate16BitValue(cpu));
-  return 10;
+  return 10; // NOLINT
 }
 
 // Load Accumulator
@@ -78,7 +78,7 @@ LDAX(i8080 *cpu, int pair)
 {
   uint16_t address = readRegisterPair(cpu, pair);
   cpu->a = cpu_read_mem(cpu, address);
-  return 7;
+  return 7; // NOLINT
 }
 
 // Load 16-bit Data to Register Pair
@@ -86,28 +86,28 @@ int
 LXI(i8080 *cpu, int pair, uint16_t value)
 {
   writeRegisterPair(cpu, pair, value);
-  return 10;
+  return 10; // NOLINT
 }
 
 int
-MOV(uint8_t *dest, uint8_t *src)
+MOV(uint8_t *dest, const uint8_t *src)
 {
   *dest = *src;
-  return 5;
+  return 5; // NOLINT
 }
 
 int
 MOV_TO_MEM(i8080 *cpu, uint8_t *reg)
 {
   cpu_write_mem(cpu, readRegisterPair(cpu, HL), *reg);
-  return 7;
+  return 7; // NOLINT
 }
 
 int
 MOV_FROM_MEM(i8080 *cpu, uint8_t *reg)
 {
   *reg = cpu_read_mem(cpu, readRegisterPair(cpu, HL));
-  return 7;
+  return 7; // NOLINT
 }
 
 // Move 8-bit Data to Register
@@ -115,14 +115,14 @@ int
 MVI(uint8_t *reg, uint8_t value)
 {
   *reg = value;
-  return 7;
+  return 7; // NOLINT
 }
 
 // No Operation
 int
 NOP()
 {
-  return 4;
+  return 4; // NOLINT
 }
 
 // Pop from Stack
@@ -133,7 +133,7 @@ POP(i8080 *cpu, int pair)
                     | cpu_read_mem(cpu, cpu->sp));
   writeRegisterPair(cpu, pair, value);
   cpu->sp += 2;
-  return 10;
+  return 10; // NOLINT
 }
 
 // Push to Stack
@@ -145,7 +145,7 @@ PUSH(i8080 *cpu, int pair)
                 (uint8_t)((value & UPPER_8_BIT_MASK) >> BYTE));
   cpu_write_mem(cpu, cpu->sp - 2, (uint8_t)(value & LOWER_8_BIT_MASK));
   cpu->sp -= 2;
-  return 11;
+  return 11; // NOLINT
 }
 
 // Return to Address
@@ -156,7 +156,7 @@ RET(i8080 *cpu)
                       | cpu_read_mem(cpu, cpu->sp));
   cpu->sp += 2;
   writeRegisterPair(cpu, PC, address);
-  return 10;
+  return 10; // NOLINT
 }
 
 // Logical XOR with Accumulator
@@ -169,7 +169,7 @@ XRA(i8080 *cpu, uint8_t *reg)
   update_parity_flag(cpu, cpu->a);
   update_aux_carry_flag(cpu, cpu->a, MAX_8_BIT_VALUE);
   update_carry_flag(cpu, false);
-  return 4;
+  return 4; // NOLINT
 }
 
 // Transform two 8-bit values into a 16-bit value
