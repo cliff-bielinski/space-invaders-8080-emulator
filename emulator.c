@@ -5,6 +5,24 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+// Add Register or Memory to Accumulator with Carry
+int
+ADC(i8080 *cpu, const u_int8_t *reg)
+{
+  // get carry bit and add A, register and CY together
+  uint8_t carry = ((cpu->flags & FLAG_CY) == FLAG_CY);
+  uint16_t result = cpu->a + *reg + carry;
+
+  // set A to sum and set flags
+  update_aux_carry_flag(cpu, cpu->a, (*reg + carry));
+  cpu->a = (uint8_t)result;
+  update_zero_flag(cpu, cpu->a);
+  update_sign_flag(cpu, cpu->a);
+  update_parity_flag(cpu, cpu->a);
+  update_carry_flag(cpu, result > MAX_8_BIT_VALUE);
+  return 4; // NOLINT
+}
+
 // Logical AND with Accumulator
 int
 ANA(i8080 *cpu, const uint8_t *reg)
@@ -783,6 +801,11 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
     case 0x7e: // NOLINT
       {        // MOV A,M
         num_cycles = MOV_FROM_MEM(cpu, &cpu->a);
+        break;
+      }
+    case 0x8a: // NOLINT
+      {        // ADC D
+        num_cycles = ADC(cpu, &cpu->d);
         break;
       }
     case 0xa7: // NOLINT

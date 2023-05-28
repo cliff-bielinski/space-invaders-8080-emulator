@@ -1693,6 +1693,48 @@ test_opcode_0x7b(void) // NOLINT
 }
 
 void
+test_opcode_0x8a(void) // NOLINT
+{                      // MOV A,E
+  // setup
+  i8080 cpu;
+  cpu_init(&cpu);
+
+  /* No Carry Set */
+  cpu.a = 0x42;
+  cpu.d = 0x3d;
+  cpu.flags = 0x00;
+
+  // execute
+  int code_found = execute_instruction(&cpu, 0x8a); // NOLINT
+
+  // verify
+  CU_ASSERT(code_found == 4);
+  CU_ASSERT(cpu.pc == 1);
+  CU_ASSERT(cpu.a == 0x7f);
+  CU_ASSERT((cpu.flags & FLAG_CY) == 0);
+  CU_ASSERT((cpu.flags & FLAG_S) == 0);
+  CU_ASSERT((cpu.flags & FLAG_Z) == 0);
+  CU_ASSERT((cpu.flags & FLAG_P) == 0);
+  CU_ASSERT((cpu.flags & FLAG_AC) == 0);
+
+  /* Carry Set */
+  cpu.a = 0x42;
+  cpu.d = 0x3d;
+  cpu.flags = FLAG_CY;
+
+  code_found = execute_instruction(&cpu, 0x8a);
+
+  CU_ASSERT(code_found == 4);
+  CU_ASSERT(cpu.pc == 2);
+  CU_ASSERT(cpu.a == 0x80);
+  CU_ASSERT((cpu.flags & FLAG_CY) == 0);
+  CU_ASSERT((cpu.flags & FLAG_S) == FLAG_S);
+  CU_ASSERT((cpu.flags & FLAG_Z) == 0);
+  CU_ASSERT((cpu.flags & FLAG_P) == 0);
+  CU_ASSERT((cpu.flags & FLAG_AC) == FLAG_AC);
+}
+
+void
 test_opcode_0xaf(void) // NOLINT
 {                      // XRA A
 
@@ -2357,6 +2399,9 @@ main(void)
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x7e()",
                          test_opcode_0x7e))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0x8a()",
+                         test_opcode_0x8a))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0xaf()",
                          test_opcode_0xaf))
