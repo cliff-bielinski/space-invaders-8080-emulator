@@ -386,6 +386,11 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         num_cycles = DCX(cpu, BC);
         break;
       }
+    case 0x0c: // NOLINT
+      {        // INR C
+        num_cycles = INR(cpu, &cpu->c);
+        break;
+      }
     case 0x0d: // NOLINT
       {        // DCR C
         num_cycles = DCR(cpu, &cpu->c);

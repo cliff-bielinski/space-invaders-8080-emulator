@@ -204,6 +204,37 @@ test_opcode_0x0b(void) // NOLINT
 }
 
 void
+test_opcode_0x0c(void) // NOLINT
+{
+  i8080 cpu;
+  cpu_init(&cpu);
+
+  cpu.c = 0xFF;
+
+  // increase c from 255 to 0
+  int code_found = execute_instruction(&cpu, 0x0c); // NOLINT
+
+  CU_ASSERT(code_found == 5);
+  CU_ASSERT(cpu.pc == 1);
+  CU_ASSERT(cpu.c == 0x00);
+  CU_ASSERT((cpu.flags & FLAG_P) == FLAG_P);
+  CU_ASSERT((cpu.flags & FLAG_S) == 0);
+  CU_ASSERT((cpu.flags & FLAG_Z) == FLAG_Z);
+  CU_ASSERT((cpu.flags & FLAG_AC) == FLAG_AC);
+
+  // increase c from 0 to 1
+  code_found = execute_instruction(&cpu, 0x0c); // NOLINT
+
+  CU_ASSERT(code_found == 5);
+  CU_ASSERT(cpu.pc == 2);
+  CU_ASSERT(cpu.c == 0x01);
+  CU_ASSERT((cpu.flags & FLAG_P) == 0);
+  CU_ASSERT((cpu.flags & FLAG_S) == 0);
+  CU_ASSERT((cpu.flags & FLAG_Z) == 0);
+  CU_ASSERT((cpu.flags & FLAG_AC) == 0);
+}
+
+void
 test_opcode_0x0d(void) // NOLINT
 {
   i8080 cpu;
@@ -1633,6 +1664,9 @@ main(void)
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x0b()",
                          test_opcode_0x0b))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0x0c()",
+                         test_opcode_0x0c))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x11()",
                          test_opcode_0x11))
