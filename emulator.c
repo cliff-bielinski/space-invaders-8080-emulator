@@ -489,7 +489,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         break;
       }
     case 0x67: // NOLINT
-      {         // MOV H,A
+      {        // MOV H,A
         num_cycles = MOV(&cpu->h, &cpu->a);
         break;
       }
