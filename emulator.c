@@ -57,6 +57,18 @@ DCR(i8080 *cpu, uint8_t *reg)
   return 5; // NOLINT
 }
 
+// Increment Register
+int
+INR(i8080 *cpu, uint8_t *reg)
+{
+  update_aux_carry_flag(cpu, *reg, 0x01);
+  *reg += 1;
+  update_zero_flag(cpu, *reg);
+  update_sign_flag(cpu, *reg);
+  update_parity_flag(cpu, *reg);
+  return 5; // NOLINT
+}
+
 // Increment Register Pair
 int
 INX(i8080 *cpu, int pair)
@@ -309,6 +321,11 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
     case 0x02: // NOLINT
       {        // STAX B
         num_cycles = STAX(cpu, BC);
+        break;
+      }
+    case 0x04: // NOLINT
+      {        // INR B
+        num_cycles = INR(cpu, &cpu->b);
         break;
       }
     case 0x05: // NOLINT
