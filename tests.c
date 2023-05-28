@@ -435,6 +435,23 @@ test_opcode_0x0e(void)
 }
 
 void
+test_opcode_0x15(void) // NOLINT
+{
+  i8080 cpu;
+  cpu_init(&cpu);
+
+  cpu.d = 0x0F;                                     // NOLINT
+  int code_found = execute_instruction(&cpu, 0x15); // NOLINT
+
+  CU_ASSERT(code_found == 5);
+  CU_ASSERT_EQUAL(cpu.d, 0x0E);
+  CU_ASSERT((cpu.flags & FLAG_Z) == 0);
+  CU_ASSERT((cpu.flags & FLAG_S) == 0);
+  CU_ASSERT((cpu.flags & FLAG_P) == 0);
+  CU_ASSERT((cpu.flags & FLAG_AC) == FLAG_AC);
+}
+
+void
 test_opcode_0x19(void) // NOLINT
 {
   // DAD D
@@ -1721,6 +1738,9 @@ main(void)
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x11()",
                          test_opcode_0x11))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0x15()",
+                         test_opcode_0x15))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x21()",
                          test_opcode_0x21))
