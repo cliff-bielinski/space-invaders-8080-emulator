@@ -382,6 +382,11 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         num_cycles = STAX(cpu, BC);
         break;
       }
+    case 0x03: // NOLINT
+      {        // INX B
+        num_cycles = INX(cpu, BC);
+        break;
+      }
     case 0x04: // NOLINT
       {        // INR B
         num_cycles = INR(cpu, &cpu->b);
