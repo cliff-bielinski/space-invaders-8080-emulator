@@ -621,6 +621,40 @@ test_opcode_0x1e(void)
 }
 
 void
+test_opcode_0x1f(void) // NOLINT
+{                      // RAR
+  /* carry 1 -> 0 */
+  // setup
+  i8080 cpu;
+  cpu_init(&cpu);
+  cpu.a = 0x6A; // NOLINT
+  cpu.flags |= FLAG_CY;
+
+  // execute
+  int code_found = execute_instruction(&cpu, 0x1f); // NOLINT
+
+  // verify
+  CU_ASSERT(code_found== 4);
+  CU_ASSERT(1 == cpu.pc);
+  CU_ASSERT(0xB5 == cpu.a); // NOLINT
+  CU_ASSERT(FLAG_CY != (cpu.flags & FLAG_CY));
+
+  /* carry 0 -> 1 */
+  // setup
+  cpu.a = 0x3D; // NOLINT
+  cpu.flags = 0x00;
+
+  // execute
+  code_found = execute_instruction(&cpu, 0x1f); // NOLINT
+
+  // verify
+  CU_ASSERT(code_found >= 0);
+  CU_ASSERT(2 == cpu.pc);
+  CU_ASSERT(0x1E == cpu.a); // NOLINT
+  CU_ASSERT(FLAG_CY == (cpu.flags & FLAG_CY));
+}
+
+void
 test_opcode_0x21(void)
 {
   i8080 cpu;
@@ -1939,6 +1973,9 @@ main(void)
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x1e()",
                          test_opcode_0x1e))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0x1f()",
+                         test_opcode_0x1f))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x0f()",
                          test_opcode_0x0f))

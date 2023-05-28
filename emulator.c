@@ -488,6 +488,33 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         cpu->pc += 1;
         break;
       }
+    case 0x1f: // NOLINT
+      {        // RAR
+        // keep old bit 0
+        uint8_t bit0 = cpu->a & 0x01; // NOLINT
+
+        // right shift register a by 1
+        cpu->a = cpu->a >> 1;
+
+        // replace bit 7 with old CY value
+        if ((cpu->flags & FLAG_CY) != 0)
+        {
+          cpu->a |= 0x80;
+        }
+
+        // set new CY to previous bit 0
+        if (bit0 != 0)
+        {
+          update_carry_flag(cpu, true);
+        }
+        else
+        {
+          update_carry_flag(cpu, false);
+        }
+        
+        num_cycles = 4; // NOLINT
+        break;
+      }
     case 0x21: // NOLINT
       {        // LXI H
         num_cycles = LXI(cpu, HL, getImmediate16BitValue(cpu));
