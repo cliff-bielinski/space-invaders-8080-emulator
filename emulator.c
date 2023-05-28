@@ -639,7 +639,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         cpu->l = cpu_read_mem(cpu, cpu->sp);
         cpu_write_mem(cpu, cpu->sp, tmp);
 
-        num_cycles = 18;
+        num_cycles = 18; // NOLINT
         break;
       }
     case 0xe5: // NOLINT
