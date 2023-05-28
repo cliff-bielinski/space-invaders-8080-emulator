@@ -680,8 +680,8 @@ test_opcode_0x22(void)
 {
   i8080 cpu;
   cpu_init(&cpu);
-  cpu.l = 0x34; // NOLINT
-  cpu.h = 0x12; // NOLINT
+  cpu.l = 0x34;                      // NOLINT
+  cpu.h = 0x12;                      // NOLINT
   cpu_write_mem(&cpu, 0x0001, 0xBB); // NOLINT
   cpu_write_mem(&cpu, 0x0002, 0xAA); // NOLINT
 
