@@ -25,7 +25,10 @@
 #define SCREEN_HEIGHT 256 // NOLINT
 
 // Bit Manipulation
+#define NIBBLE 4
 #define BYTE 8
+#define UPPER_4_BIT_MASK 0xF0
+#define LOWER_4_BIT_MASK 0x0F
 #define UPPER_8_BIT_MASK 0xFF00
 #define LOWER_8_BIT_MASK 0x00FF
 #define MAX_8_BIT_VALUE 0xFF

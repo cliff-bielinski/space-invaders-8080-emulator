@@ -34,6 +34,47 @@ CALL(i8080 *cpu, uint16_t address)
   return 17; // NOLINT
 }
 
+// Decimal Adjust Accumulator
+int
+DAA(i8080 *cpu)
+{
+  // break accumulator into 2 4-bit pieces
+  uint8_t lo_nibble = (cpu->a & LOWER_4_BIT_MASK);
+  uint8_t hi_nibble = ((cpu->a & UPPER_4_BIT_MASK) >> NIBBLE);
+
+  // STEP 1: if least sig bits are > 9 or AC is set, increment A by 6
+  if (lo_nibble > 9 || ((cpu->flags & FLAG_AC) == FLAG_AC)) // NOLINT
+    {
+      cpu->a += 6; // NOLINT
+
+      // set AC to 1
+      cpu->flags |= FLAG_AC;
+
+      // reassign nibbles to newly incremented A value
+      lo_nibble = (cpu->a & LOWER_4_BIT_MASK);
+      hi_nibble = ((cpu->a & UPPER_4_BIT_MASK) >> NIBBLE);
+    }
+  else
+    {
+      // clear AC if no carry
+      cpu->flags &= ~FLAG_AC;
+    }
+
+  // STEP 2: if most sig bits are NOW > 9 or CY is set, increment hi_nibble by
+  // 6
+  if (hi_nibble > 9 || ((cpu->flags & FLAG_CY) == FLAG_CY)) // NOLINT
+    {
+      hi_nibble += 6; // NOLINT
+      // reconstruct 8-bit A register after hi_nibble increment
+      cpu->a = ((hi_nibble << NIBBLE) | lo_nibble);
+
+      // set CY to 1
+      update_carry_flag(cpu, true);
+    }
+
+  return 4; // NOLINT
+}
+
 // Double Add
 int
 DAD(i8080 *cpu, int pair)
@@ -51,6 +92,27 @@ DCR(i8080 *cpu, uint8_t *reg)
 {
   update_aux_carry_flag(cpu, *reg, MAX_8_BIT_VALUE);
   *reg -= 1;
+  update_zero_flag(cpu, *reg);
+  update_sign_flag(cpu, *reg);
+  update_parity_flag(cpu, *reg);
+  return 5; // NOLINT
+}
+
+// Decrement Register Pair
+int
+DCX(i8080 *cpu, int pair)
+{
+  uint16_t value = readRegisterPair(cpu, pair) - 1;
+  writeRegisterPair(cpu, pair, value);
+  return 5; // NOLINT
+}
+
+// Increment Register
+int
+INR(i8080 *cpu, uint8_t *reg)
+{
+  update_aux_carry_flag(cpu, *reg, 0x01);
+  *reg += 1;
   update_zero_flag(cpu, *reg);
   update_sign_flag(cpu, *reg);
   update_parity_flag(cpu, *reg);
@@ -81,6 +143,15 @@ LDAX(i8080 *cpu, int pair)
   uint16_t address = readRegisterPair(cpu, pair);
   cpu->a = cpu_read_mem(cpu, address);
   return 7; // NOLINT
+}
+
+// Load to HL
+int
+LHLD(i8080 *cpu, u_int16_t address)
+{
+  cpu->l = cpu_read_mem(cpu, address);
+  cpu->h = cpu_read_mem(cpu, (address + 1));
+  return 16; // NOLINT
 }
 
 // Load 16-bit Data to Register Pair
@@ -162,6 +233,15 @@ RET(i8080 *cpu)
   cpu->sp += 2;
   writeRegisterPair(cpu, PC, address);
   return 10; // NOLINT
+}
+
+// Store Accumulator
+int
+STAX(i8080 *cpu, int pair)
+{
+  uint16_t address = readRegisterPair(cpu, pair);
+  cpu_write_mem(cpu, address, cpu->a);
+  return 7; // NOLINT
 }
 
 // Logical XOR with Accumulator
@@ -297,9 +377,19 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         cpu->pc += 2;
         break;
       }
+    case 0x02: // NOLINT
+      {        // STAX B
+        num_cycles = STAX(cpu, BC);
+        break;
+      }
     case 0x03: // NOLINT
       {        // INX B
         num_cycles = INX(cpu, BC);
+        break;
+      }
+    case 0x04: // NOLINT
+      {        // INR B
+        num_cycles = INR(cpu, &cpu->b);
         break;
       }
     case 0x05: // NOLINT
@@ -313,6 +403,29 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         cpu->pc += 1;
         break;
       }
+    case 0x07: // NOLINT
+      {        // RLC
+        // keep bit 7
+        uint8_t tmp = cpu->a >> 7; // NOLINT
+
+        // left shift register a
+        cpu->a = cpu->a << 1;
+
+        // replace wrapped bit
+        cpu->a ^= tmp;
+
+        // set cy flag to prev bit 7
+        if (tmp != 0)
+          {
+            update_carry_flag(cpu, true);
+          }
+        else
+          {
+            update_carry_flag(cpu, false);
+          }
+        num_cycles = 4; // NOLINT
+        break;
+      }
     case 0x09: // NOLINT
       {        // DAD B
         num_cycles = DAD(cpu, BC);
@@ -321,6 +434,16 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
     case 0x0a: // NOLINT
       {        // LDAX B
         num_cycles = LDAX(cpu, BC);
+        break;
+      }
+    case 0x0b: // NOLINT
+      {        // DCX B
+        num_cycles = DCX(cpu, BC);
+        break;
+      }
+    case 0x0c: // NOLINT
+      {        // INR C
+        num_cycles = INR(cpu, &cpu->c);
         break;
       }
     case 0x0d: // NOLINT
@@ -363,9 +486,30 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         cpu->pc += 2;
         break;
       }
+    case 0x12: // NOLINT
+      {        // STAX D
+        num_cycles = STAX(cpu, DE);
+        break;
+      }
     case 0x13: // NOLINT
       {        // INX D
         num_cycles = INX(cpu, DE);
+        break;
+      }
+    case 0x14: // NOLINT
+      {        // INR D
+        num_cycles = INR(cpu, &cpu->d);
+        break;
+      }
+    case 0x15: // NOLINT
+      {        // DCR D
+        num_cycles = DCR(cpu, &cpu->d);
+        break;
+      }
+    case 0x16: // NOLINT
+      {        // MVI D
+        num_cycles = MVI(&cpu->d, getImmediate8BitValue(cpu));
+        cpu->pc += 1;
         break;
       }
     case 0x19: // NOLINT
@@ -378,9 +522,66 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         num_cycles = LDAX(cpu, DE);
         break;
       }
+    case 0x1b: // NOLINT
+      {        // DCX D
+        num_cycles = DCX(cpu, DE);
+        break;
+      }
+    case 0x1c: // NOLINT
+      {        // INR E
+        num_cycles = INR(cpu, &cpu->e);
+        break;
+      }
+    case 0x1d: // NOLINT
+      {        // DCR E
+        num_cycles = DCR(cpu, &cpu->e);
+        break;
+      }
+    case 0x1e: // NOLINT
+      {        // MVI E
+        num_cycles = MVI(&cpu->e, getImmediate8BitValue(cpu));
+        cpu->pc += 1;
+        break;
+      }
+    case 0x1f: // NOLINT
+      {        // RAR
+        // keep old bit 0
+        uint8_t bit0 = cpu->a & 0x01; // NOLINT
+
+        // right shift register a by 1
+        cpu->a = cpu->a >> 1;
+
+        // replace bit 7 with old CY value
+        if ((cpu->flags & FLAG_CY) != 0)
+          {
+            cpu->a |= 0x80; // NOLINT
+          }
+
+        // set new CY to previous bit 0
+        if (bit0 != 0)
+          {
+            update_carry_flag(cpu, true);
+          }
+        else
+          {
+            update_carry_flag(cpu, false);
+          }
+
+        num_cycles = 4; // NOLINT
+        break;
+      }
     case 0x21: // NOLINT
       {        // LXI H
         num_cycles = LXI(cpu, HL, getImmediate16BitValue(cpu));
+        cpu->pc += 2;
+        break;
+      }
+    case 0x22: // NOLINT
+      {        // SHLD addr
+        uint16_t address = getImmediate16BitValue(cpu);
+        cpu_write_mem(cpu, address, cpu->l);
+        cpu_write_mem(cpu, (address + 1), cpu->h);
+        num_cycles = 16; // NOLINT
         cpu->pc += 2;
         break;
       }
@@ -389,15 +590,58 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         num_cycles = INX(cpu, HL);
         break;
       }
+    case 0x24: // NOLINT
+      {        // INR H
+        num_cycles = INR(cpu, &cpu->h);
+        break;
+      }
+    case 0x25: // NOLINT
+      {        // DCR H
+        num_cycles = DCR(cpu, &cpu->h);
+        break;
+      }
     case 0x26: // NOLINT
       {        // MVI H, D8
         num_cycles = MVI(&cpu->h, getImmediate8BitValue(cpu));
         cpu->pc += 1;
         break;
       }
+    case 0x27: // NOLINT
+      {        // DAA
+        num_cycles = DAA(cpu);
+        break;
+      }
     case 0x29: // NOLINT
       {        // DAD H
         num_cycles = DAD(cpu, HL);
+        break;
+      }
+    case 0x2a: // NOLINT
+      {        // LHLD
+        num_cycles = LHLD(cpu, getImmediate16BitValue(cpu));
+        cpu->pc += 2;
+        break;
+      }
+    case 0x2b: // NOLINT
+      {        // DCX H
+        num_cycles = DCX(cpu, HL);
+        break;
+      }
+    case 0x2c: // NOLINT
+      {        // INR L
+        num_cycles = INR(cpu, &cpu->l);
+        break;
+      }
+    case 0x2e: // NOLINT
+      {        // MVI L
+        num_cycles = MVI(&cpu->l, getImmediate8BitValue(cpu));
+        cpu->pc += 1;
+        break;
+      }
+    case 0x2f: // NOLINT
+      {        // CMA
+        cpu->a = ~cpu->a;
+        num_cycles = 4;
         break;
       }
     case 0x31: // NOLINT
@@ -412,6 +656,19 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         cpu_write_mem(cpu, address, cpu->a);
         cpu->pc += 2;
         num_cycles = 13; // NOLINT
+        break;
+      }
+    case 0x34: // NOLINT
+      {        // INR M
+        uint16_t address = readRegisterPair(cpu, HL);
+        uint8_t value = cpu_read_mem(cpu, address);
+        update_aux_carry_flag(cpu, value, 0x01);
+        value += 1;
+        update_zero_flag(cpu, value);
+        update_sign_flag(cpu, value);
+        update_parity_flag(cpu, value);
+        cpu_write_mem(cpu, address, value);
+        num_cycles = 10; // NOLINT
         break;
       }
     case 0x35: // NOLINT
@@ -450,6 +707,11 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         cpu->a = cpu_read_mem(cpu, addr);
         cpu->pc += 2;
         num_cycles = 13; // NOLINT
+        break;
+      }
+    case 0x3c: // NOLINT
+      {        // INR A
+        num_cycles = INR(cpu, &cpu->a);
         break;
       }
     case 0x3d: // NOLINT

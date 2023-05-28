@@ -52,6 +52,23 @@ test_opcode_0x01(void) // NOLINT
 }
 
 void
+test_opcode_0x02(void) // NOLINT
+{
+  i8080 cpu;
+  cpu_init(&cpu);
+
+  cpu.a = 0x12;                                     // NOLINT
+  writeRegisterPair(&cpu, BC, 0xAABB);              // NOLINT
+  int code_found = execute_instruction(&cpu, 0x02); // NOLINT
+  CU_ASSERT(code_found == 7);                       // NOLINT
+  CU_ASSERT(cpu.pc == 1);
+  CU_ASSERT(cpu_read_mem(&cpu, 0xAABB) == 0x12); // NOLINT
+
+  // clean up
+  cpu_write_mem(&cpu, 0xAABB, 0x00); // NOLINT
+}
+
+void
 test_opcode_0x03(void) // NOLINT
 {
   i8080 cpu;
@@ -73,6 +90,37 @@ test_opcode_0x03(void) // NOLINT
 }
 
 void
+test_opcode_0x04(void) // NOLINT
+{
+  i8080 cpu;
+  cpu_init(&cpu);
+
+  cpu.b = 0xFF; // NOLINT
+
+  // increase b from 255 to 0
+  int code_found = execute_instruction(&cpu, 0x04); // NOLINT
+
+  CU_ASSERT(code_found == 5);
+  CU_ASSERT(cpu.pc == 1);
+  CU_ASSERT(cpu.b == 0x00);
+  CU_ASSERT((cpu.flags & FLAG_P) == FLAG_P);
+  CU_ASSERT((cpu.flags & FLAG_S) == 0);
+  CU_ASSERT((cpu.flags & FLAG_Z) == FLAG_Z);
+  CU_ASSERT((cpu.flags & FLAG_AC) == FLAG_AC);
+
+  // increase b from 0 to 1
+  code_found = execute_instruction(&cpu, 0x04); // NOLINT
+
+  CU_ASSERT(code_found == 5);
+  CU_ASSERT(cpu.pc == 2);
+  CU_ASSERT(cpu.b == 0x01);
+  CU_ASSERT((cpu.flags & FLAG_P) == 0);
+  CU_ASSERT((cpu.flags & FLAG_S) == 0);
+  CU_ASSERT((cpu.flags & FLAG_Z) == 0);
+  CU_ASSERT((cpu.flags & FLAG_AC) == 0);
+}
+
+void
 test_opcode_0x06(void) // NOLINT
 {                      // MVI B, mem
 
@@ -91,6 +139,38 @@ test_opcode_0x06(void) // NOLINT
 
   // cleanup
   cpu_write_mem(&cpu, 0x0001, 0x00);
+}
+
+void
+test_opcode_0x07(void) // NOLINT
+{                      // RLC
+                       /* carry test */
+  // setup
+  i8080 cpu;
+  cpu_init(&cpu);
+  cpu.a = 0xCC; // NOLINT
+
+  // execute
+  int code_found = execute_instruction(&cpu, 0x07); // NOLINT
+
+  // verify
+  CU_ASSERT(code_found == 4);
+  CU_ASSERT(cpu.pc == 1);
+  CU_ASSERT(cpu.a == 0x99); // NOLINT
+  CU_ASSERT(FLAG_CY == (cpu.flags & FLAG_CY));
+
+  /* no carry test */
+  // setup
+  cpu.a = 0x35; // NOLINT
+
+  // execute
+  code_found = execute_instruction(&cpu, 0x07); // NOLINT
+
+  // verify
+  CU_ASSERT(code_found == 4);
+  CU_ASSERT(cpu.pc == 2);
+  CU_ASSERT(cpu.a == 0x6A); // NOLINT
+  CU_ASSERT(FLAG_CY != (cpu.flags & FLAG_CY));
 }
 
 void
@@ -118,6 +198,61 @@ test_opcode_0x09(void)
   cpu.c = 0;
   cpu.h = 0;
   cpu.l = 0;
+}
+
+void
+test_opcode_0x0b(void) // NOLINT
+{
+  i8080 cpu;
+  cpu_init(&cpu);
+
+  cpu.b = 0x01;
+  cpu.c = 0x01;
+
+  int code_found = execute_instruction(&cpu, 0x0b); // NOLINT
+
+  CU_ASSERT(code_found == 5);
+  CU_ASSERT(cpu.pc == 1);
+  CU_ASSERT(cpu.b == 0x01);
+  CU_ASSERT(cpu.c == 0x00);
+
+  code_found = execute_instruction(&cpu, 0x0b); // NOLINT
+
+  CU_ASSERT(code_found == 5);
+  CU_ASSERT(cpu.pc == 2);
+  CU_ASSERT(cpu.b == 0x00);
+  CU_ASSERT(cpu.c == 0xFF);
+}
+
+void
+test_opcode_0x0c(void) // NOLINT
+{
+  i8080 cpu;
+  cpu_init(&cpu);
+
+  cpu.c = 0xFF; // NOLINT
+
+  // increase c from 255 to 0
+  int code_found = execute_instruction(&cpu, 0x0c); // NOLINT
+
+  CU_ASSERT(code_found == 5);
+  CU_ASSERT(cpu.pc == 1);
+  CU_ASSERT(cpu.c == 0x00);
+  CU_ASSERT((cpu.flags & FLAG_P) == FLAG_P);
+  CU_ASSERT((cpu.flags & FLAG_S) == 0);
+  CU_ASSERT((cpu.flags & FLAG_Z) == FLAG_Z);
+  CU_ASSERT((cpu.flags & FLAG_AC) == FLAG_AC);
+
+  // increase c from 0 to 1
+  code_found = execute_instruction(&cpu, 0x0c); // NOLINT
+
+  CU_ASSERT(code_found == 5);
+  CU_ASSERT(cpu.pc == 2);
+  CU_ASSERT(cpu.c == 0x01);
+  CU_ASSERT((cpu.flags & FLAG_P) == 0);
+  CU_ASSERT((cpu.flags & FLAG_S) == 0);
+  CU_ASSERT((cpu.flags & FLAG_Z) == 0);
+  CU_ASSERT((cpu.flags & FLAG_AC) == 0);
 }
 
 void
@@ -217,6 +352,23 @@ test_opcode_0x11(void)
 }
 
 void
+test_opcode_0x12(void) // NOLINT
+{
+  i8080 cpu;
+  cpu_init(&cpu);
+
+  cpu.a = 0x12;                                     // NOLINT
+  writeRegisterPair(&cpu, DE, 0xAABB);              // NOLINT
+  int code_found = execute_instruction(&cpu, 0x12); // NOLINT
+  CU_ASSERT(code_found == 7);                       // NOLINT
+  CU_ASSERT(cpu.pc == 1);
+  CU_ASSERT(cpu_read_mem(&cpu, 0xAABB) == 0x12); // NOLINT
+
+  // clean up
+  cpu_write_mem(&cpu, 0xAABB, 0x00); // NOLINT
+}
+
+void
 test_opcode_0x13(void) // NOLINT
 {
   i8080 cpu;
@@ -235,6 +387,57 @@ test_opcode_0x13(void) // NOLINT
   CU_ASSERT(cpu.pc == 2);
   CU_ASSERT(cpu.e == 0);
   CU_ASSERT(cpu.d == 1);
+}
+
+void
+test_opcode_0x14(void) // NOLINT
+{
+  i8080 cpu;
+  cpu_init(&cpu);
+
+  cpu.d = 0xFF; // NOLINT
+
+  // increase d from 255 to 0
+  int code_found = execute_instruction(&cpu, 0x14); // NOLINT
+
+  CU_ASSERT(code_found == 5);
+  CU_ASSERT(cpu.pc == 1);
+  CU_ASSERT(cpu.d == 0x00);
+  CU_ASSERT((cpu.flags & FLAG_P) == FLAG_P);
+  CU_ASSERT((cpu.flags & FLAG_S) == 0);
+  CU_ASSERT((cpu.flags & FLAG_Z) == FLAG_Z);
+  CU_ASSERT((cpu.flags & FLAG_AC) == FLAG_AC);
+
+  // increase b from 0 to 1
+  code_found = execute_instruction(&cpu, 0x14); // NOLINT
+
+  CU_ASSERT(code_found == 5);
+  CU_ASSERT(cpu.pc == 2);
+  CU_ASSERT(cpu.d == 0x01);
+  CU_ASSERT((cpu.flags & FLAG_P) == 0);
+  CU_ASSERT((cpu.flags & FLAG_S) == 0);
+  CU_ASSERT((cpu.flags & FLAG_Z) == 0);
+  CU_ASSERT((cpu.flags & FLAG_AC) == 0);
+}
+
+void
+test_opcode_0x16(void) // NOLINT
+{                      // MVI D, mem
+  // setup
+  i8080 cpu;
+  cpu_init(&cpu);
+  cpu_write_mem(&cpu, 0x0001, 0xCC); // NOLINT
+
+  // execute
+  int code_found = execute_instruction(&cpu, 0x16); // NOLINT
+
+  // verify
+  CU_ASSERT(code_found == 7);
+  CU_ASSERT(2 == cpu.pc);
+  CU_ASSERT(0xCC == cpu.d);
+
+  // cleanup
+  cpu_write_mem(&cpu, 0x0001, 0x00);
 }
 
 void
@@ -273,6 +476,23 @@ test_opcode_0x0e(void)
 }
 
 void
+test_opcode_0x15(void) // NOLINT
+{
+  i8080 cpu;
+  cpu_init(&cpu);
+
+  cpu.d = 0x0F;                                     // NOLINT
+  int code_found = execute_instruction(&cpu, 0x15); // NOLINT
+
+  CU_ASSERT(code_found == 5);
+  CU_ASSERT_EQUAL(cpu.d, 0x0E);
+  CU_ASSERT((cpu.flags & FLAG_Z) == 0);
+  CU_ASSERT((cpu.flags & FLAG_S) == 0);
+  CU_ASSERT((cpu.flags & FLAG_P) == 0);
+  CU_ASSERT((cpu.flags & FLAG_AC) == FLAG_AC);
+}
+
+void
 test_opcode_0x19(void) // NOLINT
 {
   // DAD D
@@ -307,6 +527,155 @@ test_opcode_0x19(void) // NOLINT
 }
 
 void
+test_opcode_0x1b(void) // NOLINT
+{
+  i8080 cpu;
+  cpu_init(&cpu);
+
+  cpu.d = 0x01;
+  cpu.e = 0x01;
+
+  int code_found = execute_instruction(&cpu, 0x1b); // NOLINT
+
+  CU_ASSERT(code_found == 5);
+  CU_ASSERT(cpu.pc == 1);
+  CU_ASSERT(cpu.d == 0x01);
+  CU_ASSERT(cpu.e == 0x00);
+
+  code_found = execute_instruction(&cpu, 0x1b); // NOLINT
+
+  CU_ASSERT(code_found == 5);
+  CU_ASSERT(cpu.pc == 2);
+  CU_ASSERT(cpu.d == 0x00);
+  CU_ASSERT(cpu.e == 0xFF);
+}
+
+void
+test_opcode_0x1c(void) // NOLINT
+{
+  i8080 cpu;
+  cpu_init(&cpu);
+
+  cpu.e = 0xFF; // NOLINT
+
+  // increase e from 255 to 0
+  int code_found = execute_instruction(&cpu, 0x1c); // NOLINT
+
+  CU_ASSERT(code_found == 5);
+  CU_ASSERT(cpu.pc == 1);
+  CU_ASSERT(cpu.e == 0x00);
+  CU_ASSERT((cpu.flags & FLAG_P) == FLAG_P);
+  CU_ASSERT((cpu.flags & FLAG_S) == 0);
+  CU_ASSERT((cpu.flags & FLAG_Z) == FLAG_Z);
+  CU_ASSERT((cpu.flags & FLAG_AC) == FLAG_AC);
+
+  // increase e from 0 to 1
+  code_found = execute_instruction(&cpu, 0x1c); // NOLINT
+
+  CU_ASSERT(code_found == 5);
+  CU_ASSERT(cpu.pc == 2);
+  CU_ASSERT(cpu.e == 0x01);
+  CU_ASSERT((cpu.flags & FLAG_P) == 0);
+  CU_ASSERT((cpu.flags & FLAG_S) == 0);
+  CU_ASSERT((cpu.flags & FLAG_Z) == 0);
+  CU_ASSERT((cpu.flags & FLAG_AC) == 0);
+}
+
+void
+test_opcode_0x1d(void) // NOLINT
+{
+  i8080 cpu;
+  cpu_init(&cpu);
+
+  cpu.e = 0x02;
+
+  // decrease e from 2 to 1
+  int code_found = execute_instruction(&cpu, 0x1d); // NOLINT
+
+  CU_ASSERT(code_found == 5);
+  CU_ASSERT(cpu.pc == 1);
+  CU_ASSERT(cpu.e == 0x01);
+  CU_ASSERT((cpu.flags & FLAG_P) == 0);
+  CU_ASSERT((cpu.flags & FLAG_S) == 0);
+  CU_ASSERT((cpu.flags & FLAG_Z) == 0);
+  CU_ASSERT((cpu.flags & FLAG_AC) == FLAG_AC);
+
+  // decrease e from 1 to 0
+  code_found = execute_instruction(&cpu, 0x1d); // NOLINT
+
+  CU_ASSERT(code_found == 5);
+  CU_ASSERT(cpu.pc == 2);
+  CU_ASSERT(cpu.e == 0x00);
+  CU_ASSERT((cpu.flags & FLAG_P) == FLAG_P);
+  CU_ASSERT((cpu.flags & FLAG_S) == 0);
+  CU_ASSERT((cpu.flags & FLAG_Z) == FLAG_Z);
+  CU_ASSERT((cpu.flags & FLAG_AC) == FLAG_AC);
+
+  // decrease e from 0 to 255
+  code_found = execute_instruction(&cpu, 0x1d); // NOLINT
+
+  CU_ASSERT(code_found == 5);
+  CU_ASSERT(cpu.pc == 3);
+  CU_ASSERT(cpu.e == 0xFF);
+  CU_ASSERT((cpu.flags & FLAG_P) == FLAG_P);
+  CU_ASSERT((cpu.flags & FLAG_S) == FLAG_S);
+  CU_ASSERT((cpu.flags & FLAG_Z) == 0);
+  CU_ASSERT((cpu.flags & FLAG_AC) == 0);
+}
+
+void
+test_opcode_0x1e(void)
+{
+  // MVI E, D8
+  i8080 cpu;
+  cpu_init(&cpu);
+
+  cpu.pc = 0x4341;                       // NOLINT
+  cpu_write_mem(&cpu, cpu.pc + 1, 0x19); // NOLINT
+
+  int code_found = execute_instruction(&cpu, 0x1e); // NOLINT
+
+  CU_ASSERT(code_found == 7);
+  CU_ASSERT_EQUAL(cpu.e, 0x19); // NOLINT
+
+  cpu_write_mem(&cpu, 0x4342, 0x00); // NOLINT
+}
+
+void
+test_opcode_0x1f(void) // NOLINT
+{                      // RAR
+  /* carry 1 -> 0 */
+  // setup
+  i8080 cpu;
+  cpu_init(&cpu);
+  cpu.a = 0x6A; // NOLINT
+  cpu.flags |= FLAG_CY;
+
+  // execute
+  int code_found = execute_instruction(&cpu, 0x1f); // NOLINT
+
+  // verify
+  CU_ASSERT(code_found == 4);
+  CU_ASSERT(1 == cpu.pc);
+  CU_ASSERT(0xB5 == cpu.a); // NOLINT
+  CU_ASSERT(FLAG_CY != (cpu.flags & FLAG_CY));
+
+  /* carry 0 -> 1 */
+  // setup
+  cpu.a = 0x3D; // NOLINT
+  cpu.flags = 0x00;
+
+  // execute
+  code_found = execute_instruction(&cpu, 0x1f); // NOLINT
+
+  // verify
+  CU_ASSERT(code_found >= 0);
+  CU_ASSERT(2 == cpu.pc);
+  CU_ASSERT(0x1E == cpu.a); // NOLINT
+  CU_ASSERT(FLAG_CY == (cpu.flags & FLAG_CY));
+}
+
+void
 test_opcode_0x21(void)
 {
   i8080 cpu;
@@ -328,6 +697,77 @@ test_opcode_0x21(void)
 }
 
 void
+test_opcode_0x22(void)
+{
+  i8080 cpu;
+  cpu_init(&cpu);
+  cpu.l = 0x34;                      // NOLINT
+  cpu.h = 0x12;                      // NOLINT
+  cpu_write_mem(&cpu, 0x0001, 0xBB); // NOLINT
+  cpu_write_mem(&cpu, 0x0002, 0xAA); // NOLINT
+
+  int code_found = execute_instruction(&cpu, 0x22); // NOLINT
+  CU_ASSERT(code_found == 16);
+  CU_ASSERT(cpu.pc == 0x0003);
+  CU_ASSERT(cpu_read_mem(&cpu, 0xAABB) == 0x34);
+  CU_ASSERT(cpu_read_mem(&cpu, 0xAABC) == 0x12);
+
+  // clean up
+  cpu_write_mem(&cpu, 0x0001, 0x00); // NOLINT
+  cpu_write_mem(&cpu, 0x0002, 0x00); // NOLINT
+  cpu_write_mem(&cpu, 0xAABB, 0x00); // NOLINT
+  cpu_write_mem(&cpu, 0xAABC, 0x00); // NOLINT
+}
+
+void
+test_opcode_0x24(void) // NOLINT
+{
+  i8080 cpu;
+  cpu_init(&cpu);
+
+  cpu.h = 0xFF; // NOLINT
+
+  // increase h from 255 to 0
+  int code_found = execute_instruction(&cpu, 0x24); // NOLINT
+
+  CU_ASSERT(code_found == 5);
+  CU_ASSERT(cpu.pc == 1);
+  CU_ASSERT(cpu.h == 0x00);
+  CU_ASSERT((cpu.flags & FLAG_P) == FLAG_P);
+  CU_ASSERT((cpu.flags & FLAG_S) == 0);
+  CU_ASSERT((cpu.flags & FLAG_Z) == FLAG_Z);
+  CU_ASSERT((cpu.flags & FLAG_AC) == FLAG_AC);
+
+  // increase b from 0 to 1
+  code_found = execute_instruction(&cpu, 0x24); // NOLINT
+
+  CU_ASSERT(code_found == 5);
+  CU_ASSERT(cpu.pc == 2);
+  CU_ASSERT(cpu.h == 0x01);
+  CU_ASSERT((cpu.flags & FLAG_P) == 0);
+  CU_ASSERT((cpu.flags & FLAG_S) == 0);
+  CU_ASSERT((cpu.flags & FLAG_Z) == 0);
+  CU_ASSERT((cpu.flags & FLAG_AC) == 0);
+}
+
+void
+test_opcode_0x25(void) // NOLINT
+{
+  i8080 cpu;
+  cpu_init(&cpu);
+
+  cpu.h = 0x0F;                                     // NOLINT
+  int code_found = execute_instruction(&cpu, 0x25); // NOLINT
+
+  CU_ASSERT(code_found == 5);
+  CU_ASSERT_EQUAL(cpu.h, 0x0E);
+  CU_ASSERT((cpu.flags & FLAG_Z) == 0);
+  CU_ASSERT((cpu.flags & FLAG_S) == 0);
+  CU_ASSERT((cpu.flags & FLAG_P) == 0);
+  CU_ASSERT((cpu.flags & FLAG_AC) == FLAG_AC);
+}
+
+void
 test_opcode_0x26(void)
 {
   // MVI H, D8
@@ -343,6 +783,123 @@ test_opcode_0x26(void)
   CU_ASSERT_EQUAL(cpu.h, 0x65); // NOLINT
 
   cpu_write_mem(&cpu, 0x4564, 0x00); // NOLINT
+}
+
+void
+test_opcode_0x27(void)
+{
+  // DAA
+  i8080 cpu;
+  cpu_init(&cpu);
+  cpu.a = 0x9b;     // NOLINT
+  cpu.flags = 0x00; // NOLINT
+
+  int code_found = execute_instruction(&cpu, 0x27); // NOLINT
+
+  CU_ASSERT(code_found == 4);
+  CU_ASSERT(cpu.pc == 0x0001);
+  CU_ASSERT_EQUAL(cpu.a, 0x01);
+  CU_ASSERT_EQUAL(cpu.flags & FLAG_CY, FLAG_CY);
+  CU_ASSERT_EQUAL(cpu.flags & FLAG_AC, FLAG_AC);
+  CU_ASSERT_EQUAL(cpu.flags & FLAG_Z, 0);
+  CU_ASSERT_EQUAL(cpu.flags & FLAG_S, 0);
+  CU_ASSERT_EQUAL(cpu.flags & FLAG_P, 0);
+
+  cpu_write_mem(&cpu, 0x4564, 0x00); // NOLINT
+}
+
+void
+test_opcode_0x2a(void)
+{
+  i8080 cpu;
+  cpu_init(&cpu);
+  cpu_write_mem(&cpu, 0x0001, 0xBB); // NOLINT
+  cpu_write_mem(&cpu, 0x0002, 0xAA); // NOLINT
+  cpu_write_mem(&cpu, 0xAABB, 0x12); // NOLINT
+  cpu_write_mem(&cpu, 0xAABC, 0x34); // NOLINT
+
+  int code_found = execute_instruction(&cpu, 0x2a); // NOLINT
+
+  CU_ASSERT(code_found == 16);
+  CU_ASSERT(cpu.pc == 0x0003);
+  CU_ASSERT_EQUAL(cpu.l, 0x12);
+  CU_ASSERT_EQUAL(cpu.h, 0x34);
+
+  // clean up
+  cpu_write_mem(&cpu, 0x0001, 0x00); // NOLINT
+  cpu_write_mem(&cpu, 0x0002, 0x00); // NOLINT
+  cpu_write_mem(&cpu, 0xAABB, 0x00); // NOLINT
+  cpu_write_mem(&cpu, 0xAABC, 0x00); // NOLINT
+}
+
+void
+test_opcode_0x2b(void) // NOLINT
+{
+  i8080 cpu;
+  cpu_init(&cpu);
+
+  cpu.h = 0x01;
+  cpu.l = 0x01;
+
+  int code_found = execute_instruction(&cpu, 0x2b); // NOLINT
+
+  CU_ASSERT(code_found == 5);
+  CU_ASSERT(cpu.pc == 1);
+  CU_ASSERT(cpu.h == 0x01);
+  CU_ASSERT(cpu.l == 0x00);
+
+  code_found = execute_instruction(&cpu, 0x2b); // NOLINT
+
+  CU_ASSERT(code_found == 5);
+  CU_ASSERT(cpu.pc == 2);
+  CU_ASSERT(cpu.h == 0x00);
+  CU_ASSERT(cpu.l == 0xFF);
+}
+
+void
+test_opcode_0x2c(void) // NOLINT
+{
+  i8080 cpu;
+  cpu_init(&cpu);
+
+  cpu.l = 0x00;
+
+  int code_found = execute_instruction(&cpu, 0x2c); // NOLINT
+
+  CU_ASSERT(code_found == 5);
+  CU_ASSERT(cpu.pc == 1);
+  CU_ASSERT(cpu.l == 0x01);
+}
+
+void
+test_opcode_0x2e(void) // NOLINT
+{
+  i8080 cpu;
+  cpu_init(&cpu);
+
+  cpu_write_mem(&cpu, 0x0001, 0x12); // NOLINT
+
+  int code_found = execute_instruction(&cpu, 0x2e); // NOLINT
+
+  CU_ASSERT(code_found == 7);
+  CU_ASSERT(cpu.pc == 2);
+  CU_ASSERT(cpu.l == 0x12);
+
+  cpu_write_mem(&cpu, 0x0001, 0x00); // NOLINT
+}
+
+void
+test_opcode_0x2f(void) // NOLINT
+{
+  i8080 cpu;
+  cpu_init(&cpu);
+  cpu.a = 0x51; // NOLINT
+
+  int code_found = execute_instruction(&cpu, 0x2f); // NOLINT
+
+  CU_ASSERT(code_found == 4);
+  CU_ASSERT(cpu.pc == 1);
+  CU_ASSERT(cpu.a == 0xAE); // NOLINT
 }
 
 void
@@ -363,6 +920,27 @@ test_opcode_0x31(void)
 
   cpu_write_mem(&cpu, 0x0001, 0x00);
   cpu_write_mem(&cpu, 0x0002, 0x00);
+}
+
+void
+test_opcode_0x34(void)
+{
+  i8080 cpu;
+  cpu_init(&cpu);
+  cpu.h = 0xAA; // NOLINT
+  cpu.l = 0xBB; // NOLINT
+
+  cpu_write_mem(&cpu, 0xAABB, 0x12);                // NOLINT
+  int code_found = execute_instruction(&cpu, 0x34); // NOLINT
+  CU_ASSERT(code_found == 10);
+  CU_ASSERT(cpu_read_mem(&cpu, 0xAABB) == 0x13);
+  CU_ASSERT((cpu.flags & FLAG_Z) == 0);
+  CU_ASSERT((cpu.flags & FLAG_AC) == 0);
+  CU_ASSERT((cpu.flags & FLAG_S) == 0);
+  CU_ASSERT((cpu.flags & FLAG_P) == 0);
+
+  // clean up
+  cpu_write_mem(&cpu, 0xAABB, 0x00); // NOLINT
 }
 
 void
@@ -401,6 +979,34 @@ test_opcode_0x37(void)
 
   CU_ASSERT(code_found >= 0);
   CU_ASSERT_EQUAL(cpu.flags & FLAG_CY, FLAG_CY); // NOLINT
+}
+
+void
+test_opcode_0x3c(void)
+{
+  i8080 cpu;
+  cpu_init(&cpu);
+  cpu.a = 0xFF; // NOLINT
+
+  int code_found = execute_instruction(&cpu, 0x3c); // NOLINT
+
+  CU_ASSERT(code_found == 5);
+  CU_ASSERT_EQUAL(cpu.pc, 0x0001);               // NOLINT
+  CU_ASSERT_EQUAL(cpu.a, 0x00);                  // NOLINT
+  CU_ASSERT_EQUAL(cpu.flags & FLAG_S, 0);        // NOLINT
+  CU_ASSERT_EQUAL(cpu.flags & FLAG_Z, FLAG_Z);   // NOLINT
+  CU_ASSERT_EQUAL(cpu.flags & FLAG_AC, FLAG_AC); // NOLINT
+  CU_ASSERT_EQUAL(cpu.flags & FLAG_P, FLAG_P);   // NOLINT
+
+  code_found = execute_instruction(&cpu, 0x3c); // NOLINT
+
+  CU_ASSERT(code_found == 5);
+  CU_ASSERT_EQUAL(cpu.pc, 0x0002);         // NOLINT
+  CU_ASSERT_EQUAL(cpu.a, 0x01);            // NOLINT
+  CU_ASSERT_EQUAL(cpu.flags & FLAG_S, 0);  // NOLINT
+  CU_ASSERT_EQUAL(cpu.flags & FLAG_Z, 0);  // NOLINT
+  CU_ASSERT_EQUAL(cpu.flags & FLAG_AC, 0); // NOLINT
+  CU_ASSERT_EQUAL(cpu.flags & FLAG_P, 0);  // NOLINT
 }
 
 void
@@ -1581,17 +2187,53 @@ main(void)
           == CU_add_test(pSuite, "test of test_opcode_0x00()",
                          test_opcode_0x00))
       || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0x02()",
+                         test_opcode_0x02))
+      || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x03()",
                          test_opcode_0x03))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0x04()",
+                         test_opcode_0x04))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0x14()",
+                         test_opcode_0x14))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0x07()",
+                         test_opcode_0x07))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x09()",
                          test_opcode_0x09))
       || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0x16()",
+                         test_opcode_0x16))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0x0b()",
+                         test_opcode_0x0b))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0x0c()",
+                         test_opcode_0x0c))
+      || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x11()",
                          test_opcode_0x11))
       || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0x15()",
+                         test_opcode_0x15))
+      || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x21()",
                          test_opcode_0x21))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0x24()",
+                         test_opcode_0x24))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0x25()",
+                         test_opcode_0x25))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0x27()",
+                         test_opcode_0x27))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0x2a()",
+                         test_opcode_0x2a))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x31()",
                          test_opcode_0x31))
@@ -1632,8 +2274,26 @@ main(void)
           == CU_add_test(pSuite, "test of test_opcode_0x0d()",
                          test_opcode_0x0d))
       || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0x12()",
+                         test_opcode_0x12))
+      || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x13()",
                          test_opcode_0x13))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0x1b()",
+                         test_opcode_0x1b))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0x1c()",
+                         test_opcode_0x1c))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0x1d()",
+                         test_opcode_0x1d))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0x1e()",
+                         test_opcode_0x1e))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0x1f()",
+                         test_opcode_0x1f))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x0f()",
                          test_opcode_0x0f))
@@ -1644,14 +2304,32 @@ main(void)
           == CU_add_test(pSuite, "test of test_opcode_0x1a()",
                          test_opcode_0x1a))
       || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0x22()",
+                         test_opcode_0x22))
+      || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x23()",
                          test_opcode_0x23))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x29()",
                          test_opcode_0x29))
       || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0x2b()",
+                         test_opcode_0x2b))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0x2c()",
+                         test_opcode_0x2c))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0x2e()",
+                         test_opcode_0x2e))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0x2f()",
+                         test_opcode_0x2f))
+      || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x32()",
                          test_opcode_0x32))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0x34()",
+                         test_opcode_0x34))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x35()",
                          test_opcode_0x35))
@@ -1661,6 +2339,9 @@ main(void)
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x3a()",
                          test_opcode_0x3a))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0x3c)",
+                         test_opcode_0x3c))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x56()",
                          test_opcode_0x56))
