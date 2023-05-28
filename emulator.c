@@ -144,6 +144,15 @@ LDAX(i8080 *cpu, int pair)
   return 7; // NOLINT
 }
 
+// Load to HL
+int
+LHLD(i8080 *cpu, u_int16_t address)
+{
+  cpu->l = cpu_read_mem(cpu, address);
+  cpu->h = cpu_read_mem(cpu, (address + 1));
+  return 16;
+}
+
 // Load 16-bit Data to Register Pair
 int
 LXI(i8080 *cpu, int pair, uint16_t value)
@@ -599,6 +608,12 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
     case 0x29: // NOLINT
       {        // DAD H
         num_cycles = DAD(cpu, HL);
+        break;
+      }
+    case 0x2a: // NOLINT
+      {        // LHLD
+        num_cycles = LHLD(cpu, getImmediate16BitValue(cpu));
+        cpu->pc += 2;
         break;
       }
     case 0x31: // NOLINT
