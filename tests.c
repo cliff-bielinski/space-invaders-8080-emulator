@@ -1183,6 +1183,19 @@ test_opcode_0x4f(void)
 }
 
 void
+test_opcode_0x61(void)
+{
+  i8080 cpu;
+  cpu_init(&cpu);
+  cpu.c = 0x01;
+
+  int code_found = execute_instruction(&cpu, 0x61); // NOLINT
+  CU_ASSERT(cpu.pc == 0x0001);
+  CU_ASSERT(code_found == 5);
+  CU_ASSERT(cpu.h == 0x01);
+}
+
+void
 test_opcode_0x6f(void)
 {
   i8080 cpu;
@@ -2513,6 +2526,9 @@ main(void)
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x56()",
                          test_opcode_0x56))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0x61()",
+                         test_opcode_0x61))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x66()",
                          test_opcode_0x66))
