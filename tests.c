@@ -121,6 +121,38 @@ test_opcode_0x06(void) // NOLINT
 }
 
 void
+test_opcode_0x07(void) // NOLINT
+{                      // RLC
+   /* carry test */
+  // setup
+  i8080 cpu;
+  cpu_init(&cpu);
+  cpu.a = 0xCC; // NOLINT
+
+  // execute
+  int code_found = execute_instruction(&cpu, 0x07); // NOLINT
+
+  // verify
+  CU_ASSERT(code_found == 4);
+  CU_ASSERT(cpu.pc == 1);
+  CU_ASSERT(cpu.a == 0x99); // NOLINT
+  CU_ASSERT(FLAG_CY == (cpu.flags & FLAG_CY));
+
+  /* no carry test */
+  // setup
+  cpu.a = 0x35; // NOLINT
+
+  // execute
+  code_found = execute_instruction(&cpu, 0x07); // NOLINT
+
+  // verify
+  CU_ASSERT(code_found == 4);
+  CU_ASSERT(cpu.pc == 2);
+  CU_ASSERT(cpu.a == 0x6A); // NOLINT
+  CU_ASSERT(FLAG_CY != (cpu.flags & FLAG_CY));
+}
+
+void
 test_opcode_0x09(void)
 {
   i8080 cpu;
@@ -1568,6 +1600,9 @@ main(void)
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x04()",
                          test_opcode_0x04))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0x07()",
+                         test_opcode_0x07))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x09()",
                          test_opcode_0x09))

@@ -339,6 +339,29 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         cpu->pc += 1;
         break;
       }
+    case 0x07: // NOLINT
+      {        // RLC
+        // keep bit 7
+        uint8_t tmp = cpu->a >> 7; // NOLINT
+
+        // left shift register a
+        cpu->a = cpu->a << 1;
+
+        // replace wrapped bit
+        cpu->a ^= tmp;
+
+        // set cy flag to prev bit 7
+        if (tmp != 0)
+          {
+            update_carry_flag(cpu, true);
+          }
+        else
+          {
+            update_carry_flag(cpu, false);
+          }
+        num_cycles = 4; // NOLINT
+        break;
+      }
     case 0x09: // NOLINT
       {        // DAD B
         num_cycles = DAD(cpu, BC);
