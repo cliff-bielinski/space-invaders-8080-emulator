@@ -672,6 +672,16 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         break;
       }
       break;
+    case 0xfa: // NOLINT
+      {        // JM
+        if (is_sign_flag_set(cpu))
+          {
+            return JMP(cpu);
+          }
+        cpu->pc += 2;    // NOLINT
+        num_cycles = 10; // NOLINT
+        break;
+      }
     case 0xfb: // NOLINT
       {        // EI
         cpu->interrupt_enabled = true;

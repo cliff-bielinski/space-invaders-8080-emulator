@@ -706,6 +706,37 @@ test_opcode_0xf1(void) // NOLINT
 }
 
 void
+test_opcode_0xfa(void) // NOLINT
+{                      // JM
+  i8080 cpu;
+  cpu_init(&cpu);
+
+  // case where sign bit is not set
+  cpu.pc = 0x4441;                                  // NOLINT
+  cpu_write_mem(&cpu, cpu.pc + 1, 0x28);            // NOLINT
+  cpu_write_mem(&cpu, cpu.pc + 2, 0xb7);            // NOLINT
+  update_sign_flag(&cpu, 0);                        // is neg
+  int code_found = execute_instruction(&cpu, 0xfa); // NOLINT
+  CU_ASSERT(code_found >= 0);
+  CU_ASSERT(cpu.pc == 0x4444); // NOLINT
+
+  // case where sign bit is set
+  cpu.pc = 0x5541;                              // NOLINT
+  cpu_write_mem(&cpu, cpu.pc + 1, 0x3b);        // NOLINT
+  cpu_write_mem(&cpu, cpu.pc + 2, 0xb9);        // NOLINT
+  update_sign_flag(&cpu, -1);                   // is not neg
+  code_found = execute_instruction(&cpu, 0xfa); // NOLINT
+  CU_ASSERT(code_found >= 0);
+  CU_ASSERT(cpu.pc == 0xb93b); // NOLINT
+
+  // cleanup
+  cpu_write_mem(&cpu, 0x4442, 0x00); // NOLINT
+  cpu_write_mem(&cpu, 0x4443, 0x00); // NOLINT
+  cpu_write_mem(&cpu, 0x5542, 0x00); // NOLINT
+  cpu_write_mem(&cpu, 0x5543, 0x00); // NOLINT
+}
+
+void
 test_opcode_0xcd(void) // NOLINT
 {
   // Call addr
@@ -1640,6 +1671,9 @@ main(void)
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0xf5()",
                          test_opcode_0xf5))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0xfa()",
+                         test_opcode_0xfa))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0xfe()",
                          test_opcode_0xfe))
