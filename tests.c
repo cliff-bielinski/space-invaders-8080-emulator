@@ -903,6 +903,27 @@ test_opcode_0x31(void)
 }
 
 void
+test_opcode_0x34(void)
+{
+  i8080 cpu;
+  cpu_init(&cpu);
+  cpu.h = 0xAA; // NOLINT
+  cpu.l = 0xBB; // NOLINT
+
+  cpu_write_mem(&cpu, 0xAABB, 0x12); // NOLINT
+  int code_found = execute_instruction(&cpu, 0x34); // NOLINT
+  CU_ASSERT(code_found == 10);
+  CU_ASSERT(cpu_read_mem(&cpu, 0xAABB) == 0x13);
+  CU_ASSERT((cpu.flags & FLAG_Z) == 0);
+  CU_ASSERT((cpu.flags & FLAG_AC) == 0);
+  CU_ASSERT((cpu.flags & FLAG_S) == 0);
+  CU_ASSERT((cpu.flags & FLAG_P) == 0);
+
+  // clean up
+  cpu_write_mem(&cpu, 0xAABB, 0x00);
+}
+
+void
 test_opcode_0x36(void)
 {
   // MOV M, D8
@@ -2210,6 +2231,9 @@ main(void)
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x32()",
                          test_opcode_0x32))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0x34()",
+                         test_opcode_0x34))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x35()",
                          test_opcode_0x35))

@@ -653,6 +653,19 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         num_cycles = 13; // NOLINT
         break;
       }
+    case 0x34: // NOLINT
+      {        // INR M
+        uint16_t address = readRegisterPair(cpu, HL);
+        uint8_t value = cpu_read_mem(cpu, address);
+        update_aux_carry_flag(cpu, value, 0x01);
+        value += 1;
+        update_zero_flag(cpu, value);
+        update_sign_flag(cpu, value);
+        update_parity_flag(cpu, value);
+        cpu_write_mem(cpu, address, value);
+        num_cycles = 10;
+        break;
+      }
     case 0x35: // NOLINT
       {        // DCR M
         uint16_t address = readRegisterPair(cpu, HL);
