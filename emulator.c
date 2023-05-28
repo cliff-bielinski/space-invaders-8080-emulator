@@ -164,6 +164,15 @@ RET(i8080 *cpu)
   return 10; // NOLINT
 }
 
+// Store Accumulator
+int
+STAX(i8080 *cpu, int pair)
+{
+  uint16_t address = readRegisterPair(cpu, pair);
+  cpu_write_mem(cpu, address, cpu->a);
+  return 7; // NOLINT
+}
+
 // Logical XOR with Accumulator
 int
 XRA(i8080 *cpu, const uint8_t *reg)
@@ -295,6 +304,11 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       {        // LXI B
         num_cycles = LXI(cpu, BC, getImmediate16BitValue(cpu));
         cpu->pc += 2;
+        break;
+      }
+    case 0x02: // NOLINT
+      {        // STAX B
+        num_cycles = STAX(cpu, BC);
         break;
       }
     case 0x05: // NOLINT
