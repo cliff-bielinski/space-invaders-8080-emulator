@@ -591,6 +591,22 @@ test_opcode_0xe6(void)
 }
 
 void
+test_opcode_0xe9(void)
+{
+  i8080 cpu;
+  cpu_init(&cpu);
+  uint16_t initial_pc = cpu.pc;
+  cpu.h = 0x5f;                      // NOLINT
+  cpu.l = 0xd1; 
+
+  int code_found = execute_instruction(&cpu, 0xe9); // NOLINT
+  CU_ASSERT(code_found >= 0);
+  CU_ASSERT(cpu.pc == 0x5fd1);
+
+  cpu_write_mem(&cpu, 0x0001, 0x00);
+}
+
+void
 test_opcode_0xf6(void)
 {
   i8080 cpu;
@@ -1612,6 +1628,9 @@ main(void)
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0xe6()",
                          test_opcode_0xe6))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0xe9()",
+                         test_opcode_0xe9))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0xf6()",
                          test_opcode_0xf6))

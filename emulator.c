@@ -647,6 +647,11 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         num_cycles = 7; // NOLINT
         break;
       }
+    case 0xe9: // NOLINT
+      {        // PCHL 
+        cpu->pc = readRegisterPair(cpu, HL);
+	return 5; // NOLINT
+      }
     case 0xeb: // NOLINT
       {        // XCHG
         // exchange h and d
