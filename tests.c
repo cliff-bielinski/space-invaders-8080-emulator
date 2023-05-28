@@ -57,10 +57,10 @@ test_opcode_0x02(void) // NOLINT
   i8080 cpu;
   cpu_init(&cpu);
 
-  cpu.a = 0x12; // NOLINT
-  writeRegisterPair(&cpu, BC, 0xAABB); // NOLINT
+  cpu.a = 0x12;                                     // NOLINT
+  writeRegisterPair(&cpu, BC, 0xAABB);              // NOLINT
   int code_found = execute_instruction(&cpu, 0x02); // NOLINT
-  CU_ASSERT(code_found == 7); // NOLINT
+  CU_ASSERT(code_found == 7);                       // NOLINT
   CU_ASSERT(cpu.pc == 1);
   CU_ASSERT(cpu_read_mem(&cpu, 0xAABB) == 0x12); // NOLINT
 
@@ -123,7 +123,7 @@ test_opcode_0x06(void) // NOLINT
 void
 test_opcode_0x07(void) // NOLINT
 {                      // RLC
-   /* carry test */
+                       /* carry test */
   // setup
   i8080 cpu;
   cpu_init(&cpu);
@@ -336,10 +336,10 @@ test_opcode_0x12(void) // NOLINT
   i8080 cpu;
   cpu_init(&cpu);
 
-  cpu.a = 0x12; // NOLINT
-  writeRegisterPair(&cpu, DE, 0xAABB); // NOLINT
+  cpu.a = 0x12;                                     // NOLINT
+  writeRegisterPair(&cpu, DE, 0xAABB);              // NOLINT
   int code_found = execute_instruction(&cpu, 0x12); // NOLINT
-  CU_ASSERT(code_found == 7); // NOLINT
+  CU_ASSERT(code_found == 7);                       // NOLINT
   CU_ASSERT(cpu.pc == 1);
   CU_ASSERT(cpu_read_mem(&cpu, 0xAABB) == 0x12); // NOLINT
 
@@ -634,7 +634,7 @@ test_opcode_0x1f(void) // NOLINT
   int code_found = execute_instruction(&cpu, 0x1f); // NOLINT
 
   // verify
-  CU_ASSERT(code_found== 4);
+  CU_ASSERT(code_found == 4);
   CU_ASSERT(1 == cpu.pc);
   CU_ASSERT(0xB5 == cpu.a); // NOLINT
   CU_ASSERT(FLAG_CY != (cpu.flags & FLAG_CY));
@@ -770,7 +770,7 @@ test_opcode_0x27(void)
   // DAA
   i8080 cpu;
   cpu_init(&cpu);
-  cpu.a = 0x9b; // NOLINT
+  cpu.a = 0x9b;     // NOLINT
   cpu.flags = 0x00; // NOLINT
 
   int code_found = execute_instruction(&cpu, 0x27); // NOLINT

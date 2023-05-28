@@ -40,36 +40,37 @@ DAA(i8080 *cpu)
 {
   // break accumulator into 2 4-bit pieces
   uint8_t lo_nibble = (cpu->a & LOWER_4_BIT_MASK);
-  uint8_t hi_nibble = ((cpu->a & UPPER_4_BIT_MASK) >> NIBBLE); 
+  uint8_t hi_nibble = ((cpu->a & UPPER_4_BIT_MASK) >> NIBBLE);
 
   // STEP 1: if least sig bits are > 9 or AC is set, increment A by 6
   if (lo_nibble > 9 || ((cpu->flags & FLAG_AC) == FLAG_AC))
-  {
-    cpu->a += 6;
+    {
+      cpu->a += 6;
 
-    // set AC to 1
-    cpu->flags |= FLAG_AC;
+      // set AC to 1
+      cpu->flags |= FLAG_AC;
 
-    // reassign nibbles to newly incremented A value
-    lo_nibble = (cpu->a & LOWER_4_BIT_MASK);  
-    hi_nibble = ((cpu->a & UPPER_4_BIT_MASK) >> NIBBLE); 
-  }
-  else 
-  {
-    // clear AC if no carry
-    cpu->flags &= ~FLAG_AC;
-  }
+      // reassign nibbles to newly incremented A value
+      lo_nibble = (cpu->a & LOWER_4_BIT_MASK);
+      hi_nibble = ((cpu->a & UPPER_4_BIT_MASK) >> NIBBLE);
+    }
+  else
+    {
+      // clear AC if no carry
+      cpu->flags &= ~FLAG_AC;
+    }
 
-  // STEP 2: if most sig bits are NOW > 9 or CY is set, increment hi_nibble by 6
+  // STEP 2: if most sig bits are NOW > 9 or CY is set, increment hi_nibble by
+  // 6
   if (hi_nibble > 9 || ((cpu->flags & FLAG_CY) == FLAG_CY))
-  {
-    hi_nibble += 6;
-    // reconstruct 8-bit A register after hi_nibble increment
-    cpu->a = ((hi_nibble << NIBBLE) | lo_nibble);
-    
-    // set CY to 1
-    update_carry_flag(cpu, true);
-  }
+    {
+      hi_nibble += 6;
+      // reconstruct 8-bit A register after hi_nibble increment
+      cpu->a = ((hi_nibble << NIBBLE) | lo_nibble);
+
+      // set CY to 1
+      update_carry_flag(cpu, true);
+    }
 
   return 4; // NOLINT
 }
@@ -547,20 +548,20 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
 
         // replace bit 7 with old CY value
         if ((cpu->flags & FLAG_CY) != 0)
-        {
-          cpu->a |= 0x80;
-        }
+          {
+            cpu->a |= 0x80;
+          }
 
         // set new CY to previous bit 0
         if (bit0 != 0)
-        {
-          update_carry_flag(cpu, true);
-        }
+          {
+            update_carry_flag(cpu, true);
+          }
         else
-        {
-          update_carry_flag(cpu, false);
-        }
-        
+          {
+            update_carry_flag(cpu, false);
+          }
+
         num_cycles = 4; // NOLINT
         break;
       }
