@@ -43,9 +43,9 @@ DAA(i8080 *cpu)
   uint8_t hi_nibble = ((cpu->a & UPPER_4_BIT_MASK) >> NIBBLE);
 
   // STEP 1: if least sig bits are > 9 or AC is set, increment A by 6
-  if (lo_nibble > 9 || ((cpu->flags & FLAG_AC) == FLAG_AC))
+  if (lo_nibble > 9 || ((cpu->flags & FLAG_AC) == FLAG_AC)) // NOLINT
     {
-      cpu->a += 6;
+      cpu->a += 6; // NOLINT
 
       // set AC to 1
       cpu->flags |= FLAG_AC;
@@ -62,9 +62,9 @@ DAA(i8080 *cpu)
 
   // STEP 2: if most sig bits are NOW > 9 or CY is set, increment hi_nibble by
   // 6
-  if (hi_nibble > 9 || ((cpu->flags & FLAG_CY) == FLAG_CY))
+  if (hi_nibble > 9 || ((cpu->flags & FLAG_CY) == FLAG_CY)) // NOLINT
     {
-      hi_nibble += 6;
+      hi_nibble += 6; // NOLINT
       // reconstruct 8-bit A register after hi_nibble increment
       cpu->a = ((hi_nibble << NIBBLE) | lo_nibble);
 
@@ -151,7 +151,7 @@ LHLD(i8080 *cpu, u_int16_t address)
 {
   cpu->l = cpu_read_mem(cpu, address);
   cpu->h = cpu_read_mem(cpu, (address + 1));
-  return 16;
+  return 16; // NOLINT
 }
 
 // Load 16-bit Data to Register Pair
@@ -549,7 +549,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         // replace bit 7 with old CY value
         if ((cpu->flags & FLAG_CY) != 0)
           {
-            cpu->a |= 0x80;
+            cpu->a |= 0x80; // NOLINT
           }
 
         // set new CY to previous bit 0
@@ -576,7 +576,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         uint16_t address = getImmediate16BitValue(cpu);
         cpu_write_mem(cpu, address, cpu->l);
         cpu_write_mem(cpu, (address + 1), cpu->h);
-        num_cycles = 16;
+        num_cycles = 16; // NOLINT
         cpu->pc += 2;
         break;
       }
