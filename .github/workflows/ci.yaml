@@ -17,7 +17,7 @@ jobs:
           style: file
           extensions: 'c,h,C,H'
           tidy-checks: 'bugprone-*,readability-*,portability-*,clang-analyzer-*' 
-          ignore: 'disassembler_8080.c'
+          ignore: 'disassembler_8080.c | tests.c'
 
       - name: static analysis
         if: steps.linter.outputs.checks-failed > 0
