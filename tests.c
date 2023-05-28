@@ -331,6 +331,23 @@ test_opcode_0x11(void)
 }
 
 void
+test_opcode_0x12(void) // NOLINT
+{
+  i8080 cpu;
+  cpu_init(&cpu);
+
+  cpu.a = 0x12; // NOLINT
+  writeRegisterPair(&cpu, DE, 0xAABB); // NOLINT
+  int code_found = execute_instruction(&cpu, 0x12); // NOLINT
+  CU_ASSERT(code_found == 7); // NOLINT
+  CU_ASSERT(cpu.pc == 1);
+  CU_ASSERT(cpu_read_mem(&cpu, 0xAABB) == 0x12); // NOLINT
+
+  // clean up
+  cpu_write_mem(&cpu, 0xAABB, 0x00);
+}
+
+void
 test_opcode_0x13(void) // NOLINT
 {
   i8080 cpu;
@@ -1712,6 +1729,9 @@ main(void)
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x0d()",
                          test_opcode_0x0d))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0x12()",
+                         test_opcode_0x12))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x13()",
                          test_opcode_0x13))

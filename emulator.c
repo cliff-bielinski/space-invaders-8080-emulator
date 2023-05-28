@@ -431,6 +431,11 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         cpu->pc += 2;
         break;
       }
+    case 0x12: // NOLINT
+      {        // STAX D
+        num_cycles = STAX(cpu, DE);
+        break;
+      }
     case 0x13: // NOLINT
       {        // INX D
         num_cycles = INX(cpu, DE);
