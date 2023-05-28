@@ -530,6 +530,79 @@ test_opcode_0x1b(void) // NOLINT
 }
 
 void
+test_opcode_0x1c(void) // NOLINT
+{
+  i8080 cpu;
+  cpu_init(&cpu);
+
+  cpu.e = 0xFF;
+
+  // increase e from 255 to 0
+  int code_found = execute_instruction(&cpu, 0x1c); // NOLINT
+
+  CU_ASSERT(code_found == 5);
+  CU_ASSERT(cpu.pc == 1);
+  CU_ASSERT(cpu.e == 0x00);
+  CU_ASSERT((cpu.flags & FLAG_P) == FLAG_P);
+  CU_ASSERT((cpu.flags & FLAG_S) == 0);
+  CU_ASSERT((cpu.flags & FLAG_Z) == FLAG_Z);
+  CU_ASSERT((cpu.flags & FLAG_AC) == FLAG_AC);
+
+  // increase e from 0 to 1
+  code_found = execute_instruction(&cpu, 0x1c); // NOLINT
+
+  CU_ASSERT(code_found == 5);
+  CU_ASSERT(cpu.pc == 2);
+  CU_ASSERT(cpu.e == 0x01);
+  CU_ASSERT((cpu.flags & FLAG_P) == 0);
+  CU_ASSERT((cpu.flags & FLAG_S) == 0);
+  CU_ASSERT((cpu.flags & FLAG_Z) == 0);
+  CU_ASSERT((cpu.flags & FLAG_AC) == 0);
+}
+
+void
+test_opcode_0x1d(void) // NOLINT
+{
+  i8080 cpu;
+  cpu_init(&cpu);
+
+  cpu.e = 0x02;
+
+  // decrease e from 2 to 1
+  int code_found = execute_instruction(&cpu, 0x1d); // NOLINT
+
+  CU_ASSERT(code_found == 5);
+  CU_ASSERT(cpu.pc == 1);
+  CU_ASSERT(cpu.e == 0x01);
+  CU_ASSERT((cpu.flags & FLAG_P) == 0);
+  CU_ASSERT((cpu.flags & FLAG_S) == 0);
+  CU_ASSERT((cpu.flags & FLAG_Z) == 0);
+  CU_ASSERT((cpu.flags & FLAG_AC) == FLAG_AC);
+
+  // decrease e from 1 to 0
+  code_found = execute_instruction(&cpu, 0x1d); // NOLINT
+
+  CU_ASSERT(code_found == 5);
+  CU_ASSERT(cpu.pc == 2);
+  CU_ASSERT(cpu.e == 0x00);
+  CU_ASSERT((cpu.flags & FLAG_P) == FLAG_P);
+  CU_ASSERT((cpu.flags & FLAG_S) == 0);
+  CU_ASSERT((cpu.flags & FLAG_Z) == FLAG_Z);
+  CU_ASSERT((cpu.flags & FLAG_AC) == FLAG_AC);
+
+  // decrease e from 0 to 255
+  code_found = execute_instruction(&cpu, 0x1d); // NOLINT
+
+  CU_ASSERT(code_found == 5);
+  CU_ASSERT(cpu.pc == 3);
+  CU_ASSERT(cpu.e == 0xFF);
+  CU_ASSERT((cpu.flags & FLAG_P) == FLAG_P);
+  CU_ASSERT((cpu.flags & FLAG_S) == FLAG_S);
+  CU_ASSERT((cpu.flags & FLAG_Z) == 0);
+  CU_ASSERT((cpu.flags & FLAG_AC) == 0);
+}
+
+void
 test_opcode_0x21(void)
 {
   i8080 cpu;
@@ -1839,6 +1912,12 @@ main(void)
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x1b()",
                          test_opcode_0x1b))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0x1c()",
+                         test_opcode_0x1c))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0x1d()",
+                         test_opcode_0x1d))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x0f()",
                          test_opcode_0x0f))

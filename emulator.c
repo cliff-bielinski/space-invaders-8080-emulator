@@ -472,6 +472,16 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         num_cycles = DCX(cpu, DE);
         break;
       }
+    case 0x1c: // NOLINT
+      {        // INR E
+        num_cycles = INR(cpu, &cpu->e);
+        break;
+      }
+    case 0x1d: // NOLINT
+      {        // DCR E
+        num_cycles = DCR(cpu, &cpu->e);
+        break;
+      }
     case 0x21: // NOLINT
       {        // LXI H
         num_cycles = LXI(cpu, HL, getImmediate16BitValue(cpu));
