@@ -1735,6 +1735,29 @@ test_opcode_0x8a(void) // NOLINT
 }
 
 void
+test_opcode_0x97(void) // NOLINT
+{                      
+  // setup
+  i8080 cpu;
+  cpu_init(&cpu);
+  cpu.a = 0x3E;
+  cpu.flags = 0x00;
+
+  // execute
+  int code_found = execute_instruction(&cpu, 0x97); // NOLINT
+
+  // verify
+  CU_ASSERT(code_found == 4);
+  CU_ASSERT(cpu.pc == 1);
+  CU_ASSERT(cpu.a == 0x00);
+  CU_ASSERT((cpu.flags & FLAG_CY) == 0);
+  CU_ASSERT((cpu.flags & FLAG_S) == 0);
+  CU_ASSERT((cpu.flags & FLAG_Z) == FLAG_Z);
+  CU_ASSERT((cpu.flags & FLAG_P) == FLAG_P);
+  CU_ASSERT((cpu.flags & FLAG_AC) == FLAG_AC);
+}
+
+void
 test_opcode_0xaf(void) // NOLINT
 {                      // XRA A
 
@@ -2402,6 +2425,9 @@ main(void)
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x8a()",
                          test_opcode_0x8a))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0x97()",
+                         test_opcode_0x97))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0xaf()",
                          test_opcode_0xaf))

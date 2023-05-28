@@ -262,6 +262,21 @@ STAX(i8080 *cpu, int pair)
   return 7; // NOLINT
 }
 
+// Subtract Register from Accumulator
+int
+SUB(i8080 *cpu, const uint8_t *reg)
+{
+  // set flags and subtract register value from accumulator
+  uint16_t result = cpu->a + (u_int8_t)~*reg + 1;
+  update_aux_carry_flag(cpu, cpu->a, ((u_int8_t)~*reg + 1));
+  update_carry_flag(cpu, result <= MAX_8_BIT_VALUE); // if NO carry out, then carry is set
+  cpu->a = (uint8_t)result;
+  update_zero_flag(cpu, cpu->a);
+  update_sign_flag(cpu, cpu->a);
+  update_parity_flag(cpu, cpu->a);
+  return 4; // NOLINT
+}
+
 // Logical XOR with Accumulator
 int
 XRA(i8080 *cpu, const uint8_t *reg)
@@ -806,6 +821,11 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
     case 0x8a: // NOLINT
       {        // ADC D
         num_cycles = ADC(cpu, &cpu->d);
+        break;
+      }
+    case 0x97: // NOLINT
+      {
+        num_cycles = SUB(cpu, &cpu->a);
         break;
       }
     case 0xa7: // NOLINT
