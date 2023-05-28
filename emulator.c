@@ -627,6 +627,12 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         num_cycles = INR(cpu, &cpu->l);
         break;
       }
+    case 0x2e: // NOLINT
+      {        // MVI L
+        num_cycles = MVI(&cpu->l, getImmediate8BitValue(cpu));
+        cpu->pc += 1;
+        break;
+      }
     case 0x31: // NOLINT
       {        // LXI SP
         num_cycles = LXI(cpu, SP, getImmediate16BitValue(cpu));
