@@ -765,6 +765,29 @@ test_opcode_0x26(void)
 }
 
 void
+test_opcode_0x27(void)
+{
+  // DAA
+  i8080 cpu;
+  cpu_init(&cpu);
+  cpu.a = 0x9b; // NOLINT
+  cpu.flags = 0x00; // NOLINT
+
+  int code_found = execute_instruction(&cpu, 0x27); // NOLINT
+
+  CU_ASSERT(code_found == 4);
+  CU_ASSERT(cpu.pc == 0x0001);
+  CU_ASSERT_EQUAL(cpu.a, 0x01);
+  CU_ASSERT_EQUAL(cpu.flags & FLAG_CY, FLAG_CY);
+  CU_ASSERT_EQUAL(cpu.flags & FLAG_AC, FLAG_AC);
+  CU_ASSERT_EQUAL(cpu.flags & FLAG_Z, 0);
+  CU_ASSERT_EQUAL(cpu.flags & FLAG_S, 0);
+  CU_ASSERT_EQUAL(cpu.flags & FLAG_P, 0);
+
+  cpu_write_mem(&cpu, 0x4564, 0x00); // NOLINT
+}
+
+void
 test_opcode_0x31(void)
 {
   i8080 cpu;
@@ -1993,6 +2016,9 @@ main(void)
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x25()",
                          test_opcode_0x25))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0x27()",
+                         test_opcode_0x27))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x31()",
                          test_opcode_0x31))
