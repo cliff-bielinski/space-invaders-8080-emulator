@@ -939,7 +939,7 @@ test_opcode_0x34(void)
   CU_ASSERT((cpu.flags & FLAG_P) == 0);
 
   // clean up
-  cpu_write_mem(&cpu, 0xAABB, 0x00);
+  cpu_write_mem(&cpu, 0xAABB, 0x00); // NOLINT
 }
 
 void
@@ -985,7 +985,7 @@ test_opcode_0x3c(void)
 {
   i8080 cpu;
   cpu_init(&cpu);
-  cpu.a = 0xFF;
+  cpu.a = 0xFF; // NOLINT
 
   int code_found = execute_instruction(&cpu, 0x3c); // NOLINT
 
