@@ -840,6 +840,11 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         num_cycles = MOV_TO_MEM(cpu, &cpu->b);
         break;
       }
+    case 0x71: // NOLINT
+      {        // MOV M,C
+        num_cycles = MOV_TO_MEM(cpu, &cpu->c);
+        break;
+      }
     case 0x77: // NOLINT
       {        // MOV M,A
         num_cycles = MOV_TO_MEM(cpu, &cpu->a);
