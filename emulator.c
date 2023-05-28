@@ -672,6 +672,19 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         break;
       }
       break;
+    case 0xf6: // NOLINT
+      {        // ORI d8
+        uint8_t immediate = getImmediate8BitValue(cpu);
+        cpu->a |= immediate;
+        update_zero_flag(cpu, cpu->a);
+        update_sign_flag(cpu, cpu->a);
+        update_parity_flag(cpu, cpu->a);
+        update_carry_flag(cpu, false);
+        cpu->flags &= ~FLAG_AC;
+        cpu->pc += 1;
+        num_cycles = 7; // NOLINT
+        break;
+      }
     case 0xfa: // NOLINT
       {        // JM
         if (is_sign_flag_set(cpu))

@@ -591,6 +591,31 @@ test_opcode_0xe6(void)
 }
 
 void
+test_opcode_0xf6(void)
+{
+  i8080 cpu;
+  cpu_init(&cpu);
+  uint16_t initial_pc = cpu.pc;
+  cpu.a = 0x5f;                      // NOLINT
+  cpu_write_mem(&cpu, 0x0001, 0x3c); // NOLINT
+
+  int code_found = execute_instruction(&cpu, 0xf6); // NOLINT
+  CU_ASSERT(code_found >= 0);
+  CU_ASSERT(cpu.pc == initial_pc + 2);
+  CU_ASSERT(cpu.a == 0x7f);
+
+  // Flag Asserts
+  CU_ASSERT((cpu.flags & FLAG_Z) == 0);
+  CU_ASSERT((cpu.flags & FLAG_S) == 0);
+  CU_ASSERT((cpu.flags & FLAG_P) == 0);
+  CU_ASSERT((cpu.flags & FLAG_CY) == 0);
+  CU_ASSERT((cpu.flags & FLAG_AC) == 0);
+
+  cpu.a = 0;
+  cpu_write_mem(&cpu, 0x0001, 0x00);
+}
+
+void
 test_opcode_0xfb(void)
 {
   i8080 cpu;
@@ -1587,6 +1612,9 @@ main(void)
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0xe6()",
                          test_opcode_0xe6))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0xf6()",
+                         test_opcode_0xf6))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0xfb()",
                          test_opcode_0xfb))
