@@ -521,6 +521,15 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         cpu->pc += 2;
         break;
       }
+    case 0x22: // NOLINT
+      {        // SHLD addr
+        uint16_t address = getImmediate16BitValue(cpu);
+        cpu_write_mem(cpu, address, cpu->l);
+        cpu_write_mem(cpu, (address + 1), cpu->h);
+        num_cycles = 16;
+        cpu->pc += 2;
+        break;
+      }
     case 0x23: // NOLINT
       {        // INX H
         num_cycles = INX(cpu, HL);

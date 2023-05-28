@@ -676,6 +676,29 @@ test_opcode_0x21(void)
 }
 
 void
+test_opcode_0x22(void)
+{
+  i8080 cpu;
+  cpu_init(&cpu);
+  cpu.l = 0x34;
+  cpu.h = 0x12;
+  cpu_write_mem(&cpu, 0x0001, 0xBB); // NOLINT
+  cpu_write_mem(&cpu, 0x0002, 0xAA); // NOLINT
+
+  int code_found = execute_instruction(&cpu, 0x22); // NOLINT
+  CU_ASSERT(code_found == 16);
+  CU_ASSERT(cpu.pc == 0x0003);
+  CU_ASSERT(cpu_read_mem(&cpu, 0xAABB) == 0x34);
+  CU_ASSERT(cpu_read_mem(&cpu, 0xAABC) == 0x12);
+
+  // clean up
+  cpu_write_mem(&cpu, 0x0001, 0x00);
+  cpu_write_mem(&cpu, 0x0002, 0x00);
+  cpu_write_mem(&cpu, 0xAABB, 0x00);
+  cpu_write_mem(&cpu, 0xAABC, 0x00);
+}
+
+void
 test_opcode_0x26(void)
 {
   // MVI H, D8
@@ -1985,6 +2008,9 @@ main(void)
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x1a()",
                          test_opcode_0x1a))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0x22()",
+                         test_opcode_0x22))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x23()",
                          test_opcode_0x23))
