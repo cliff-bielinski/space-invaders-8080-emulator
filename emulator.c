@@ -5,10 +5,279 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define BYTE 8
-#define UPPER_8_BIT_MASK 0xFF00
-#define LOWER_8_BIT_MASK 0x00FF
-#define RST_RANGE 7
+// Logical AND with Accumulator
+int
+ANA(i8080 *cpu, const uint8_t *reg)
+{
+  uint8_t temp = cpu->a;
+  cpu->a = cpu->a & *reg;
+
+  update_zero_flag(cpu, cpu->a);
+  update_sign_flag(cpu, cpu->a);
+  update_parity_flag(cpu, cpu->a);
+  update_aux_carry_flag(cpu, temp, cpu->a);
+  update_carry_flag(cpu, false);
+  return 4; // NOLINT
+}
+
+// Call Address
+int
+CALL(i8080 *cpu, uint16_t address)
+{
+  uint16_t return_address = readRegisterPair(cpu, PC) + 3; // NOLINT
+  cpu_write_mem(cpu, cpu->sp - 1,
+                (uint8_t)((return_address & UPPER_8_BIT_MASK) >> BYTE));
+  cpu_write_mem(cpu, cpu->sp - 2,
+                (uint8_t)(return_address & LOWER_8_BIT_MASK));
+  cpu->sp -= 2;
+  writeRegisterPair(cpu, PC, address);
+  return 17; // NOLINT
+}
+
+// Double Add
+int
+DAD(i8080 *cpu, int pair)
+{
+  uint32_t result
+      = (uint32_t)(readRegisterPair(cpu, pair) + readRegisterPair(cpu, HL));
+  update_carry_flag(cpu, result > MAX_16_BIT_VALUE);
+  writeRegisterPair(cpu, HL, (uint16_t)result);
+  return 10; // NOLINT
+}
+
+// Decrement Register
+int
+DCR(i8080 *cpu, uint8_t *reg)
+{
+  update_aux_carry_flag(cpu, *reg, MAX_8_BIT_VALUE);
+  *reg -= 1;
+  update_zero_flag(cpu, *reg);
+  update_sign_flag(cpu, *reg);
+  update_parity_flag(cpu, *reg);
+  return 5; // NOLINT
+}
+
+// Increment Register Pair
+int
+INX(i8080 *cpu, int pair)
+{
+  uint16_t value = readRegisterPair(cpu, pair) + 1;
+  writeRegisterPair(cpu, pair, value);
+  return 5; // NOLINT
+}
+
+// Jump to Address
+int
+JMP(i8080 *cpu)
+{
+  writeRegisterPair(cpu, PC, getImmediate16BitValue(cpu));
+  return 10; // NOLINT
+}
+
+// Load Accumulator
+int
+LDAX(i8080 *cpu, int pair)
+{
+  uint16_t address = readRegisterPair(cpu, pair);
+  cpu->a = cpu_read_mem(cpu, address);
+  return 7; // NOLINT
+}
+
+// Load 16-bit Data to Register Pair
+int
+LXI(i8080 *cpu, int pair, uint16_t value)
+{
+  writeRegisterPair(cpu, pair, value);
+  return 10; // NOLINT
+}
+
+// Move register value
+int
+MOV(uint8_t *dest, const uint8_t *src)
+{
+  *dest = *src;
+  return 5; // NOLINT
+}
+
+// Move register value to memory
+int
+MOV_TO_MEM(i8080 *cpu, const uint8_t *reg)
+{
+  cpu_write_mem(cpu, readRegisterPair(cpu, HL), *reg);
+  return 7; // NOLINT
+}
+
+// Move memory to register
+int
+MOV_FROM_MEM(i8080 *cpu, uint8_t *reg)
+{
+  *reg = cpu_read_mem(cpu, readRegisterPair(cpu, HL));
+  return 7; // NOLINT
+}
+
+// Move 8-bit Data to Register
+int
+MVI(uint8_t *reg, uint8_t value)
+{
+  *reg = value;
+  return 7; // NOLINT
+}
+
+// No Operation
+int
+NOP()
+{
+  return 4; // NOLINT
+}
+
+// Pop from Stack
+int
+POP(i8080 *cpu, int pair)
+{
+  uint16_t value = ((cpu_read_mem(cpu, cpu->sp + 1) << BYTE)
+                    | cpu_read_mem(cpu, cpu->sp));
+  writeRegisterPair(cpu, pair, value);
+  cpu->sp += 2;
+  return 10; // NOLINT
+}
+
+// Push to Stack
+int
+PUSH(i8080 *cpu, int pair)
+{
+  uint16_t value = readRegisterPair(cpu, pair);
+  cpu_write_mem(cpu, cpu->sp - 1,
+                (uint8_t)((value & UPPER_8_BIT_MASK) >> BYTE));
+  cpu_write_mem(cpu, cpu->sp - 2, (uint8_t)(value & LOWER_8_BIT_MASK));
+  cpu->sp -= 2;
+  return 11; // NOLINT
+}
+
+// Return to Address
+int
+RET(i8080 *cpu)
+{
+  uint16_t address = ((cpu_read_mem(cpu, cpu->sp + 1) << BYTE)
+                      | cpu_read_mem(cpu, cpu->sp));
+  cpu->sp += 2;
+  writeRegisterPair(cpu, PC, address);
+  return 10; // NOLINT
+}
+
+// Logical XOR with Accumulator
+int
+XRA(i8080 *cpu, const uint8_t *reg)
+{
+  cpu->a = cpu->a ^ *reg;
+  update_zero_flag(cpu, cpu->a);
+  update_sign_flag(cpu, cpu->a);
+  update_parity_flag(cpu, cpu->a);
+  update_aux_carry_flag(cpu, cpu->a, MAX_8_BIT_VALUE);
+  update_carry_flag(cpu, false);
+  return 4; // NOLINT
+}
+
+// Get next byte in program counter
+uint8_t
+getImmediate8BitValue(i8080 *cpu)
+{
+  return cpu_read_mem(cpu, cpu->pc + 1);
+}
+
+// Get next two bytes in program counter
+uint16_t
+getImmediate16BitValue(i8080 *cpu)
+{
+  uint8_t lo = cpu_read_mem(cpu, cpu->pc + 1);
+  uint8_t hi = cpu_read_mem(cpu, cpu->pc + 2);
+  return (uint16_t)((hi << BYTE) | lo);
+}
+
+// Get 16-bit value for given register pair
+uint16_t
+readRegisterPair(i8080 *cpu, int pair)
+{
+  switch (pair)
+    {
+    case PSW:
+      {
+        return (uint16_t)((cpu->a << BYTE) | cpu->flags);
+      }
+    case BC:
+      {
+        return (uint16_t)((cpu->b << BYTE) | cpu->c);
+      }
+    case DE:
+      {
+        return (uint16_t)((cpu->d << BYTE) | cpu->e);
+      }
+    case HL:
+      {
+        return (uint16_t)((cpu->h << BYTE) | cpu->l);
+      }
+    case SP:
+      {
+        return cpu->sp;
+      }
+    case PC:
+      {
+        return cpu->pc;
+      }
+    default:
+      {
+        fprintf(stderr, "Invalid register pair: %d", pair);
+        exit(EXIT_FAILURE);
+      }
+    }
+}
+
+// Write 16-bit value to given register pair
+void
+writeRegisterPair(i8080 *cpu, int pair, uint16_t value)
+{
+  switch (pair)
+    {
+    case PSW:
+      {
+        cpu->a = (uint8_t)((value & UPPER_8_BIT_MASK) >> BYTE);
+        cpu->flags = (uint8_t)(value & LOWER_8_BIT_MASK);
+        break;
+      }
+    case BC:
+      {
+        cpu->b = (uint8_t)((value & UPPER_8_BIT_MASK) >> BYTE);
+        cpu->c = (uint8_t)(value & LOWER_8_BIT_MASK);
+        break;
+      }
+    case DE:
+      {
+        cpu->d = (uint8_t)((value & UPPER_8_BIT_MASK) >> BYTE);
+        cpu->e = (uint8_t)(value & LOWER_8_BIT_MASK);
+        break;
+      }
+    case HL:
+      {
+        cpu->h = (uint8_t)((value & UPPER_8_BIT_MASK) >> BYTE);
+        cpu->l = (uint8_t)(value & LOWER_8_BIT_MASK);
+        break;
+      }
+    case SP:
+      {
+        cpu->sp = value;
+        break;
+      }
+    case PC:
+      {
+        cpu->pc = value;
+        break;
+      }
+    default:
+      {
+        fprintf(stderr, "Invalid register pair: %d", pair);
+        exit(EXIT_FAILURE);
+      }
+    }
+}
 
 // Execute Instruction
 int
@@ -17,86 +286,51 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
   int num_cycles = 0;
   switch (opcode)
     {
-    case 0x00:          // NOLINT
-      {                 // NOP
-        num_cycles = 4; // NOLINT
+    case 0x00: // NOLINT
+      {        // NOP
+        num_cycles = NOP();
         break;
       }
     case 0x01: // NOLINT
       {        // LXI B
-        cpu->c = cpu_read_mem(cpu, cpu->pc + 1);
-        cpu->b = cpu_read_mem(cpu, cpu->pc + 2);
-        cpu->pc += 2;    // NOLINT
-        num_cycles = 10; // NOLINT
+        num_cycles = LXI(cpu, BC, getImmediate16BitValue(cpu));
+        cpu->pc += 2;
         break;
       }
     case 0x05: // NOLINT
       {        // DCR B
-        cpu->b -= 1;
-
-        update_zero_flag(cpu, cpu->b);
-        update_sign_flag(cpu, cpu->b);
-        update_parity_flag(cpu, cpu->b);
-        update_aux_carry_flag(cpu, cpu->b, 0xFF); // NOLINT
-        num_cycles = 5;                           // NOLINT
-
+        num_cycles = DCR(cpu, &cpu->b);
         break;
       }
     case 0x06: // NOLINT
       {        // MVI B, mem8
-        cpu->b = cpu_read_mem(cpu, cpu->pc + 1);
+        num_cycles = MVI(&cpu->b, getImmediate8BitValue(cpu));
         cpu->pc += 1;
-        num_cycles = 7; // NOLINT
         break;
       }
     case 0x09: // NOLINT
-      // DAD B
-      {
-        uint32_t bc = (cpu->b << 8) | (cpu->c); // NOLINT
-        uint32_t hl = (cpu->h << 8) | (cpu->l); // NOLINT
-        uint32_t result = hl + bc;
-        update_carry_flag(cpu, result > 0xFFFF); // NOLINT
-        cpu->h = (result & 0xff00) >> 8;         // NOLINT
-        cpu->l = (result & 0xff);                // NOLINT
-        num_cycles = 10;                         // NOLINT
+      {        // DAD B
+        num_cycles = DAD(cpu, BC);
         break;
       }
     case 0x0a: // NOLINT
       {        // LDAX B
-               // get addr
-        uint16_t addr = cpu->b;
-        addr = addr << 8; // NOLINT
-        addr += cpu->c;
-
-        // get value at addr
-        uint8_t val = cpu_read_mem(cpu, addr);
-
-        // put value in a
-        cpu->a = val;
-        num_cycles = 7; // NOLINT
+        num_cycles = LDAX(cpu, BC);
         break;
       }
     case 0x0d: // NOLINT
       {        // DCR C
-        uint8_t result = cpu->c - 1;
-        update_zero_flag(cpu, result);
-        update_sign_flag(cpu, result);
-        update_parity_flag(cpu, result);
-        update_aux_carry_flag(cpu, cpu->c, 0xFF); // NOLINT
-        cpu->c = result;
-        num_cycles = 5; // NOLINT
+        num_cycles = DCR(cpu, &cpu->c);
         break;
       }
     case 0x0e: // NOLINT
       {        // MVI C, D8
-        cpu->c = cpu_read_mem(cpu, (cpu->pc + 1));
+        num_cycles = MVI(&cpu->c, getImmediate8BitValue(cpu));
         cpu->pc += 1;
-        num_cycles = 7; // NOLINT
         break;
       }
     case 0x0f: // NOLINT
       {        // RRC
-
         // keep bit 0
         uint8_t tmp = cpu->a << 7; // NOLINT
 
@@ -119,112 +353,57 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         break;
       }
     case 0x11: // NOLINT
-      {
-        cpu->e = cpu_read_mem(cpu, cpu->pc + 1);
-        cpu->d = cpu_read_mem(cpu, cpu->pc + 2);
-        cpu->pc += 2;    // NOLINT
-        num_cycles = 10; // NOLINT
+      {        // LXI D
+        num_cycles = LXI(cpu, DE, getImmediate16BitValue(cpu));
+        cpu->pc += 2;
         break;
       }
     case 0x13: // NOLINT
       {        // INX D
-        cpu->e += 1;
-        if (cpu->e == 0)
-          {
-            cpu->d += 1;
-          }
+        num_cycles = INX(cpu, DE);
         break;
-        num_cycles = 5; // NOLINT
       }
     case 0x19: // NOLINT
       {        // DAD D
-        uint32_t sum
-            = (cpu->h << 8) // NOLINT
-              | (cpu->l);   // convert reg pair h,l to 16 bit int // NOLINT
-
-        // Convert rep pair d,e to 16 bit int.
-        uint32_t reg_de = (cpu->d << 8) | (cpu->e); // NOLINT
-
-        sum += reg_de;
-
-        cpu->h = sum >> 8;                      // NOLINT
-        cpu->l = sum & 0xFF;                    // NOLINT
-        update_carry_flag(cpu, (sum > 0xFFFF)); // NOLINT
-        num_cycles = 10;                        // NOLINT
-
+        num_cycles = DAD(cpu, DE);
         break;
       }
     case 0x1a: // NOLINT
       {        // LDAX D
-               // get addr
-        uint16_t addr = cpu->d;
-        addr = addr << 8; // NOLINT
-        addr += cpu->e;
-
-        // get value at addr
-        uint8_t val = cpu_read_mem(cpu, addr);
-
-        // put value in a
-        cpu->a = val;
-        num_cycles = 7; // NOLINT
+        num_cycles = LDAX(cpu, DE);
         break;
       }
     case 0x21: // NOLINT
-      // LXI H
-      {
-        cpu->l = cpu_read_mem(cpu, cpu->pc + 1);
-        cpu->h = cpu_read_mem(cpu, cpu->pc + 2);
-        cpu->pc += 2;    // NOLINT
-        num_cycles = 10; // NOLINT
+      {        // LXI H
+        num_cycles = LXI(cpu, HL, getImmediate16BitValue(cpu));
+        cpu->pc += 2;
         break;
       }
     case 0x23: // NOLINT
       {        // INX H
-        cpu->l += 1;
-        if (cpu->l == 0)
-          {
-            cpu->h += 1;
-          }
-        num_cycles = 5; // NOLINT
+        num_cycles = INX(cpu, HL);
         break;
       }
     case 0x26: // NOLINT
       {        // MVI H, D8
-        cpu->h = cpu_read_mem(cpu, cpu->pc + 1);
+        num_cycles = MVI(&cpu->h, getImmediate8BitValue(cpu));
         cpu->pc += 1;
-        num_cycles = 7; // NOLINT
         break;
       }
     case 0x29: // NOLINT
       {        // DAD H
-        uint32_t sum = cpu->h;
-        sum = (sum << 8) + cpu->l; // NOLINT
-        sum = sum << 1;            // double hl
-
-        // update carry flag
-        update_carry_flag(cpu, sum > 0xffff); // NOLINT
-
-        // put values back in registers
-        cpu->l = sum;
-        cpu->h = (sum >> 8); // NOLINT
-        num_cycles = 10;     // NOLINT
+        num_cycles = DAD(cpu, HL);
         break;
       }
     case 0x31: // NOLINT
-      {
-        // NOLINTNEXTLINE
-        cpu->sp = cpu_read_mem(cpu, cpu->pc + 1)
-                  | (cpu_read_mem(cpu, cpu->pc + 2) << 8); // NOLINT
+      {        // LXI SP
+        num_cycles = LXI(cpu, SP, getImmediate16BitValue(cpu));
         cpu->pc += 2;
-        num_cycles = 10; // NOLINT
         break;
       }
     case 0x32: // NOLINT
       {        // STA
-        // little endian - first byte is LSB, second byte is MSB for memory
-        // address
-        uint16_t address = cpu_read_mem(cpu, cpu->pc + 1);
-        address += (cpu_read_mem(cpu, cpu->pc + 2) << 8); // NOLINT
+        uint16_t address = getImmediate16BitValue(cpu);
         cpu_write_mem(cpu, address, cpu->a);
         cpu->pc += 2;
         num_cycles = 13; // NOLINT
@@ -232,24 +411,23 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       }
     case 0x35: // NOLINT
       {        // DCR M
-        uint16_t address = cpu->l;
-        address += (cpu->h << 8); // NOLINT
+        uint16_t address = readRegisterPair(cpu, HL);
         uint8_t mem_value = cpu_read_mem(cpu, address);
         uint8_t result = mem_value - 1;
         update_zero_flag(cpu, result);
         update_sign_flag(cpu, result);
         update_parity_flag(cpu, result);
-        update_aux_carry_flag(cpu, mem_value, 0xFF); // NOLINT
+        update_aux_carry_flag(cpu, mem_value, MAX_8_BIT_VALUE);
         cpu_write_mem(cpu, address, result);
         num_cycles = 10; // NOLINT
         break;
       }
     case 0x36: // NOLINT
       {        // MVI M, D8
-               // Address is stored in reg h,l.
-        uint16_t address = (cpu->h << 8) | cpu->l; // NOLINT
+        uint16_t address = readRegisterPair(cpu, HL);
+        uint8_t value = getImmediate8BitValue(cpu);
 
-        cpu_write_mem(cpu, address, cpu_read_mem(cpu, cpu->pc + 1));
+        cpu_write_mem(cpu, address, value);
 
         cpu->pc += 1;
         num_cycles = 10; // NOLINT
@@ -263,8 +441,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       }
     case 0x3a: // NOLINT
       {        // LDA adr
-        uint16_t addr = cpu_read_mem(cpu, cpu->pc + 2);
-        addr = (addr << 8) + cpu_read_mem(cpu, cpu->pc + 1); // NOLINT
+        uint16_t addr = getImmediate16BitValue(cpu);
         cpu->a = cpu_read_mem(cpu, addr);
         cpu->pc += 2;
         num_cycles = 13; // NOLINT
@@ -272,136 +449,80 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       }
     case 0x3d: // NOLINT
       {        // DCR A
-        cpu->a -= 1;
-
-        update_zero_flag(cpu, cpu->a);
-        update_sign_flag(cpu, cpu->a);
-        update_parity_flag(cpu, cpu->a);
-        update_aux_carry_flag(cpu, cpu->a, 0xFF); // NOLINT
-        num_cycles = 5;                           // NOLINT
-
+        num_cycles = DCR(cpu, &cpu->a);
         break;
       }
     case 0x3e: // NOLINT
-      {
-        cpu->a = cpu_read_mem(cpu, cpu->pc + 1);
+      {        // MVI A
+        num_cycles = MVI(&cpu->a, getImmediate8BitValue(cpu));
         cpu->pc += 1;
-        num_cycles = 7; // NOLINT
         break;
       }
     case 0x56: // NOLINT
       {        // MOV D,M
-        // 16-bit memory address located in registers HL
-        uint16_t address = cpu->l;
-        address += (cpu->h << 8); // NOLINT
-        cpu->d = cpu_read_mem(cpu, address);
-        num_cycles = 7; // NOLINT
+        num_cycles = MOV_FROM_MEM(cpu, &cpu->d);
         break;
       }
     case 0x5e: // NOLINT
       {        // MOV E,M
-        // Address is stored in reg h,l.
-        uint16_t address = (cpu->h << 8) | cpu->l; // NOLINT
-
-        cpu->e = cpu_read_mem(cpu, address);
-        num_cycles = 7; // NOLINT
+        num_cycles = MOV_FROM_MEM(cpu, &cpu->e);
         break;
       }
     case 0x66: // NOLINT
       {        // MOV H,M
-        uint16_t addr = cpu->h;
-        addr = (addr << 8) + cpu->l; // NOLINT
-        cpu->h = cpu_read_mem(cpu, addr);
-        num_cycles = 7; // NOLINT
+        num_cycles = MOV_FROM_MEM(cpu, &cpu->h);
         break;
       }
     case 0x6f: // NOLINT
-      {
-        cpu->l = cpu->a;
-        num_cycles = 5; // NOLINT
+      {        // MOV L,A
+        num_cycles = MOV(&cpu->l, &cpu->a);
         break;
       }
     case 0x77: // NOLINT
       {        // MOV M,A
-        uint16_t address = cpu->l;
-        address += (cpu->h << 8); // NOLINT
-        cpu_write_mem(cpu, address, cpu->a);
-        num_cycles = 7; // NOLINT
+        num_cycles = MOV_TO_MEM(cpu, &cpu->a);
         break;
       }
     case 0x7a: // NOLINT
       {        // MOV A,D
-        cpu->a = cpu->d;
-        num_cycles = 5; // NOLINT
+        num_cycles = MOV(&cpu->a, &cpu->d);
         break;
       }
     case 0x7b: // NOLINT
       {        // MOV A,E
-        cpu->a = cpu->e;
-        num_cycles = 5; // NOLINT
+        num_cycles = MOV(&cpu->a, &cpu->e);
         break;
       }
     case 0x7c: // NOLINT
-      {
-        cpu->a = cpu->h;
-        num_cycles = 5; // NOLINT
+      {        // MOV A,H
+        num_cycles = MOV(&cpu->a, &cpu->h);
         break;
       }
     case 0x7e: // NOLINT
       {        // MOV A,M
-        uint16_t address = cpu->l;
-        address += (cpu->h << 8); // NOLINT
-        cpu->a = cpu_read_mem(cpu, address);
-        num_cycles = 7; // NOLINT
+        num_cycles = MOV_FROM_MEM(cpu, &cpu->a);
         break;
       }
     case 0xa7: // NOLINT
       {        // ANA A
-        uint8_t temp = cpu->a;
-        cpu->a = cpu->a & cpu->a;
-
-        update_zero_flag(cpu, cpu->a);
-        update_sign_flag(cpu, cpu->a);
-        update_parity_flag(cpu, cpu->a);
-        update_aux_carry_flag(cpu, temp, cpu->a);
-        update_carry_flag(cpu, false);
-        num_cycles = 4; // NOLINT
-
+        num_cycles = ANA(cpu, &cpu->a);
         break;
       }
     case 0xaf: // NOLINT
       {        // XRA A
-        uint8_t result = cpu->a ^ cpu->a;
-        update_sign_flag(cpu, result);
-        update_zero_flag(cpu, result);
-        update_parity_flag(cpu, result);
-        update_carry_flag(cpu, false);
-        update_aux_carry_flag(cpu, result, 0xFF); // NOLINT
-
-        cpu->a = result;
-        num_cycles = 4; // NOLINT
-
+        num_cycles = XRA(cpu, &cpu->a);
         break;
       }
     case 0xc1: // NOLINT
-      {
-        cpu->c = cpu_read_mem(cpu, cpu->sp);
-        cpu->b = cpu_read_mem(cpu, cpu->sp + 1);
-        cpu->sp += 2;    // NOLINT
-        num_cycles = 10; // NOLINT
+      {        // POP B
+        num_cycles = POP(cpu, BC);
         break;
       }
     case 0xc2: // NOLINT
       {        // JNZ
-        uint16_t address = cpu_read_mem(cpu, cpu->pc + 1);
-        address += (cpu_read_mem(cpu, cpu->pc + 2) << 8); // NOLINT
         if ((cpu->flags & FLAG_Z) == 0)
           {
-            // returns rather than breaks to avoid pc increment at end of
-            // function
-            cpu->pc = address;
-            // NOLINTNEXTLINE
-            return 10; // return cycle number
+            return JMP(cpu);
           }
         cpu->pc += 2;
         num_cycles = 10; // NOLINT
@@ -409,33 +530,23 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       }
     case 0xc3: // NOLINT
       {        // JMP
-        // address format is instruction byte 3 byte 2 little endian.
-        uint16_t address = cpu_read_mem(cpu, cpu->pc + 2);
-        address = (address << 8) | cpu_read_mem(cpu, cpu->pc + 1); // NOLINT
-        cpu->pc = address;
-        // NOLINTNEXTLINE
-        return 10; // no PC increment due to JMP, return num cycles
+        return JMP(cpu);
       }
     case 0xc5: // NOLINT
       {        // PUSH B
-        cpu_write_mem(cpu, cpu->sp - 1, cpu->b);
-        cpu->sp -= 1;
-        cpu_write_mem(cpu, cpu->sp - 1, cpu->c);
-        cpu->sp -= 1;
-        num_cycles = 11; // NOLINT
+        num_cycles = PUSH(cpu, BC);
         break;
       }
     case 0xc6: // NOLINT
-      {
-        // Affects Z, S, P, CY, AC
-        uint8_t immediate = cpu_read_mem(cpu, cpu->pc + 1);
+      {        // ADI
+        uint8_t immediate = getImmediate8BitValue(cpu);
         uint16_t answer = cpu->a + immediate;
         update_zero_flag(cpu, (uint8_t)answer);
         update_sign_flag(cpu, (uint8_t)answer);
         update_parity_flag(cpu, (uint8_t)answer);
-        update_carry_flag(cpu, answer > 0xFF); // NOLINT
+        update_carry_flag(cpu, answer > MAX_8_BIT_VALUE);
         update_aux_carry_flag(cpu, cpu->a, immediate);
-        cpu->a = (uint8_t)answer;
+        cpu->a = (uint8_t)(answer & LOWER_8_BIT_MASK);
         cpu->pc += 1;
         num_cycles = 7; // NOLINT
         break;
@@ -444,81 +555,47 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       {                                      // RZ
         if ((cpu->flags & FLAG_Z) == FLAG_Z) // if Z set, RET
           {
-            uint16_t address = cpu_read_mem(cpu, cpu->sp);
-            address += (cpu_read_mem(cpu, cpu->sp + 1) << 8); // NOLINT
-            cpu->sp += 2;
-            cpu->pc = address;
-            // NOLINTNEXTLINE
-            return 11; // return num cycles
+            return RET(cpu) + 1; // 11 cycles
           }
         num_cycles = 5; // NOLINT
         break;
       }
     case 0xc9: // NOLINT
       {        // RET
-        // returns rather than breaks to avoid pc increment at end of function
-        uint16_t address = cpu_read_mem(cpu, cpu->sp);
-        address += (cpu_read_mem(cpu, cpu->sp + 1) << 8); // NOLINT
-        cpu->sp += 2;
-        cpu->pc = address;
-        // NOLINTNEXTLINE
-        return 10; // return num cycles
+        return RET(cpu);
       }
     case 0xca: // NOLINT
       {        // JZ
         if (is_zero_flag_set(cpu))
           {
-            uint16_t address = cpu_read_mem(cpu, cpu->pc + 2); // NOLINT
-            address = address << 8;                            // NOLINT
-            address += cpu_read_mem(cpu, cpu->pc + 1);
-            cpu->pc = address;
-            // NOLINTNEXTLINE
-            return 10; // return num cycles
+            return JMP(cpu);
           }
         cpu->pc += 2;    // NOLINT
         num_cycles = 10; // NOLINT
         break;
       }
-    case 0xcd:                                                   // NOLINT
-      {                                                          // CALL ADDR
-        cpu_write_mem(cpu, cpu->sp - 1, ((cpu->pc + 3) >> 8));   // NOLINT
-        cpu_write_mem(cpu, cpu->sp - 2, ((cpu->pc + 3) & 0xFF)); // NOLINT
-
-        cpu->sp -= 2;
-        cpu->pc = (cpu_read_mem(cpu, cpu->pc + 2) << 8) // NOLINT
-                  | (cpu_read_mem(cpu, cpu->pc + 1));
-        // NOLINTNEXTLINE
-        return 17; // return num cycles
+    case 0xcd: // NOLINT
+      {        // CALL ADDR
+        return CALL(cpu, getImmediate16BitValue(cpu));
       }
     case 0xd1: // NOLINT
-      {
-        // POP D
-        cpu->e = cpu_read_mem(cpu, cpu->sp);
-        cpu->sp += 1;
-        cpu->d = cpu_read_mem(cpu, cpu->sp);
-        cpu->sp += 1;
-        num_cycles = 10; // NOLINT
+      {        // POP D
+        num_cycles = POP(cpu, DE);
         break;
       }
-    case 0xd2: // NOLINT
-      {        // JNC ADR
-        uint16_t address = cpu_read_mem(cpu, cpu->pc + 2);
-        address = (address << BYTE) | cpu_read_mem(cpu, cpu->pc + 1);
+    case 0xd2:                                 // NOLINT
+      {                                        // JNC ADR
         if ((cpu->flags & FLAG_CY) != FLAG_CY) // if CY not set JUMP
           {
-            cpu->pc = address;
-            // NOLINTNEXTLINE
-            return 10; // return cycle number
+            return JMP(cpu);
           }
         cpu->pc += 2;
         num_cycles = 10; // NOLINT
         break;
       }
     case 0xd3: // NOLINT
-      {
-        // printf("OUT ");
-        // cpu->a will be byte one and port to write to is port 2
-        uint8_t port = cpu_read_mem(cpu, cpu->pc + 1);
+      {        // OUT d8
+        uint8_t port = getImmediate8BitValue(cpu);
         printf("%u", port);
         cpu->pc += 1;
         num_cycles = 10; // NOLINT
@@ -526,21 +603,14 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       }
     case 0xd5: // NOLINT
       {        // PUSH D
-        cpu_write_mem(cpu, cpu->sp - 2, cpu->e);
-        cpu_write_mem(cpu, cpu->sp - 1, cpu->d);
-        cpu->sp -= 2;    // NOLINT
-        num_cycles = 11; // NOLINT
+        num_cycles = PUSH(cpu, DE);
         break;
       }
-    case 0xda: // NOLINT
-      {        // JC ADR
-        uint16_t address = cpu_read_mem(cpu, cpu->pc + 2);
-        address = (address << BYTE) | cpu_read_mem(cpu, cpu->pc + 1);
+    case 0xda:                                 // NOLINT
+      {                                        // JC ADR
         if ((cpu->flags & FLAG_CY) == FLAG_CY) // if CY set JUMP
           {
-            cpu->pc = address;
-            // NOLINTNEXTLINE
-            return 10; // return cycle number
+            return JMP(cpu);
           }
         cpu->pc += 2;
         num_cycles = 10; // NOLINT
@@ -548,7 +618,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       }
     case 0xdb: // NOLINT
       {        // IN D8
-        uint8_t port = cpu_read_mem(cpu, cpu->pc + 1);
+        uint8_t port = getImmediate8BitValue(cpu);
         printf("%u", port);
         cpu->pc += 1;
         num_cycles = 10; // NOLINT
@@ -556,24 +626,17 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       }
     case 0xe1: // NOLINT
       {        // POP H
-        cpu->l = cpu_read_mem(cpu, cpu->sp);
-        cpu->h = cpu_read_mem(cpu, cpu->sp + 1);
-        cpu->sp += 2;    // NOLINT
-        num_cycles = 10; // NOLINT
+        num_cycles = POP(cpu, HL);
         break;
       }
     case 0xe5: // NOLINT
       {        // PUSH H
-        cpu_write_mem(cpu, cpu->sp - 1, cpu->h);
-        cpu->sp -= 1;
-        cpu_write_mem(cpu, cpu->sp - 1, cpu->l);
-        cpu->sp -= 1;
-        num_cycles = 11; // NOLINT
+        num_cycles = PUSH(cpu, HL);
         break;
       }
     case 0xe6: // NOLINT
-      {
-        uint8_t immediate = cpu_read_mem(cpu, cpu->pc + 1);
+      {        // ANI d8
+        uint8_t immediate = getImmediate8BitValue(cpu);
         cpu->a &= immediate;
         update_zero_flag(cpu, cpu->a);
         update_sign_flag(cpu, cpu->a);
@@ -600,31 +663,24 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       }
     case 0xf1: // NOLINT
       {        // POP PSW
-        cpu->flags = cpu_read_mem(cpu, cpu->sp);
-        cpu->a = cpu_read_mem(cpu, cpu->sp + 1);
-        cpu->sp += 2;
-        num_cycles = 10; // NOLINT
+        num_cycles = POP(cpu, PSW);
         break;
       }
     case 0xf5: // NOLINT
       {        // PUSH PSW
-        cpu_write_mem(cpu, cpu->sp - 1, cpu->a);
-        cpu->sp -= 1;
-        cpu_write_mem(cpu, cpu->sp - 1, cpu->flags);
-        cpu->sp -= 1;
-        num_cycles = 11; // NOLINT
+        num_cycles = PUSH(cpu, PSW);
         break;
       }
       break;
     case 0xfb: // NOLINT
-      {
+      {        // EI
         cpu->interrupt_enabled = true;
         num_cycles = 4; // NOLINT
         break;
       }
     case 0xfe: // NOLINT
       {        // CPI
-        uint8_t data = cpu_read_mem(cpu, cpu->pc + 1);
+        uint8_t data = getImmediate8BitValue(cpu);
         uint8_t result = cpu->a - data;
         update_zero_flag(cpu, result);
         update_sign_flag(cpu, result);
