@@ -1110,6 +1110,23 @@ test_opcode_0x44(void)
 }
 
 void
+test_opcode_0x46(void)
+{
+  i8080 cpu;
+  cpu_init(&cpu);
+  cpu.h = 0xAA;
+  cpu.l = 0xBB;
+  cpu_write_mem(&cpu, 0xAABB, 0x12);
+
+  int code_found = execute_instruction(&cpu, 0x46); // NOLINT
+  CU_ASSERT(cpu.pc == 0x0001);
+  CU_ASSERT(code_found == 7);
+  CU_ASSERT(cpu.b == 0x12);
+
+  cpu_write_mem(&cpu, 0xAABB, 0x00);
+}
+
+void
 test_opcode_0x6f(void)
 {
   i8080 cpu;
@@ -2422,6 +2439,9 @@ main(void)
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x44()",
                          test_opcode_0x44))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0x46()",
+                         test_opcode_0x46))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x56()",
                          test_opcode_0x56))
