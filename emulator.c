@@ -629,6 +629,19 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         num_cycles = POP(cpu, HL);
         break;
       }
+    case 0xe3: // NOLINT
+      {        // XTHL
+
+        uint8_t tmp = cpu->h;
+        cpu->h = cpu_read_mem(cpu, cpu->sp + 1);
+        cpu_write_mem(cpu, cpu->sp + 1, tmp);
+        tmp = cpu->l;
+        cpu->l = cpu_read_mem(cpu, cpu->sp);
+        cpu_write_mem(cpu, cpu->sp, tmp);
+
+        num_cycles = 18;
+        break;
+      }
     case 0xe5: // NOLINT
       {        // PUSH H
         num_cycles = PUSH(cpu, HL);
@@ -648,9 +661,9 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         break;
       }
     case 0xe9: // NOLINT
-      {        // PCHL 
+      {        // PCHL
         cpu->pc = readRegisterPair(cpu, HL);
-	return 5; // NOLINT
+        return 5; // NOLINT
       }
     case 0xeb: // NOLINT
       {        // XCHG

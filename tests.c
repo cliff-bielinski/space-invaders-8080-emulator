@@ -596,8 +596,8 @@ test_opcode_0xe9(void)
   i8080 cpu;
   cpu_init(&cpu);
   uint16_t initial_pc = cpu.pc;
-  cpu.h = 0x5f;                      // NOLINT
-  cpu.l = 0xd1; 
+  cpu.h = 0x5f; // NOLINT
+  cpu.l = 0xd1;
 
   int code_found = execute_instruction(&cpu, 0xe9); // NOLINT
   CU_ASSERT(code_found >= 0);
@@ -721,6 +721,31 @@ test_opcode_0xe1(void) // NOLINT
 
   cpu_write_mem(&cpu, 0xDADE, 0x00); // NOLINT
   cpu_write_mem(&cpu, 0xDADF, 0x00); // NOLINT
+}
+
+void
+test_opcode_0xe3(void) // NOLINT
+{
+  // XTHL
+  i8080 cpu;
+  cpu_init(&cpu);
+
+  cpu.sp = 0x12b3;                       // NOLINT
+  cpu_write_mem(&cpu, cpu.sp, 0xf0);     // NOLINT
+  cpu_write_mem(&cpu, cpu.sp + 1, 0x0d); // NOLINT
+  cpu.l = 0x3c;
+  cpu.h = 0x0b;
+
+  int code_found = execute_instruction(&cpu, 0xe3); // NOLINT
+
+  CU_ASSERT(code_found >= 0);
+  CU_ASSERT(cpu.l == 0xf0);                              // NOLINT
+  CU_ASSERT(cpu.h == 0x0d);                              // NOLINT
+  CU_ASSERT_EQUAL(cpu_read_mem(&cpu, cpu.sp), 0x3c);     // NOLINT
+  CU_ASSERT_EQUAL(cpu_read_mem(&cpu, cpu.sp + 1), 0x0b); // NOLINT
+
+  cpu_write_mem(&cpu, 0x12b3, 0x00); // NOLINT
+  cpu_write_mem(&cpu, 0x12b4, 0x00); // NOLINT
 }
 
 void
@@ -1625,6 +1650,9 @@ main(void)
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0xdb()",
                          test_opcode_0xdb))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0xe3()",
+                         test_opcode_0xe3))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0xe6()",
                          test_opcode_0xe6))
