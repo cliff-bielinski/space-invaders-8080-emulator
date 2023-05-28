@@ -668,7 +668,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         update_sign_flag(cpu, value);
         update_parity_flag(cpu, value);
         cpu_write_mem(cpu, address, value);
-        num_cycles = 10;
+        num_cycles = 10; // NOLINT
         break;
       }
     case 0x35: // NOLINT
