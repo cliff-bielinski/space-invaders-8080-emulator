@@ -57,6 +57,15 @@ DCR(i8080 *cpu, uint8_t *reg)
   return 5; // NOLINT
 }
 
+// Decrement Register Pair
+int
+DCX(i8080 *cpu, int pair)
+{
+  uint16_t value = readRegisterPair(cpu, pair) - 1;
+  writeRegisterPair(cpu, pair, value);
+  return 5; // NOLINT
+}
+
 // Increment Register
 int
 INR(i8080 *cpu, uint8_t *reg)
@@ -370,6 +379,11 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
     case 0x0a: // NOLINT
       {        // LDAX B
         num_cycles = LDAX(cpu, BC);
+        break;
+      }
+    case 0x0b: // NOLINT
+      {        // DCX B
+        num_cycles = DCX(cpu, BC);
         break;
       }
     case 0x0d: // NOLINT
