@@ -633,6 +633,12 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         cpu->pc += 1;
         break;
       }
+    case 0x2f: // NOLINT
+      {        // CMA
+        cpu->a = ~cpu->a;
+        num_cycles = 4;
+        break;
+      }
     case 0x31: // NOLINT
       {        // LXI SP
         num_cycles = LXI(cpu, SP, getImmediate16BitValue(cpu));

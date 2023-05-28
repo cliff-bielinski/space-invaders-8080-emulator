@@ -868,6 +868,21 @@ test_opcode_0x2e(void) // NOLINT
 }
 
 void
+test_opcode_0x2f(void) // NOLINT
+{
+  i8080 cpu;
+  cpu_init(&cpu);
+  cpu.a = 0x51; // NOLINT
+
+  int code_found = execute_instruction(&cpu, 0x2f); // NOLINT
+
+  CU_ASSERT(code_found == 4);
+  CU_ASSERT(cpu.pc == 1);
+  CU_ASSERT(cpu.a == 0xAE); // NOLINT
+
+}
+
+void
 test_opcode_0x31(void)
 {
   i8080 cpu;
@@ -2189,6 +2204,9 @@ main(void)
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x2e()",
                          test_opcode_0x2e))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0x2f()",
+                         test_opcode_0x2f))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x32()",
                          test_opcode_0x32))
