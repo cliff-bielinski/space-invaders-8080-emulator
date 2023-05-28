@@ -400,6 +400,26 @@ test_opcode_0x14(void) // NOLINT
 }
 
 void
+test_opcode_0x16(void) // NOLINT
+{                      // MVI D, mem
+  // setup
+  i8080 cpu;
+  cpu_init(&cpu);
+  cpu_write_mem(&cpu, 0x0001, 0xCC); // NOLINT
+
+  // execute
+  int code_found = execute_instruction(&cpu, 0x16); // NOLINT
+
+  // verify
+  CU_ASSERT(code_found == 7);
+  CU_ASSERT(2 == cpu.pc);
+  CU_ASSERT(0xCC == cpu.d);
+
+  // cleanup
+  cpu_write_mem(&cpu, 0x0001, 0x00);
+}
+
+void
 test_opcode_0x05(void) // NOLINT
 {
   i8080 cpu;
@@ -1729,6 +1749,9 @@ main(void)
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x09()",
                          test_opcode_0x09))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0x16()",
+                         test_opcode_0x16))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x0b()",
                          test_opcode_0x0b))

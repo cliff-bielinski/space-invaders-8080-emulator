@@ -451,6 +451,12 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         num_cycles = DCR(cpu, &cpu->d);
         break;
       }
+    case 0x16: // NOLINT
+      {        // MVI D
+        num_cycles = MVI(&cpu->d, getImmediate8BitValue(cpu));
+        cpu->pc += 1;
+        break;
+      }
     case 0x19: // NOLINT
       {        // DAD D
         num_cycles = DAD(cpu, DE);
