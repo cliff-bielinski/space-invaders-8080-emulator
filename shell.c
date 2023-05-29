@@ -9,8 +9,8 @@
 #include <unistd.h>
 #define JOYSTICK_DEAD_ZONE 8000
 
-static SDL_Renderer *renderer = NULL;
-static SDL_Texture *texture = NULL;
+//static SDL_Renderer *renderer = NULL;
+//static SDL_Texture *texture = NULL;
 static SDL_Event e;
 bool has_event = false;
 
@@ -80,34 +80,34 @@ io_processor(i8080 *cpu) // NOLINT(readability-function-cognitive-complexity)
           SDL_Scancode key = e.key.keysym.scancode;
           if (key == SDL_SCANCODE_C) // Coin
             {
-              cpu->port1 &= 0b11111110; // NOLINT
+              cpu->port1 &= 0xFE; // NOLINT
             }
           else if (key == SDL_SCANCODE_2) // P2 Start
             {
-              cpu->port1 &= 0b11111101; // NOLINT
+              cpu->port1 &= 0xFD; // NOLINT
             }
           else if (key == SDL_SCANCODE_RETURN) // P1 Start
             {
-              cpu->port1 &= 0b11111011; // NOLINT
+              cpu->port1 &= 0xFB; // NOLINT
             }
           else if (key == SDL_SCANCODE_SPACE) // Shoot button
             {
-              cpu->port1 &= 0b11101111; // NOLINT
-              cpu->port2 &= 0b11101111; // NOLINT
+              cpu->port1 &= 0xEF; // NOLINT
+              cpu->port2 &= 0xEF; // NOLINT
             }
           else if (key == SDL_SCANCODE_LEFT) // Left
             {
-              cpu->port1 &= 0b11011111; // NOLINT
-              cpu->port2 &= 0b11011111; // NOLINT
+              cpu->port1 &= 0xDF; // NOLINT
+              cpu->port2 &= 0xDF; // NOLINT
             }
           else if (key == SDL_SCANCODE_RIGHT) // Right
             {
-              cpu->port1 &= 0b10111111; // NOLINT
-              cpu->port2 &= 0b10111111; // NOLINT
+              cpu->port1 &= 0xBF; // NOLINT
+              cpu->port2 &= 0xBF; // NOLINT
             }
           else if (key == SDL_SCANCODE_T) // Tilt
             {
-              cpu->port2 &= 0b11111011; // NOLINT
+              cpu->port2 &= 0xFB; // NOLINT
             }
           else if (key == SDL_SCANCODE_TAB) // Change Speed
             {
@@ -130,11 +130,11 @@ io_processor(i8080 *cpu) // NOLINT(readability-function-cognitive-complexity)
                 }
               else
                 {
-                  cpu->port1 &= 0b11011111; // NOLINT
-                  cpu->port2 &= 0b11011111; // NOLINT
+                  cpu->port1 &= 0xDF; // NOLINT
+                  cpu->port2 &= 0xDF; // NOLINT
 
-                  cpu->port1 &= 0b10111111; // NOLINT
-                  cpu->port2 &= 0b10111111; // NOLINT
+                  cpu->port1 &= 0xBF; // NOLINT
+                  cpu->port2 &= 0xBF; // NOLINT
                 }
             }
           else if (e.type == SDL_JOYBUTTONDOWN)
@@ -176,30 +176,30 @@ io_processor(i8080 *cpu) // NOLINT(readability-function-cognitive-complexity)
             {
               if (e.jbutton.button == 1) // NOLINT // coin
                 {
-                  cpu->port1 &= 0b11111110; // NOLINT
+                  cpu->port1 &= 0xFE; // NOLINT
                 }
               else if (e.jbutton.button == 0) // NOLINT // shoot button
                 {
-                  cpu->port1 &= 0b11101111; // NOLINT
-                  cpu->port2 &= 0b11101111; // NOLINT
+                  cpu->port1 &= 0xEF; // NOLINT
+                  cpu->port2 &= 0xEF; // NOLINT
                 }
               else if (e.jbutton.button == 8) // NOLINT // start
                 {
-                  cpu->port1 &= 0b11111011; // NOLINT
+                  cpu->port1 &= 0xFB; // NOLINT
                 }
               else if (e.jbutton.button == 9) // NOLINT // select
                 {
-                  cpu->port1 &= 0b11111101; // NOLINT
+                  cpu->port1 &= 0xFD; // NOLINT
                 }
               else if (e.jbutton.button == 13) // NOLINT // left
                 {
-                  cpu->port1 &= 0b11011111; // NOLINT
-                  cpu->port2 &= 0b11011111; // NOLINT
+                  cpu->port1 &= 0xDF; // NOLINT
+                  cpu->port2 &= 0xDF; // NOLINT
                 }
               else if (e.jbutton.button == 14) // NOLINT // right
                 {
-                  cpu->port1 &= 0b10111111; // NOLINT
-                  cpu->port2 &= 0b10111111; // NOLINT
+                  cpu->port1 &= 0xBF; // NOLINT
+                  cpu->port2 &= 0xBF; // NOLINT
                 }
             }
         }
