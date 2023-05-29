@@ -2549,6 +2549,31 @@ test_opcode_0xd5(void) // NOLINT
 }
 
 void
+test_opcode_0xd6(void) // NOLINT
+{
+  // setup
+  i8080 cpu;
+  cpu_init(&cpu);
+  cpu.a = 0x3E;
+  cpu_write_mem(&cpu, 0x0001, 0x3E);
+
+  // execute
+  int code_found = execute_instruction(&cpu, 0xd6); // NOLINT
+
+  // verify
+  CU_ASSERT(code_found == 7);
+  CU_ASSERT(cpu.pc == 2);
+  CU_ASSERT(cpu.a == 0x00);
+  CU_ASSERT((cpu.flags & FLAG_CY) == 0);
+  CU_ASSERT((cpu.flags & FLAG_S) == 0);
+  CU_ASSERT((cpu.flags & FLAG_Z) == FLAG_Z);
+  CU_ASSERT((cpu.flags & FLAG_P) == FLAG_P);
+  CU_ASSERT((cpu.flags & FLAG_AC) == FLAG_AC);
+
+  cpu_write_mem(&cpu, 0x0001, 0x00);
+}
+
+void
 test_opcode_0xeb(void) // NOLINT
 {
   i8080 cpu;
@@ -2952,6 +2977,9 @@ main(void)
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0xd5()",
                          test_opcode_0xd5))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0xd6()",
+                         test_opcode_0xd6))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0xda()",
                          test_opcode_0xda))

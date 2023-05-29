@@ -286,14 +286,12 @@ STAX(i8080 *cpu, int pair)
 
 // Subtract Register from Accumulator
 int
-SUB(i8080 *cpu, const uint8_t *reg)
+SUB(i8080 *cpu, const uint8_t value)
 {
   // set flags and subtract register value from accumulator
-  uint16_t result = cpu->a + (u_int8_t) ~*reg + 1;
-  update_aux_carry_flag(cpu, cpu->a, ((u_int8_t) ~*reg + 1));
-  update_carry_flag(
-      cpu, result <= MAX_8_BIT_VALUE); // if NO carry out, then carry is set
-  cpu->a = (uint8_t)result;
+  update_aux_carry_flag(cpu, cpu->a, ((u_int8_t) ~value + 1));
+  update_carry_flag(cpu, cpu->a < value); // carry if borrow
+  cpu->a = cpu->a - value;
   update_zero_flag(cpu, cpu->a);
   update_sign_flag(cpu, cpu->a);
   update_parity_flag(cpu, cpu->a);
@@ -848,7 +846,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       }
     case 0x97: // NOLINT
       {        // SUB A
-        num_cycles = SUB(cpu, &cpu->a);
+        num_cycles = SUB(cpu, cpu->a);
         break;
       }
     case 0xa0: // NOLINT
@@ -1053,6 +1051,12 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
     case 0xd5: // NOLINT
       {        // PUSH D
         num_cycles = PUSH(cpu, DE);
+        break;
+      }
+    case 0xd6: // NOLINT
+      {
+        num_cycles = SUB(cpu, getImmediate8BitValue(cpu)) + 3; // 7 cycles
+        cpu->pc += 1;
         break;
       }
     case 0xda:                                 // NOLINT
