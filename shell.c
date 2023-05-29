@@ -11,6 +11,14 @@
 
 // static SDL_Renderer *renderer = NULL;
 // static SDL_Texture *texture = NULL;
+char sound1_path[15] = "./sounds/0.wav";
+char sound2_path[15] = "./sounds/1.wav";
+char sound3_path[15] = "./sounds/2.wav";
+char sound4_path[15] = "./sounds/3.wav";
+char sound5_path[15]= "./sounds/4.wav";
+char sound6_path[15] = "./sounds/5.wav";
+char sound7_path[15] = "./sounds/6.wav";
+
 static SDL_Event e;
 bool has_event = false;
 
@@ -282,7 +290,7 @@ main(int argc, char *argv[])
 
   // Initialize SDL
   if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_JOYSTICK
-               | SDL_INIT_EVENTS)
+               | SDL_INIT_EVENTS | SDL_INIT_AUDIO)
       < 0)
     {
       fprintf(stderr, "SDL could not initialize! SDL_Error: %s\n",
@@ -291,6 +299,10 @@ main(int argc, char *argv[])
     }
   else
     {
+      if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
+        fprintf(stderr, "SDL mixer could not initialize!");
+        exit(EXIT_FAILURE);
+      }
       // Create window
       window = SDL_CreateWindow("Space Invaders Emulator",
                                 SDL_WINDOWPOS_UNDEFINED,
@@ -363,6 +375,10 @@ main(int argc, char *argv[])
     }
 
   // Destroy window
+  for (int i = 0; i < NUM_SOUNDS; i++) {
+    Mix_FreeChunk(cpu.sounds[i]);
+  }
+  Mix_Quit();
   SDL_DestroyWindow(window);
   // Quit SDL subsystems
   SDL_Quit();

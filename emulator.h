@@ -6,6 +6,8 @@
 
 // SDL Files
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_mixer.h>
+#define NUM_SOUNDS 18
 
 // #include "SDL_nmix.h"
 // #include "SDL_nmix_file.h"
@@ -79,6 +81,7 @@ typedef struct
 
   bool colored_screen;
   // Ports & Shift registers for in/out opcode
+  Mix_Chunk* sounds[NUM_SOUNDS];
   uint8_t port1, port2;
   uint8_t shift_msb, shift_lsb, shift_offset;
   uint8_t last_out_port3, last_out_port5;
