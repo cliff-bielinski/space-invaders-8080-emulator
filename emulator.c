@@ -1520,6 +1520,8 @@ port_out(i8080 *cpu, uint8_t port, uint8_t value)
       cpu->shift_lsb = cpu->shift_msb;
       cpu->shift_msb = value;
       break;
+    case 6:
+      break;
     default:
       fprintf(stderr, "Error: Unknown OUT port %02x\n", port);
       break;
