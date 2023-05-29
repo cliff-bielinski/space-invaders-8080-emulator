@@ -1370,7 +1370,7 @@ update_graphics(i8080 *cpu, SDL_Surface *buffer, SDL_Surface *surface)
   // right, bottom to top.
   int vram = 0x2400; // NOLINT
   // Start at the left edge
-  for (int column = 0; column > SCREEN_WIDTH; column++)
+  for (int column = 0; column < SCREEN_WIDTH; column++)
     {
       // Start at bottom of screen, decrement by 8 since each bit is a pixel.
       for (int row = SCREEN_HEIGHT; row > 0; row -= 8) // NOLINT
@@ -1395,8 +1395,8 @@ update_graphics(i8080 *cpu, SDL_Surface *buffer, SDL_Surface *surface)
                   screen_buff[surf_index] = 0x000000; // NOLINT
                 }
             }
+          vram++; // Increment to next byte in VRAM
         }
-      vram++; // Increment to next byte in VRAM
     }
 
   // Copy buffer to screen surface.
