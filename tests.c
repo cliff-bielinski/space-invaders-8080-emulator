@@ -2092,6 +2092,202 @@ test_opcode_0xfe(void) // NOLINT
 }
 
 void
+test_opcode_0x80(void)
+{
+  i8080 cpu;
+  cpu_init(&cpu);
+
+  cpu.a = 0xF;
+  cpu.b = 0xF;
+
+  int code_found = execute_instruction(&cpu, 0x80);
+  CU_ASSERT(code_found >= 0);
+  CU_ASSERT_EQUAL(cpu.a, 0x1E);
+  CU_ASSERT_EQUAL((cpu.flags & FLAG_Z), 0);
+  CU_ASSERT_EQUAL((cpu.flags & FLAG_S), 0);
+  CU_ASSERT_EQUAL((cpu.flags & FLAG_P), FLAG_P);
+  CU_ASSERT_EQUAL((cpu.flags & FLAG_AC), FLAG_AC);
+  CU_ASSERT_EQUAL((cpu.flags & FLAG_CY), 0);
+
+  cpu.a = 0x9;
+  cpu.b = MAX_8_BIT_VALUE;
+
+  // Only 8 bits are kept from addition, the rest discarded and cy flag is set.
+  code_found = execute_instruction(&cpu, 0x80);
+  CU_ASSERT(code_found >= 0);
+  CU_ASSERT_EQUAL(cpu.a, 0x8);
+  CU_ASSERT_EQUAL((cpu.flags & FLAG_Z), 0);
+  CU_ASSERT_EQUAL((cpu.flags & FLAG_S), 0);
+  CU_ASSERT_EQUAL((cpu.flags & FLAG_P), 0);
+  CU_ASSERT_EQUAL((cpu.flags & FLAG_AC), FLAG_AC);
+  CU_ASSERT_EQUAL((cpu.flags & FLAG_CY), FLAG_CY);
+}
+
+void
+test_opcode_0x81(void)
+{
+  i8080 cpu;
+  cpu_init(&cpu);
+
+  cpu.a = 0xF;
+  cpu.c = 0xF;
+
+  int code_found = execute_instruction(&cpu, 0x81);
+  CU_ASSERT(code_found >= 0);
+  CU_ASSERT_EQUAL(cpu.a, 0x1E);
+  CU_ASSERT_EQUAL((cpu.flags & FLAG_Z), 0);
+  CU_ASSERT_EQUAL((cpu.flags & FLAG_S), 0);
+  CU_ASSERT_EQUAL((cpu.flags & FLAG_P), FLAG_P);
+  CU_ASSERT_EQUAL((cpu.flags & FLAG_AC), FLAG_AC);
+  CU_ASSERT_EQUAL((cpu.flags & FLAG_CY), 0);
+
+  cpu.a = 0x9;
+  cpu.c = MAX_8_BIT_VALUE;
+
+  // Only 8 bits are kept from addition, the rest discarded and cy flag is set.
+  code_found = execute_instruction(&cpu, 0x81);
+  CU_ASSERT(code_found >= 0);
+  CU_ASSERT_EQUAL(cpu.a, 0x8);
+  CU_ASSERT_EQUAL((cpu.flags & FLAG_Z), 0);
+  CU_ASSERT_EQUAL((cpu.flags & FLAG_S), 0);
+  CU_ASSERT_EQUAL((cpu.flags & FLAG_P), 0);
+  CU_ASSERT_EQUAL((cpu.flags & FLAG_AC), FLAG_AC);
+  CU_ASSERT_EQUAL((cpu.flags & FLAG_CY), FLAG_CY);
+}
+
+void
+test_opcode_0x82(void)
+{
+  i8080 cpu;
+  cpu_init(&cpu);
+
+  cpu.a = 0xF;
+  cpu.d = 0xF;
+
+  int code_found = execute_instruction(&cpu, 0x82);
+  CU_ASSERT(code_found >= 0);
+  CU_ASSERT_EQUAL(cpu.a, 0x1E);
+  CU_ASSERT_EQUAL((cpu.flags & FLAG_Z), 0);
+  CU_ASSERT_EQUAL((cpu.flags & FLAG_S), 0);
+  CU_ASSERT_EQUAL((cpu.flags & FLAG_P), FLAG_P);
+  CU_ASSERT_EQUAL((cpu.flags & FLAG_AC), FLAG_AC);
+  CU_ASSERT_EQUAL((cpu.flags & FLAG_CY), 0);
+
+  cpu.a = 0x9;
+  cpu.d = MAX_8_BIT_VALUE;
+
+  // Only 8 bits are kept from addition, the rest discarded and cy flag is set.
+  code_found = execute_instruction(&cpu, 0x82);
+  CU_ASSERT(code_found >= 0);
+  CU_ASSERT_EQUAL(cpu.a, 0x8);
+  CU_ASSERT_EQUAL((cpu.flags & FLAG_Z), 0);
+  CU_ASSERT_EQUAL((cpu.flags & FLAG_S), 0);
+  CU_ASSERT_EQUAL((cpu.flags & FLAG_P), 0);
+  CU_ASSERT_EQUAL((cpu.flags & FLAG_AC), FLAG_AC);
+  CU_ASSERT_EQUAL((cpu.flags & FLAG_CY), FLAG_CY);
+}
+
+void
+test_opcode_0x83(void)
+{
+  i8080 cpu;
+  cpu_init(&cpu);
+
+  cpu.a = 0xF;
+  cpu.e = 0xF;
+
+  int code_found = execute_instruction(&cpu, 0x83);
+  CU_ASSERT(code_found >= 0);
+  CU_ASSERT_EQUAL(cpu.a, 0x1E);
+  CU_ASSERT_EQUAL((cpu.flags & FLAG_Z), 0);
+  CU_ASSERT_EQUAL((cpu.flags & FLAG_S), 0);
+  CU_ASSERT_EQUAL((cpu.flags & FLAG_P), FLAG_P);
+  CU_ASSERT_EQUAL((cpu.flags & FLAG_AC), FLAG_AC);
+  CU_ASSERT_EQUAL((cpu.flags & FLAG_CY), 0);
+
+  cpu.a = 0x9;
+  cpu.e = MAX_8_BIT_VALUE;
+
+  // Only 8 bits are kept from addition, the rest discarded and cy flag is set.
+  code_found = execute_instruction(&cpu, 0x83);
+  CU_ASSERT(code_found >= 0);
+  CU_ASSERT_EQUAL(cpu.a, 0x8);
+  CU_ASSERT_EQUAL((cpu.flags & FLAG_Z), 0);
+  CU_ASSERT_EQUAL((cpu.flags & FLAG_S), 0);
+  CU_ASSERT_EQUAL((cpu.flags & FLAG_P), 0);
+  CU_ASSERT_EQUAL((cpu.flags & FLAG_AC), FLAG_AC);
+  CU_ASSERT_EQUAL((cpu.flags & FLAG_CY), FLAG_CY);
+}
+
+void
+test_opcode_0x85(void)
+{
+  i8080 cpu;
+  cpu_init(&cpu);
+
+  cpu.a = 0xF;
+  cpu.l = 0xF;
+
+  int code_found = execute_instruction(&cpu, 0x85);
+  CU_ASSERT(code_found >= 0);
+  CU_ASSERT_EQUAL(cpu.a, 0x1E);
+  CU_ASSERT_EQUAL((cpu.flags & FLAG_Z), 0);
+  CU_ASSERT_EQUAL((cpu.flags & FLAG_S), 0);
+  CU_ASSERT_EQUAL((cpu.flags & FLAG_P), FLAG_P);
+  CU_ASSERT_EQUAL((cpu.flags & FLAG_AC), FLAG_AC);
+  CU_ASSERT_EQUAL((cpu.flags & FLAG_CY), 0);
+
+  cpu.a = 0x9;
+  cpu.l = MAX_8_BIT_VALUE;
+
+  // Only 8 bits are kept from addition, the rest discarded and cy flag is set.
+  code_found = execute_instruction(&cpu, 0x85);
+  CU_ASSERT(code_found >= 0);
+  CU_ASSERT_EQUAL(cpu.a, 0x8);
+  CU_ASSERT_EQUAL((cpu.flags & FLAG_Z), 0);
+  CU_ASSERT_EQUAL((cpu.flags & FLAG_S), 0);
+  CU_ASSERT_EQUAL((cpu.flags & FLAG_P), 0);
+  CU_ASSERT_EQUAL((cpu.flags & FLAG_AC), FLAG_AC);
+  CU_ASSERT_EQUAL((cpu.flags & FLAG_CY), FLAG_CY);
+}
+
+void
+test_opcode_0x86(void)
+{
+  i8080 cpu;
+  cpu_init(&cpu);
+
+  cpu.a = 0xF;
+  writeRegisterPair(&cpu, 3, 0xAABB);
+  cpu_write_mem(&cpu, 0xAABB, 0xF);
+
+  int code_found = execute_instruction(&cpu, 0x86);
+  CU_ASSERT(code_found >= 0);
+  CU_ASSERT_EQUAL(cpu.a, 0x1E);
+  CU_ASSERT_EQUAL((cpu.flags & FLAG_Z), 0);
+  CU_ASSERT_EQUAL((cpu.flags & FLAG_S), 0);
+  CU_ASSERT_EQUAL((cpu.flags & FLAG_P), FLAG_P);
+  CU_ASSERT_EQUAL((cpu.flags & FLAG_AC), FLAG_AC);
+  CU_ASSERT_EQUAL((cpu.flags & FLAG_CY), 0);
+
+  cpu.a = 0x9;
+  writeRegisterPair(&cpu, 3, 0xAABB);
+  cpu_write_mem(&cpu, 0xAABB, MAX_8_BIT_VALUE);
+
+  // Only 8 bits are kept from addition, the rest discarded and cy flag is set.
+  code_found = execute_instruction(&cpu, 0x86);
+  CU_ASSERT(code_found >= 0);
+  CU_ASSERT_EQUAL(cpu.a, 0x8);
+  CU_ASSERT_EQUAL((cpu.flags & FLAG_Z), 0);
+  CU_ASSERT_EQUAL((cpu.flags & FLAG_S), 0);
+  CU_ASSERT_EQUAL((cpu.flags & FLAG_P), 0);
+  CU_ASSERT_EQUAL((cpu.flags & FLAG_AC), FLAG_AC);
+  CU_ASSERT_EQUAL((cpu.flags & FLAG_CY), FLAG_CY);
+
+  cpu_write_mem(&cpu, cpu.pc + 1, 0x00);
+}
+
+void
 test_handle_interrupt(void) // NOLINT
 {
   i8080 cpu;
@@ -2443,7 +2639,20 @@ main(void)
                          test_handle_interrupt_invalid_rst))
       || (NULL
           == CU_add_test(pSuite, "test_handle_interrupt_interrupts_disabled()",
-                         test_handle_interrupt_interrupts_disabled)))
+                         test_handle_interrupt_interrupts_disabled))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0x80", test_opcode_0x80))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0x81", test_opcode_0x81))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0x82", test_opcode_0x82))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0x83", test_opcode_0x83))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0x85", test_opcode_0x85))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0x86",
+                         test_opcode_0x86)))
     {
       CU_cleanup_registry();
       return CU_get_error();
