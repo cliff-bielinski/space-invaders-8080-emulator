@@ -1377,6 +1377,38 @@ test_opcode_0xc3(void) // NOLINT
 }
 
 void
+test_opcode_0xc4(void) // NOLINT
+{
+  // Call addr
+  i8080 cpu;
+  cpu_init(&cpu);
+
+  cpu.pc = 0xABCD;                       // NOLINT
+  cpu.sp = 0xDCBA;                       // NOLINT
+  uint16_t temp = cpu.sp;                // Holds original sp addr
+  cpu_write_mem(&cpu, cpu.pc + 1, 0xFE); // NOLINT
+  cpu_write_mem(&cpu, cpu.pc + 2, 0xEF); // NOLINT
+
+  int code_found = execute_instruction(&cpu, 0xc4); // NOLINT
+
+  CU_ASSERT(code_found == 17);
+  CU_ASSERT_EQUAL(cpu_read_mem(&cpu, temp - 1), 0xAB); // NOLINT
+  CU_ASSERT_EQUAL(cpu_read_mem(&cpu, temp - 2), 0xD0); // NOLINT
+  CU_ASSERT_EQUAL(cpu.sp, 0xDCBA - 2);                 // NOLINT
+  CU_ASSERT_EQUAL(cpu.pc, 0xEFFE);                     // NOLINT
+
+  cpu.flags |= FLAG_Z;
+  code_found = execute_instruction(&cpu, 0xc4);
+
+  CU_ASSERT(code_found == 11);
+  CU_ASSERT_EQUAL(cpu.sp, 0xDCBA - 2);
+  CU_ASSERT_EQUAL(cpu.pc, 0xEFFE + 3);
+
+  cpu_write_mem(&cpu, 0xABCE, 0x00); // NOLINT
+  cpu_write_mem(&cpu, 0xABCF, 0x00); // NOLINT
+}
+
+void
 test_opcode_0xc8(void)
 { // RZ
   i8080 cpu;
@@ -2799,6 +2831,9 @@ main(void)
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0xc2()",
                          test_opcode_0xc2))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0xc4()",
+                         test_opcode_0xc4))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0xc5()",
                          test_opcode_0xc5))

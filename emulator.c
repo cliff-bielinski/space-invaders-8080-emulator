@@ -942,6 +942,16 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       {        // JMP
         return JMP(cpu);
       }
+    case 0xc4: // NOLINT
+      {        // CNZ
+        if ((cpu->flags & FLAG_Z) == 0)
+          {
+            return CALL(cpu, getImmediate16BitValue(cpu));
+          }
+        cpu->pc += 2;
+        num_cycles = 11; // NOLINT
+        break;
+      }
     case 0xc5: // NOLINT
       {        // PUSH B
         num_cycles = PUSH(cpu, BC);
