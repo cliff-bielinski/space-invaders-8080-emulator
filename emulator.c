@@ -1214,7 +1214,6 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
     case 0xd3: // NOLINT
       {        // OUT d8
         uint8_t port = getImmediate8BitValue(cpu);
-        printf("%u", port);
         port_out(cpu, port, cpu->a);
         cpu->pc += 1;
         num_cycles = 10;
@@ -1263,7 +1262,6 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
     case 0xdb: // NOLINT
       {        // IN D8
         uint8_t port = getImmediate8BitValue(cpu);
-        // printf("%u", port);
         cpu->a = port_in(cpu, port);
         cpu->pc += 1;
         num_cycles = 10; // NOLINT
