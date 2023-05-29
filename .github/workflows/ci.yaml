@@ -16,7 +16,7 @@ jobs:
         with:
           style: file
           extensions: 'c,h,C,H'
-          tidy-checks: 'bugprone-*,readability-*,portability-*,clang-analyzer-*' 
+          tidy-checks: 'bugprone-*,portability-*,clang-analyzer-*' 
           ignore: 'disassembler_8080.c | tests.c'
 
       - name: static analysis

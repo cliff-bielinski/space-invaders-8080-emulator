@@ -5,17 +5,32 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// Logical AND with Accumulator
+// Add Register or Memory to Accumulator with Carry
 int
-ANA(i8080 *cpu, const uint8_t *reg)
+ADC(i8080 *cpu, const u_int8_t *reg)
 {
-  uint8_t temp = cpu->a;
-  cpu->a = cpu->a & *reg;
+  // get carry bit and add A, register and CY together
+  uint8_t carry = ((cpu->flags & FLAG_CY) == FLAG_CY);
+  uint16_t result = cpu->a + *reg + carry;
 
+  // set A to sum and set flags
+  update_aux_carry_flag(cpu, cpu->a, (*reg + carry));
+  cpu->a = (uint8_t)result;
   update_zero_flag(cpu, cpu->a);
   update_sign_flag(cpu, cpu->a);
   update_parity_flag(cpu, cpu->a);
-  update_aux_carry_flag(cpu, temp, cpu->a);
+  update_carry_flag(cpu, result > MAX_8_BIT_VALUE);
+  return 4; // NOLINT
+}
+
+// Logical AND with Accumulator
+int
+ANA(i8080 *cpu, const uint8_t value)
+{
+  cpu->a = cpu->a & value;
+  update_zero_flag(cpu, cpu->a);
+  update_sign_flag(cpu, cpu->a);
+  update_parity_flag(cpu, cpu->a);
   update_carry_flag(cpu, false);
   return 4; // NOLINT
 }
@@ -32,6 +47,18 @@ CALL(i8080 *cpu, uint16_t address)
   cpu->sp -= 2;
   writeRegisterPair(cpu, PC, address);
   return 17; // NOLINT
+}
+
+// Compare Register or Memory with Accumulator
+int
+CMP(i8080 *cpu, uint8_t value)
+{
+  u_int8_t result = cpu->a - value;
+  update_zero_flag(cpu, result);
+  update_carry_flag(cpu, value > cpu->a);
+  update_parity_flag(cpu, result);
+  update_sign_flag(cpu, result);
+  return 4; // NOLINT
 }
 
 // Decimal Adjust Accumulator
@@ -222,6 +249,19 @@ NOP()
   return 4; // NOLINT
 }
 
+// Logical OR with accumulator
+int
+ORA(i8080 *cpu, u_int8_t value)
+{
+  cpu->a |= value;
+  // always set to 0
+  update_carry_flag(cpu, false);
+  update_parity_flag(cpu, cpu->a);
+  update_sign_flag(cpu, cpu->a);
+  update_zero_flag(cpu, cpu->a);
+  return 4;
+}
+
 // Pop from Stack
 int
 POP(i8080 *cpu, int pair)
@@ -256,6 +296,24 @@ RET(i8080 *cpu)
   return 10; // NOLINT
 }
 
+// Subtract Immediate Value with Borrow
+int
+SBI(i8080 *cpu, u_int8_t value)
+{
+  // get carry bit and add A, register and CY together
+  uint8_t carry = ((cpu->flags & FLAG_CY) == FLAG_CY);
+
+  // set A to sum and set flags
+  update_aux_carry_flag(cpu, cpu->a, (~value + carry));
+  update_carry_flag(cpu, cpu->a < (value + carry));
+  cpu->a = cpu->a - (value + carry);
+  update_zero_flag(cpu, cpu->a);
+  update_sign_flag(cpu, cpu->a);
+  update_parity_flag(cpu, cpu->a);
+
+  return 7; // NOLINT
+}
+
 // Store Accumulator
 int
 STAX(i8080 *cpu, int pair)
@@ -263,6 +321,20 @@ STAX(i8080 *cpu, int pair)
   uint16_t address = readRegisterPair(cpu, pair);
   cpu_write_mem(cpu, address, cpu->a);
   return 7; // NOLINT
+}
+
+// Subtract Register from Accumulator
+int
+SUB(i8080 *cpu, const uint8_t value)
+{
+  // set flags and subtract register value from accumulator
+  update_aux_carry_flag(cpu, cpu->a, ((u_int8_t)~value + 1));
+  update_carry_flag(cpu, cpu->a < value); // carry if borrow
+  cpu->a = cpu->a - value;
+  update_zero_flag(cpu, cpu->a);
+  update_sign_flag(cpu, cpu->a);
+  update_parity_flag(cpu, cpu->a);
+  return 4; // NOLINT
 }
 
 // Logical XOR with Accumulator
@@ -948,14 +1020,86 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
               + 3;
         break;
       }
+    case 0x8a: // NOLINT
+      {        // ADC D
+        num_cycles = ADC(cpu, &cpu->d);
+        break;
+      }
+    case 0x97: // NOLINT
+      {        // SUB A
+        num_cycles = SUB(cpu, cpu->a);
+        break;
+      }
+    case 0xa0: // NOLINT
+      {        // ANA B
+        num_cycles = ANA(cpu, cpu->b);
+        break;
+      }
+    case 0xa1: // NOLINT
+      {        // ANA C
+        num_cycles = ANA(cpu, cpu->c);
+        break;
+      }
+    case 0xa6: // NOLINT
+      {        // ANA M
+        num_cycles = ANA(cpu, cpu_read_mem(cpu, readRegisterPair(cpu, HL)))
+                     + 3; // 7 cycles
+        break;
+      }
     case 0xa7: // NOLINT
       {        // ANA A
-        num_cycles = ANA(cpu, &cpu->a);
+        num_cycles = ANA(cpu, cpu->a);
+        break;
+      }
+    case 0xa8: // NOLINT
+      {        // XRA B
+        num_cycles = XRA(cpu, &cpu->b);
         break;
       }
     case 0xaf: // NOLINT
       {        // XRA A
         num_cycles = XRA(cpu, &cpu->a);
+        break;
+      }
+    case 0xb0: // NOLINT
+      {        // ORA B
+        num_cycles = ORA(cpu, cpu->b);
+        break;
+      }
+    case 0xb4: // NOLINT
+      {        // ORA H
+        num_cycles = ORA(cpu, cpu->h);
+        break;
+      }
+    case 0xb6: // NOLINT
+      {        // ORA M
+        num_cycles = ORA(cpu, cpu_read_mem(cpu, readRegisterPair(cpu, HL)))
+                     + 3; // 7 cycles
+        break;
+      }
+    case 0xb8: // NOLINT
+      {        // CMP B
+        num_cycles = CMP(cpu, cpu->b);
+        break;
+      }
+    case 0xbc: // NOLINT
+      {        // CMP H
+        num_cycles = CMP(cpu, cpu->h);
+        break;
+      }
+    case 0xbe: // NOLINT
+      {        // CMP M
+        num_cycles = CMP(cpu, cpu_read_mem(cpu, readRegisterPair(cpu, HL)))
+                     + 3; // 7 cyles
+        break;
+      }
+    case 0xc0:                          // NOLINT
+      {                                 // RNZ
+        if ((cpu->flags & FLAG_Z) == 0) // if Z reset, RET
+          {
+            return RET(cpu) + 1; // 11 cycles
+          }
+        num_cycles = 5; // NOLINT
         break;
       }
     case 0xc1: // NOLINT
@@ -976,6 +1120,16 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
     case 0xc3: // NOLINT
       {        // JMP
         return JMP(cpu);
+      }
+    case 0xc4: // NOLINT
+      {        // CNZ
+        if ((cpu->flags & FLAG_Z) == 0)
+          {
+            return CALL(cpu, getImmediate16BitValue(cpu));
+          }
+        cpu->pc += 2;
+        num_cycles = 11; // NOLINT
+        break;
       }
     case 0xc5: // NOLINT
       {        // PUSH B
@@ -1019,9 +1173,28 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         num_cycles = 10; // NOLINT
         break;
       }
+    case 0xcc: // NOLINT
+      {        // CZ ADDR
+        if ((cpu->flags & FLAG_Z) == FLAG_Z)
+          {
+            return CALL(cpu, getImmediate16BitValue(cpu));
+          }
+        cpu->pc += 2;
+        num_cycles = 11; // NOLINT
+        break;
+      }
     case 0xcd: // NOLINT
       {        // CALL ADDR
         return CALL(cpu, getImmediate16BitValue(cpu));
+      }
+    case 0xd0: // NOLINT
+      {        // RNC
+        if ((cpu->flags & FLAG_CY) == 0)
+          {
+            return RET(cpu) + 1; // 11 cycles
+          }
+        num_cycles = 5;
+        break;
       }
     case 0xd1: // NOLINT
       {        // POP D
@@ -1046,9 +1219,34 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         num_cycles = 10; // NOLINT
         break;
       }
+    case 0xd4: // NOLINT
+      {        // CNC ADDR
+        if ((cpu->flags & FLAG_CY) == 0)
+          {
+            return CALL(cpu, getImmediate16BitValue(cpu));
+          }
+        cpu->pc += 2;
+        num_cycles = 11; // NOLINT
+        break;
+      }
     case 0xd5: // NOLINT
       {        // PUSH D
         num_cycles = PUSH(cpu, DE);
+        break;
+      }
+    case 0xd6:                                                 // NOLINT
+      {                                                        // SUI d8
+        num_cycles = SUB(cpu, getImmediate8BitValue(cpu)) + 3; // 7 cycles
+        cpu->pc += 1;
+        break;
+      }
+    case 0xd8: // NOLINT
+      {        // RC
+        if ((cpu->flags & FLAG_CY) == FLAG_CY)
+          {
+            return RET(cpu) + 1; // 11 cycles
+          }
+        num_cycles = 5;
         break;
       }
     case 0xda:                                 // NOLINT
@@ -1067,6 +1265,12 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         printf("%u", port);
         cpu->pc += 1;
         num_cycles = 10; // NOLINT
+        break;
+      }
+    case 0xde: // NOLINT
+      {
+        num_cycles = SBI(cpu, getImmediate8BitValue(cpu));
+        cpu->pc += 1;
         break;
       }
     case 0xe1: // NOLINT
