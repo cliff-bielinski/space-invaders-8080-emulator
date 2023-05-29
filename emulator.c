@@ -1040,6 +1040,16 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         num_cycles = 10; // NOLINT
         break;
       }
+    case 0xd4: // NOLINT
+      {        // CNC ADDR
+        if ((cpu->flags & FLAG_CY) == 0)
+          {
+            return CALL(cpu, getImmediate16BitValue(cpu));
+          }
+        cpu->pc += 2;
+        num_cycles = 11; // NOLINT
+        break;
+      }
     case 0xd5: // NOLINT
       {        // PUSH D
         num_cycles = PUSH(cpu, DE);
