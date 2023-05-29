@@ -1074,6 +1074,19 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         num_cycles = POP(cpu, HL);
         break;
       }
+    case 0xe3: // NOLINT
+      {        // XTHL
+
+        uint8_t tmp = cpu->h;
+        cpu->h = cpu_read_mem(cpu, cpu->sp + 1);
+        cpu_write_mem(cpu, cpu->sp + 1, tmp);
+        tmp = cpu->l;
+        cpu->l = cpu_read_mem(cpu, cpu->sp);
+        cpu_write_mem(cpu, cpu->sp, tmp);
+
+        num_cycles = 18; // NOLINT
+        break;
+      }
     case 0xe5: // NOLINT
       {        // PUSH H
         num_cycles = PUSH(cpu, HL);
@@ -1091,6 +1104,11 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         cpu->pc += 1;
         num_cycles = 7; // NOLINT
         break;
+      }
+    case 0xe9: // NOLINT
+      {        // PCHL
+        cpu->pc = readRegisterPair(cpu, HL);
+        return 5; // NOLINT
       }
     case 0xeb: // NOLINT
       {        // XCHG
@@ -1117,6 +1135,29 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         break;
       }
       break;
+    case 0xf6: // NOLINT
+      {        // ORI d8
+        uint8_t immediate = getImmediate8BitValue(cpu);
+        cpu->a |= immediate;
+        update_zero_flag(cpu, cpu->a);
+        update_sign_flag(cpu, cpu->a);
+        update_parity_flag(cpu, cpu->a);
+        update_carry_flag(cpu, false);
+        cpu->flags &= ~FLAG_AC;
+        cpu->pc += 1;
+        num_cycles = 7; // NOLINT
+        break;
+      }
+    case 0xfa: // NOLINT
+      {        // JM
+        if (is_sign_flag_set(cpu))
+          {
+            return JMP(cpu);
+          }
+        cpu->pc += 2;    // NOLINT
+        num_cycles = 10; // NOLINT
+        break;
+      }
     case 0xfb: // NOLINT
       {        // EI
         cpu->interrupt_enabled = true;
