@@ -905,6 +905,11 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         num_cycles = CMP(cpu, cpu->h);
         break;
       }
+    case 0xbe: // NOLINT
+      {        // CMP M
+        num_cycles = CMP(cpu, cpu_read_mem(cpu, readRegisterPair(cpu, HL))) + 3; // 7 cyles
+        break;
+      }
     case 0xc1: // NOLINT
       {        // POP B
         num_cycles = POP(cpu, BC);

@@ -1991,7 +1991,7 @@ test_opcode_0xb8(void) // NOLINT
 
 void
 test_opcode_0xbc(void) // NOLINT
-{                      // CMP B
+{                      // CMP H
   // setup
   i8080 cpu;
   cpu_init(&cpu);
@@ -2031,6 +2031,54 @@ test_opcode_0xbc(void) // NOLINT
   CU_ASSERT((cpu.flags & FLAG_Z) == FLAG_Z);
   CU_ASSERT((cpu.flags & FLAG_P) == FLAG_P);
   CU_ASSERT((cpu.flags & FLAG_CY) == 0);
+}
+
+void
+test_opcode_0xbe(void) // NOLINT
+{                      // CMP M
+  // setup
+  i8080 cpu;
+  cpu_init(&cpu);
+  /* M < A */
+  cpu.a = 0x0A;
+  cpu.h = 0xAA;
+  cpu.l = 0xBB;
+
+  cpu_write_mem(&cpu, 0xAABB, 0x05);
+
+  int code_found = execute_instruction(&cpu, 0xbe); // NOLINT
+
+  CU_ASSERT(code_found == 7);
+  CU_ASSERT(1 == cpu.pc);
+  CU_ASSERT((cpu.flags & FLAG_S) == 0);
+  CU_ASSERT((cpu.flags & FLAG_Z) == 0);
+  CU_ASSERT((cpu.flags & FLAG_P) == FLAG_P);
+  CU_ASSERT((cpu.flags & FLAG_CY) == 0);
+
+  /* Reg > A*/
+  cpu.a = 0x02;
+
+  code_found = execute_instruction(&cpu, 0xbe); // NOLINT
+  CU_ASSERT(code_found == 7);
+  CU_ASSERT(2 == cpu.pc);
+  CU_ASSERT((cpu.flags & FLAG_S) == FLAG_S);
+  CU_ASSERT((cpu.flags & FLAG_Z) == 0);
+  CU_ASSERT((cpu.flags & FLAG_P) == 0);
+  CU_ASSERT((cpu.flags & FLAG_CY) == FLAG_CY);
+
+  /* Reg = A*/
+  cpu.a = 0x02;
+  cpu_write_mem(&cpu, 0xAABB, 0x02);
+
+  code_found = execute_instruction(&cpu, 0xbe); // NOLINT
+  CU_ASSERT(code_found == 7);
+  CU_ASSERT(3 == cpu.pc);
+  CU_ASSERT((cpu.flags & FLAG_S) == 0);
+  CU_ASSERT((cpu.flags & FLAG_Z) == FLAG_Z);
+  CU_ASSERT((cpu.flags & FLAG_P) == FLAG_P);
+  CU_ASSERT((cpu.flags & FLAG_CY) == 0);
+
+  cpu_write_mem(&cpu, 0xAABB, 0x00);
 }
 
 void
@@ -2711,6 +2759,9 @@ main(void)
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0xbc()",
                          test_opcode_0xbc))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0xbe()",
+                         test_opcode_0xbe))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0xc2()",
                          test_opcode_0xc2))
