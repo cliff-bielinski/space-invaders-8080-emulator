@@ -67,7 +67,9 @@ io_loop(i8080 *cpu) // NOLINT(readability-function-cognitive-complexity)
             }
           else if (key == SDL_SCANCODE_ESCAPE)
             {
-              break;
+              SDL_Event quit_event;
+              quit_event.type = SDL_QUIT;
+              SDL_PushEvent(&quit_event);
               //
               //
               //
