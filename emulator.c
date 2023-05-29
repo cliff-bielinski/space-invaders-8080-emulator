@@ -113,6 +113,27 @@ DAD(i8080 *cpu, int pair)
   return 10; // NOLINT
 }
 
+// Add reg
+int
+add_reg_accum(i8080 *cpu, uint8_t value)
+{
+  uint16_t result = cpu->a + value;
+  update_sign_flag(cpu, result);
+  update_zero_flag(cpu, result);
+  update_aux_carry_flag(cpu, cpu->a, value);
+  update_parity_flag(cpu, result);
+  if (result > MAX_8_BIT_VALUE)
+    {
+      update_carry_flag(cpu, true);
+    }
+  else
+    {
+      update_carry_flag(cpu, false);
+    }
+  cpu->a = (uint8_t)result;
+  return 4; // NOLINT
+}
+
 // Decrement Register
 int
 DCR(i8080 *cpu, uint8_t *reg)
@@ -797,6 +818,56 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         cpu->pc += 1;
         break;
       }
+    case 0x40: // NOLINT
+      {        // MOV B,B
+        num_cycles = MOV(&cpu->b, &cpu->b);
+        break;
+      }
+    case 0x41: // NOLINT
+      {        // MOV B,C
+        num_cycles = MOV(&cpu->b, &cpu->c);
+        break;
+      }
+    case 0x42: // NOLINT
+      {        // MOV B,D
+        num_cycles = MOV(&cpu->b, &cpu->d);
+        break;
+      }
+    case 0x43: // NOLINT
+      {        // MOV B,E
+        num_cycles = MOV(&cpu->b, &cpu->e);
+        break;
+      }
+    case 0x44: // NOLINT
+      {        // MOV B,H
+        num_cycles = MOV(&cpu->b, &cpu->h);
+        break;
+      }
+    case 0x46: // NOLINT
+      {        // MOV B,M
+        num_cycles = MOV_FROM_MEM(cpu, &cpu->b);
+        break;
+      }
+    case 0x47: // NOLINT
+      {        // MOV B,A
+        num_cycles = MOV(&cpu->b, &cpu->a);
+        break;
+      }
+    case 0x48: // NOLINT
+      {        // MOV C,B
+        num_cycles = MOV(&cpu->c, &cpu->b);
+        break;
+      }
+    case 0x4e: // NOLINT
+      {        // MOV C,M
+        num_cycles = MOV_FROM_MEM(cpu, &cpu->c);
+        break;
+      }
+    case 0x4f: // NOLINT
+      {        // MOV C,A
+        num_cycles = MOV(&cpu->c, &cpu->a);
+        break;
+      }
     case 0x56: // NOLINT
       {        // MOV D,M
         num_cycles = MOV_FROM_MEM(cpu, &cpu->d);
@@ -817,6 +888,21 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         num_cycles = MOV(&cpu->e, &cpu->a);
         break;
       }
+    case 0x61: // NOLINT
+      {        // MOV H,C
+        num_cycles = MOV(&cpu->h, &cpu->c);
+        break;
+      }
+    case 0x64: // NOLINT
+      {        // MOV H,H
+        num_cycles = MOV(&cpu->h, &cpu->h);
+        break;
+      }
+    case 0x65: // NOLINT
+      {        // MOV H,L
+        num_cycles = MOV(&cpu->h, &cpu->l);
+        break;
+      }
     case 0x66: // NOLINT
       {        // MOV H,M
         num_cycles = MOV_FROM_MEM(cpu, &cpu->h);
@@ -827,14 +913,54 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         num_cycles = MOV(&cpu->h, &cpu->a);
         break;
       }
+    case 0x68: // NOLINT
+      {        // MOV L,B
+        num_cycles = MOV(&cpu->l, &cpu->b);
+        break;
+      }
+    case 0x69: // NOLINT
+      {        // MOV L,C
+        num_cycles = MOV(&cpu->l, &cpu->c);
+        break;
+      }
     case 0x6f: // NOLINT
       {        // MOV L,A
         num_cycles = MOV(&cpu->l, &cpu->a);
         break;
       }
+    case 0x70: // NOLINT
+      {        // MOV M,B
+        num_cycles = MOV_TO_MEM(cpu, &cpu->b);
+        break;
+      }
+    case 0x71: // NOLINT
+      {        // MOV M,C
+        num_cycles = MOV_TO_MEM(cpu, &cpu->c);
+        break;
+      }
+    case 0x72: // NOLINT
+      {        // MOV M,D
+        num_cycles = MOV_TO_MEM(cpu, &cpu->d);
+        break;
+      }
+    case 0x73: // NOLINT
+      {        // MOV M,E
+        num_cycles = MOV_TO_MEM(cpu, &cpu->e);
+        break;
+      }
     case 0x77: // NOLINT
       {        // MOV M,A
         num_cycles = MOV_TO_MEM(cpu, &cpu->a);
+        break;
+      }
+    case 0x78: // NOLINT
+      {        // MOV A,B
+        num_cycles = MOV(&cpu->a, &cpu->b);
+        break;
+      }
+    case 0x79: // NOLINT
+      {        // MOV A,C
+        num_cycles = MOV(&cpu->a, &cpu->c);
         break;
       }
     case 0x7a: // NOLINT
@@ -852,9 +978,46 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         num_cycles = MOV(&cpu->a, &cpu->h);
         break;
       }
+    case 0x7d: // NOLINT
+      {        // MOV A,L
+        num_cycles = MOV(&cpu->a, &cpu->l);
+        break;
+      }
     case 0x7e: // NOLINT
       {        // MOV A,M
         num_cycles = MOV_FROM_MEM(cpu, &cpu->a);
+        break;
+      }
+    case 0x80: // NOLINT
+      {        // ADD B
+        num_cycles = add_reg_accum(cpu, cpu->b);
+        break;
+      }
+    case 0x81: // NOLINT
+      {        // ADD C
+        num_cycles = add_reg_accum(cpu, cpu->c);
+        break;
+      }
+    case 0x82: // NOLINT
+      {        // ADD D
+        num_cycles = add_reg_accum(cpu, cpu->d);
+        break;
+      }
+    case 0x83: // NOLINT
+      {        // ADD E
+        num_cycles = add_reg_accum(cpu, cpu->e);
+        break;
+      }
+    case 0x85: // NOLINT
+      {        // ADD L
+        num_cycles = add_reg_accum(cpu, cpu->l);
+        break;
+      }
+    case 0x86: // NOLINT
+      {        // ADD M
+        num_cycles
+            = add_reg_accum(cpu, cpu_read_mem(cpu, readRegisterPair(cpu, HL)))
+              + 3;
         break;
       }
     case 0x8a: // NOLINT
