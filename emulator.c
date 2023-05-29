@@ -275,6 +275,24 @@ RET(i8080 *cpu)
   return 10; // NOLINT
 }
 
+// Subtract Immediate Value with Borrow
+int
+SBI(i8080 *cpu, u_int8_t value)
+{
+  // get carry bit and add A, register and CY together
+  uint8_t carry = ((cpu->flags & FLAG_CY) == FLAG_CY);
+
+  // set A to sum and set flags
+  update_aux_carry_flag(cpu, cpu->a, (~value + carry));
+  update_carry_flag(cpu, cpu->a < (value + carry));
+  cpu->a = cpu->a - (value + carry);
+  update_zero_flag(cpu, cpu->a);
+  update_sign_flag(cpu, cpu->a);
+  update_parity_flag(cpu, cpu->a);
+  
+  return 7; // NOLINT
+}
+
 // Store Accumulator
 int
 STAX(i8080 *cpu, int pair)
@@ -1084,6 +1102,12 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         printf("%u", port);
         cpu->pc += 1;
         num_cycles = 10; // NOLINT
+        break;
+      }
+    case 0xde: // NOLINT
+      {
+        num_cycles = SBI(cpu, getImmediate8BitValue(cpu));
+        cpu->pc += 1;
         break;
       }
     case 0xe1: // NOLINT

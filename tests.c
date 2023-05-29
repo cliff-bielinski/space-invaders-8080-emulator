@@ -2606,6 +2606,48 @@ test_opcode_0xd8(void) // NOLINT
 }
 
 void
+test_opcode_0xde(void) // NOLINT
+{
+  i8080 cpu;
+  cpu_init(&cpu);
+
+  cpu.a = 0x00;
+  cpu.flags = 0x00;
+  cpu_write_mem(&cpu, 0x0001, 0x01);
+
+  int code_found = execute_instruction(&cpu, 0xde); // NOLINT
+
+  CU_ASSERT(code_found == 7);
+  CU_ASSERT(cpu.a == 0xFF);
+  CU_ASSERT(cpu.pc == 0x0002);
+  CU_ASSERT((cpu.flags & FLAG_CY) == FLAG_CY);
+  CU_ASSERT((cpu.flags & FLAG_S) == FLAG_S);
+  CU_ASSERT((cpu.flags & FLAG_Z) == 0);
+  CU_ASSERT((cpu.flags & FLAG_P) == FLAG_P);
+  CU_ASSERT((cpu.flags & FLAG_AC) == 0);
+
+  cpu.a = 0x00;
+  cpu.flags |= FLAG_CY;
+  cpu_write_mem(&cpu, 0x0003, 0x01);
+
+  code_found = execute_instruction(&cpu, 0xde); // NOLINT
+
+  CU_ASSERT(code_found == 7);
+  CU_ASSERT(cpu.a == 0xFE);
+  CU_ASSERT(cpu.pc == 0x0004);
+  CU_ASSERT((cpu.flags & FLAG_CY) == FLAG_CY);
+  CU_ASSERT((cpu.flags & FLAG_S) == FLAG_S);
+  CU_ASSERT((cpu.flags & FLAG_Z) == 0);
+  CU_ASSERT((cpu.flags & FLAG_P) == 0);
+  CU_ASSERT((cpu.flags & FLAG_AC) == 0);
+
+
+  // clean up
+  cpu_write_mem(&cpu, 0x0001, 0x00);
+  cpu_write_mem(&cpu, 0x0003, 0x00);
+}
+
+void
 test_opcode_0xeb(void) // NOLINT
 {
   i8080 cpu;
@@ -3018,6 +3060,9 @@ main(void)
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0xda()",
                          test_opcode_0xda))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0xde()",
+                         test_opcode_0xde))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0xe5()",
                          test_opcode_0xe5))
