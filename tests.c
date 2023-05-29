@@ -2258,8 +2258,8 @@ test_opcode_0x86(void)
   cpu_init(&cpu);
 
   cpu.a = 0xF;
-  cpu.pc = 0x2000;
-  cpu_write_mem(&cpu, cpu.pc + 1, 0xF);
+  writeRegisterPair(&cpu, 3, 0xAABB);
+  cpu_write_mem(&cpu, 0xAABB, 0xF);
 
   int code_found = execute_instruction(&cpu, 0x86);
   CU_ASSERT(code_found >= 0);
@@ -2271,8 +2271,8 @@ test_opcode_0x86(void)
   CU_ASSERT_EQUAL((cpu.flags & FLAG_CY), 0);
 
   cpu.a = 0x9;
-  cpu.pc = 0x2000;
-  cpu_write_mem(&cpu, cpu.pc + 1, MAX_8_BIT_VALUE);
+  writeRegisterPair(&cpu, 3, 0xAABB);
+  cpu_write_mem(&cpu, 0xAABB, MAX_8_BIT_VALUE);
 
   // Only 8 bits are kept from addition, the rest discarded and cy flag is set.
   code_found = execute_instruction(&cpu, 0x86);
@@ -2641,20 +2641,15 @@ main(void)
           == CU_add_test(pSuite, "test_handle_interrupt_interrupts_disabled()",
                          test_handle_interrupt_interrupts_disabled))
       || (NULL
-          == CU_add_test(pSuite, "test of test_opcode_0x80",
-                         test_opcode_0x80))
+          == CU_add_test(pSuite, "test of test_opcode_0x80", test_opcode_0x80))
       || (NULL
-          == CU_add_test(pSuite, "test of test_opcode_0x81",
-                         test_opcode_0x81))
+          == CU_add_test(pSuite, "test of test_opcode_0x81", test_opcode_0x81))
       || (NULL
-          == CU_add_test(pSuite, "test of test_opcode_0x82",
-                         test_opcode_0x82))
+          == CU_add_test(pSuite, "test of test_opcode_0x82", test_opcode_0x82))
       || (NULL
-          == CU_add_test(pSuite, "test of test_opcode_0x83",
-                         test_opcode_0x83))
+          == CU_add_test(pSuite, "test of test_opcode_0x83", test_opcode_0x83))
       || (NULL
-          == CU_add_test(pSuite, "test of test_opcode_0x85",
-                         test_opcode_0x85))
+          == CU_add_test(pSuite, "test of test_opcode_0x85", test_opcode_0x85))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x86",
                          test_opcode_0x86)))

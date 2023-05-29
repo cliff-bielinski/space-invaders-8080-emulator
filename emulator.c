@@ -833,22 +833,9 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       }
     case 0x86: // NOLINT
       {        // ADD M
-        uint8_t value = cpu_read_mem(cpu, cpu->pc + 1);
-        uint16_t result = cpu->a + value;
-        update_sign_flag(cpu, result);
-        update_zero_flag(cpu, result);
-        update_aux_carry_flag(cpu, cpu->a, value);
-        update_parity_flag(cpu, result);
-        if (result > MAX_8_BIT_VALUE)
-          {
-            update_carry_flag(cpu, true);
-          }
-        else
-          {
-            update_carry_flag(cpu, false);
-          }
-        cpu->a = (uint8_t)result;
-        num_cycles = 7; // NOLINT
+        num_cycles
+            = add_reg_accum(cpu, cpu_read_mem(cpu, readRegisterPair(cpu, HL)))
+              + 3;
         break;
       }
     case 0xa7: // NOLINT
