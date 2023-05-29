@@ -19,7 +19,7 @@ static bool should_quit = false;
 bool colored_screen;
 
 void
-io_loop(i8080 *cpu) // NOLINT(readability-function-cognitive-complexity)
+io_processor(i8080 *cpu) // NOLINT(readability-function-cognitive-complexity)
 {
 
   has_event = SDL_PollEvent(&e) != 0;
@@ -386,7 +386,7 @@ main(int argc, char *argv[])
 
           // 3 Update system state for display, input, and sound
           // Update graphics after VBLANK int
-          io_loop(&cpu);
+          io_processor(&cpu);
           update_graphics(&cpu, buffer, screen_surface);
           SDL_UpdateWindowSurface(window);
 
