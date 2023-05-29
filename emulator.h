@@ -96,6 +96,8 @@ uint16_t readRegisterPair(i8080 *cpu, int pair);
 uint8_t getImmediate8BitValue(i8080 *cpu);
 uint16_t getImmediate16BitValue(i8080 *cpu);
 
+static uint8_t port_in(i8080 *cpu, uint8_t port);
+static void port_out(i8080 *cpu, uint8_t port, uint8_t value);
 // Prototypes for Flags
 
 // Parity Flag
