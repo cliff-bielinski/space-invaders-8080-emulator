@@ -2082,6 +2082,37 @@ test_opcode_0xbe(void) // NOLINT
 }
 
 void
+test_opcode_0xc0(void) // NOLINT
+{
+  i8080 cpu;
+  cpu_init(&cpu);
+
+  // write memory address in stack pointer
+  cpu_write_mem(&cpu, 0x0001, 0xAA); // NOLINT
+  cpu_write_mem(&cpu, 0x0002, 0xBB); // NOLINT
+
+  cpu.sp = 0x0001;
+
+  int code_found = execute_instruction(&cpu, 0xc0); // NOLINT
+
+  CU_ASSERT(code_found == 11);
+  CU_ASSERT(cpu.pc == 0xBBAA);
+  CU_ASSERT(cpu.sp == 0x0003);
+
+  cpu.flags |= FLAG_Z;
+
+  code_found = execute_instruction(&cpu, 0xc0); // NOLINT
+
+  CU_ASSERT(code_found == 5);
+  CU_ASSERT(cpu.pc == 0xBBAB);
+  CU_ASSERT(cpu.sp == 0x0003);
+
+  // clean up
+  cpu_write_mem(&cpu, 0x0001, 0x00);
+  cpu_write_mem(&cpu, 0x0002, 0x00);
+}
+
+void
 test_opcode_0xc5(void) // NOLINT
 {                      // PUSH B
 
@@ -2762,6 +2793,9 @@ main(void)
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0xbe()",
                          test_opcode_0xbe))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0xc0()",
+                         test_opcode_0xc0))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0xc2()",
                          test_opcode_0xc2))
