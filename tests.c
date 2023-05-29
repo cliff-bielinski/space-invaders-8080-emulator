@@ -1439,6 +1439,38 @@ test_opcode_0xc8(void)
 }
 
 void
+test_opcode_0xcc(void) // NOLINT
+{
+  i8080 cpu;
+  cpu_init(&cpu);
+
+  cpu.pc = 0xABCD;                       // NOLINT
+  cpu.sp = 0xDCBA;                       // NOLINT
+  cpu.flags |= FLAG_Z;
+  uint16_t temp = cpu.sp;                // Holds original sp addr
+  cpu_write_mem(&cpu, cpu.pc + 1, 0xFE); // NOLINT
+  cpu_write_mem(&cpu, cpu.pc + 2, 0xEF); // NOLINT
+
+  int code_found = execute_instruction(&cpu, 0xcc); // NOLINT
+
+  CU_ASSERT(code_found == 17);
+  CU_ASSERT_EQUAL(cpu_read_mem(&cpu, temp - 1), 0xAB); // NOLINT
+  CU_ASSERT_EQUAL(cpu_read_mem(&cpu, temp - 2), 0xD0); // NOLINT
+  CU_ASSERT_EQUAL(cpu.sp, 0xDCBA - 2);                 // NOLINT
+  CU_ASSERT_EQUAL(cpu.pc, 0xEFFE);                     // NOLINT
+
+  cpu.flags = 0x00;
+  code_found = execute_instruction(&cpu, 0xcc);
+
+  CU_ASSERT(code_found == 11);
+  CU_ASSERT_EQUAL(cpu.sp, 0xDCBA - 2);
+  CU_ASSERT_EQUAL(cpu.pc, 0xEFFE + 3);
+
+  cpu_write_mem(&cpu, 0xABCE, 0x00); // NOLINT
+  cpu_write_mem(&cpu, 0xABCF, 0x00); // NOLINT
+}
+
+void
 test_opcode_0x0a(void) // NOLINT
 {                      // LDAX B
 
@@ -2840,6 +2872,9 @@ main(void)
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0xc9()",
                          test_opcode_0xc9))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0xcc()",
+                         test_opcode_0xcc))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0xd1()",
                          test_opcode_0xd1))

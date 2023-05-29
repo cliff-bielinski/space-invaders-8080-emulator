@@ -994,6 +994,16 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         num_cycles = 10; // NOLINT
         break;
       }
+    case 0xcc: // NOLINT
+      {        // CZ ADDR
+        if ((cpu->flags & FLAG_Z) == FLAG_Z)
+          {
+            return CALL(cpu, getImmediate16BitValue(cpu));
+          }
+        cpu->pc += 2;
+        num_cycles = 11; // NOLINT
+        break;
+      }
     case 0xcd: // NOLINT
       {        // CALL ADDR
         return CALL(cpu, getImmediate16BitValue(cpu));
