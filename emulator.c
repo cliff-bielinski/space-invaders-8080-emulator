@@ -1008,6 +1008,15 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       {        // CALL ADDR
         return CALL(cpu, getImmediate16BitValue(cpu));
       }
+    case 0xd0: // NOLINT
+      {        // RNC
+        if ((cpu->flags & FLAG_CY) == 0)
+          {
+            return RET(cpu) + 1; // 11 cycles
+          }
+        num_cycles = 5;
+        break;
+      }
     case 0xd1: // NOLINT
       {        // POP D
         num_cycles = POP(cpu, DE);
