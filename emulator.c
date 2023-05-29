@@ -289,9 +289,10 @@ int
 SUB(i8080 *cpu, const uint8_t *reg)
 {
   // set flags and subtract register value from accumulator
-  uint16_t result = cpu->a + (u_int8_t)~*reg + 1;
-  update_aux_carry_flag(cpu, cpu->a, ((u_int8_t)~*reg + 1));
-  update_carry_flag(cpu, result <= MAX_8_BIT_VALUE); // if NO carry out, then carry is set
+  uint16_t result = cpu->a + (u_int8_t) ~*reg + 1;
+  update_aux_carry_flag(cpu, cpu->a, ((u_int8_t) ~*reg + 1));
+  update_carry_flag(
+      cpu, result <= MAX_8_BIT_VALUE); // if NO carry out, then carry is set
   cpu->a = (uint8_t)result;
   update_zero_flag(cpu, cpu->a);
   update_sign_flag(cpu, cpu->a);
@@ -862,7 +863,8 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       }
     case 0xa6: // NOLINT
       {        // ANA M
-        num_cycles = ANA(cpu, cpu_read_mem(cpu, readRegisterPair(cpu, HL))) + 3; // 7 cycles
+        num_cycles = ANA(cpu, cpu_read_mem(cpu, readRegisterPair(cpu, HL)))
+                     + 3; // 7 cycles
         break;
       }
     case 0xa7: // NOLINT
@@ -892,7 +894,8 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       }
     case 0xb6: // NOLINT
       {        // ORA M
-        num_cycles = ORA(cpu, cpu_read_mem(cpu, readRegisterPair(cpu, HL))) + 3; // 7 cycles
+        num_cycles = ORA(cpu, cpu_read_mem(cpu, readRegisterPair(cpu, HL)))
+                     + 3; // 7 cycles
         break;
       }
     case 0xb8: // NOLINT
@@ -907,11 +910,12 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       }
     case 0xbe: // NOLINT
       {        // CMP M
-        num_cycles = CMP(cpu, cpu_read_mem(cpu, readRegisterPair(cpu, HL))) + 3; // 7 cyles
+        num_cycles = CMP(cpu, cpu_read_mem(cpu, readRegisterPair(cpu, HL)))
+                     + 3; // 7 cyles
         break;
       }
-    case 0xc0: // NOLINT
-      {        // RNZ
+    case 0xc0:                          // NOLINT
+      {                                 // RNZ
         if ((cpu->flags & FLAG_Z) == 0) // if Z reset, RET
           {
             return RET(cpu) + 1; // 11 cycles

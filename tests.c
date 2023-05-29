@@ -1735,7 +1735,7 @@ test_opcode_0x8a(void) // NOLINT
 
 void
 test_opcode_0x97(void) // NOLINT
-{                      
+{
   // setup
   i8080 cpu;
   cpu_init(&cpu);
