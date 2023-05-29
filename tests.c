@@ -1920,6 +1920,32 @@ test_opcode_0xb4(void) // NOLINT
 }
 
 void
+test_opcode_0xb6(void) // NOLINT
+{                      // ORA M
+  // setup
+  i8080 cpu;
+  cpu_init(&cpu);
+  cpu.a = 0x33;
+  cpu.h = 0xAA;
+  cpu.l = 0xBB;
+  cpu_write_mem(&cpu, 0xAABB, 0x0F);
+
+  // execute
+  int code_found = execute_instruction(&cpu, 0xb6); // NOLINT
+
+  // verify
+  CU_ASSERT(code_found == 4);
+  CU_ASSERT(1 == cpu.pc);
+  CU_ASSERT(cpu.a == 0x3F);
+  CU_ASSERT((cpu.flags & FLAG_S) == 0);
+  CU_ASSERT((cpu.flags & FLAG_Z) == 0);
+  CU_ASSERT((cpu.flags & FLAG_P) == FLAG_P);
+  CU_ASSERT((cpu.flags & FLAG_CY) == 0);
+
+  cpu_write_mem(&cpu, 0xAABB, 0x00);
+}
+
+void
 test_opcode_0xc5(void) // NOLINT
 {                      // PUSH B
 
@@ -2588,6 +2614,9 @@ main(void)
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0xb4()",
                          test_opcode_0xb4))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0xb6()",
+                         test_opcode_0xb6))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0xc2()",
                          test_opcode_0xc2))
