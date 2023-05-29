@@ -95,11 +95,14 @@ add_reg_accum(i8080 *cpu, uint8_t value)
   update_zero_flag(cpu, result);
   update_aux_carry_flag(cpu, cpu->a, value);
   update_parity_flag(cpu, result);
-  if (result > MAX_8_BIT_VALUE) {
-    update_carry_flag(cpu, true);
-  } else {
-    update_carry_flag(cpu, false);
-  }
+  if (result > MAX_8_BIT_VALUE)
+    {
+      update_carry_flag(cpu, true);
+    }
+  else
+    {
+      update_carry_flag(cpu, false);
+    }
   cpu->a = (uint8_t)result;
   return 4; // NOLINT
 }
@@ -836,11 +839,14 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         update_zero_flag(cpu, result);
         update_aux_carry_flag(cpu, cpu->a, value);
         update_parity_flag(cpu, result);
-        if (result > MAX_8_BIT_VALUE) {
-          update_carry_flag(cpu, true);
-        } else {
-          update_carry_flag(cpu, false);
-        }
+        if (result > MAX_8_BIT_VALUE)
+          {
+            update_carry_flag(cpu, true);
+          }
+        else
+          {
+            update_carry_flag(cpu, false);
+          }
         cpu->a = (uint8_t)result;
         num_cycles = 7; // NOLINT
         break;
