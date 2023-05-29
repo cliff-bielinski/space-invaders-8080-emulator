@@ -343,6 +343,7 @@ main(int argc, char *argv[])
 
           // run second half of tick cycles
           cycle_offset = run_cpu(&cpu, num_cycles - abs(cycle_offset));
+          io_processor(&cpu);
 
           // second interrupt
           handle_interrupt(&cpu, 0x02);
