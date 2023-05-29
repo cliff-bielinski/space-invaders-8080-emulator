@@ -86,6 +86,24 @@ DAD(i8080 *cpu, int pair)
   return 10; // NOLINT
 }
 
+// Add reg
+int
+add_reg_accum(i8080 *cpu, uint8_t value)
+{
+  uint16_t result = cpu->a + value;
+  update_sign_flag(cpu, result);
+  update_zero_flag(cpu, result);
+  update_aux_carry_flag(cpu, cpu->a, value);
+  update_parity_flag(cpu, result);
+  if (result > MAX_8_BIT_VALUE) {
+    update_carry_flag(cpu, true);
+  } else {
+    update_carry_flag(cpu, false);
+  }
+  cpu->a = (uint8_t)result;
+  return 4; // NOLINT
+}
+
 // Decrement Register
 int
 DCR(i8080 *cpu, uint8_t *reg)
@@ -783,6 +801,48 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
     case 0x7e: // NOLINT
       {        // MOV A,M
         num_cycles = MOV_FROM_MEM(cpu, &cpu->a);
+        break;
+      }
+    case 0x80: // NOLINT
+      {        // ADD B
+        num_cycles = add_reg_accum(cpu, cpu->b);
+        break;
+      }
+    case 0x81: // NOLINT
+      {        // ADD C
+        num_cycles = add_reg_accum(cpu, cpu->c);
+        break;
+      }
+    case 0x82: // NOLINT
+      {        // ADD D
+        num_cycles = add_reg_accum(cpu, cpu->d);
+        break;
+      }
+    case 0x83: // NOLINT
+      {        // ADD E
+        num_cycles = add_reg_accum(cpu, cpu->e);
+        break;
+      }
+    case 0x85: // NOLINT
+      {        // ADD L
+        num_cycles = add_reg_accum(cpu, cpu->l);
+        break;
+      }
+    case 0x86: // NOLINT
+      {        // ADD M
+        uint8_t value = cpu_read_mem(cpu, cpu->pc + 1);
+        uint16_t result = cpu->a + value;
+        update_sign_flag(cpu, result);
+        update_zero_flag(cpu, result);
+        update_aux_carry_flag(cpu, cpu->a, value);
+        update_parity_flag(cpu, result);
+        if (result > MAX_8_BIT_VALUE) {
+          update_carry_flag(cpu, true);
+        } else {
+          update_carry_flag(cpu, false);
+        }
+        cpu->a = (uint8_t)result;
+        num_cycles = 7; // NOLINT
         break;
       }
     case 0xa7: // NOLINT
