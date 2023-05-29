@@ -12,6 +12,7 @@
 static SDL_Renderer *renderer = NULL;
 static SDL_Texture *texture = NULL;
 static SDL_Event e;
+bool has_event = false;
 
 static int speed = 1;
 static bool should_quit = false;
@@ -22,10 +23,9 @@ static uint32_t dt = 0;
 void
 io_loop(i8080 *cpu) // NOLINT(readability-function-cognitive-complexity)
 {
-  curr_time = SDL_GetTicks();
-  dt = curr_time - last_time;
 
-  while (SDL_PollEvent(&e) != 0) // NOLINT
+  has_event = SDL_PollEvent(&e) != 0;
+  if (has_event) // NOLINT
     {
       if (e.type == SDL_QUIT)
         {
@@ -208,11 +208,11 @@ io_loop(i8080 *cpu) // NOLINT(readability-function-cognitive-complexity)
     }
 
   // update
+  has_event = false;
   SDL_RenderClear(renderer);
   SDL_RenderCopy(renderer, texture, NULL, NULL);
   SDL_RenderPresent(renderer);
 
-  last_time = curr_time;
 }
 
 #define CLOCK_SPEED_MS 2000
@@ -343,6 +343,12 @@ main(int argc, char *argv[])
                                         0, 0, 0);
         }
     }
+  renderer = SDL_CreateRenderer(
+    window, -1, SDL_RENDERER,ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+  if (renderer == NULL) {
+  SDL_LOG("unable to create renderer: %s", SDL_GetError());
+  return 1;
+  }
   SDL_Joystick *joystick = NULL;
   if (SDL_NumJoysticks() > 0)
     {
