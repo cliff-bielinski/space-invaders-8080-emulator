@@ -344,7 +344,7 @@ main(int argc, char *argv[])
         }
     }
   renderer = SDL_CreateRenderer(
-    window, -1, SDL_RENDERER,ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
   if (renderer == NULL) {
   SDL_LOG("unable to create renderer: %s", SDL_GetError());
   return 1;
