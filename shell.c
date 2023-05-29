@@ -16,9 +16,6 @@ bool has_event = false;
 
 static int speed = 1;
 static bool should_quit = false;
-static uint32_t curr_time = 0;
-static uint32_t last_time = 0;
-static uint32_t dt = 0;
 bool colored_screen;
 
 void
@@ -71,10 +68,6 @@ io_loop(i8080 *cpu) // NOLINT(readability-function-cognitive-complexity)
               SDL_Event quit_event;
               quit_event.type = SDL_QUIT;
               SDL_PushEvent(&quit_event);
-              //
-              //
-              //
-              //
             }
           else if (key == SDL_SCANCODE_TAB)
             {
@@ -319,7 +312,7 @@ main(int argc, char *argv[])
   // The surface contained by the window
 
   // Initialize SDL
-  if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_JOYSTICK) < 0)
+  if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_JOYSTICK | SDL_INIT_EVENTS) < 0)
     {
       fprintf(stderr, "SDL could not initialize! SDL_Error: %s\n",
               SDL_GetError());
@@ -350,7 +343,7 @@ main(int argc, char *argv[])
   renderer = SDL_CreateRenderer(
     window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
   if (renderer == NULL) {
-  SDL_LOG("unable to create renderer: %s", SDL_GetError());
+  SDL_Log("unable to create renderer: %s", SDL_GetError());
   return 1;
   }
   SDL_Joystick *joystick = NULL;
