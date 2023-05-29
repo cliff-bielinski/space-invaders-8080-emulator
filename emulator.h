@@ -7,8 +7,8 @@
 // SDL Files
 #include <SDL2/SDL.h>
 
-//#include "SDL_nmix.h"
-//#include "SDL_nmix_file.h"
+// #include "SDL_nmix.h"
+// #include "SDL_nmix_file.h"
 
 // Flags Defined
 #define FLAG_S 0x80  // NOLINT
@@ -96,7 +96,6 @@ void writeRegisterPair(i8080 *cpu, int pair, uint16_t value);
 uint16_t readRegisterPair(i8080 *cpu, int pair);
 uint8_t getImmediate8BitValue(i8080 *cpu);
 uint16_t getImmediate16BitValue(i8080 *cpu);
-
 
 // Prototypes for Flags
 

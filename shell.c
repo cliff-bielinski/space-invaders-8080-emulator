@@ -9,8 +9,8 @@
 #include <unistd.h>
 #define JOYSTICK_DEAD_ZONE 8000
 
-//static SDL_Renderer *renderer = NULL;
-//static SDL_Texture *texture = NULL;
+// static SDL_Renderer *renderer = NULL;
+// static SDL_Texture *texture = NULL;
 static SDL_Event e;
 bool has_event = false;
 
@@ -141,7 +141,7 @@ io_processor(i8080 *cpu) // NOLINT(readability-function-cognitive-complexity)
             {
               if (e.jbutton.button == 1) // NOLINT // Coin
                 {
-                  cpu->port1 |= 1 << 0; // NOLINT 
+                  cpu->port1 |= 1 << 0; // NOLINT
                 }
               else if (e.jbutton.button == 0) // NOLINT // Shoot
                 {
@@ -281,7 +281,9 @@ main(int argc, char *argv[])
   // The surface contained by the window
 
   // Initialize SDL
-  if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_JOYSTICK | SDL_INIT_EVENTS) < 0)
+  if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_JOYSTICK
+               | SDL_INIT_EVENTS)
+      < 0)
     {
       fprintf(stderr, "SDL could not initialize! SDL_Error: %s\n",
               SDL_GetError());
