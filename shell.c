@@ -265,29 +265,6 @@ main(int argc, char *argv[])
                       "one non-option argument (rom_filepath).\n");
       exit(EXIT_FAILURE);
     }
-
-  i8080 cpu;
-  cpu_init(&cpu);
-
-  // NOLINTNEXTLINE
-  uint16_t load_address = 0x0000;
-
-  // Load ROM into memory
-  if (!cpu_load_file(&cpu, argv[optind], load_address))
-    {
-      fprintf(stderr, "Failed to load ROM\n");
-      exit(EXIT_FAILURE);
-    }
-
-  // start timer
-  uint64_t last_tick = SDL_GetTicks();
-
-  // set initial offset value
-  int cycle_offset = 0;
-  int num_cycles = CYCLES_PER_TICK / 2;
-
-  // The surface contained by the window
-
   // Initialize SDL
   if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_JOYSTICK
                | SDL_INIT_EVENTS | SDL_INIT_AUDIO)
@@ -323,6 +300,27 @@ main(int argc, char *argv[])
                                         0, 0, 0);
         }
     }
+  i8080 cpu;
+  cpu_init(&cpu);
+
+  // NOLINTNEXTLINE
+  uint16_t load_address = 0x0000;
+
+  // Load ROM into memory
+  if (!cpu_load_file(&cpu, argv[optind], load_address))
+    {
+      fprintf(stderr, "Failed to load ROM\n");
+      exit(EXIT_FAILURE);
+    }
+
+  // start timer
+  uint64_t last_tick = SDL_GetTicks();
+
+  // set initial offset value
+  int cycle_offset = 0;
+  int num_cycles = CYCLES_PER_TICK / 2;
+
+  // The surface contained by the window
 
   SDL_Joystick *joystick = NULL;
   if (SDL_NumJoysticks() > 0)
@@ -378,7 +376,7 @@ main(int argc, char *argv[])
   for (int i = 0; i < NUM_SOUNDS; i++) {
     Mix_FreeChunk(cpu.sounds[i]);
   }
-  Mix_Quit();
+  Mix_CloseAudio();
   SDL_DestroyWindow(window);
   // Quit SDL subsystems
   SDL_Quit();
