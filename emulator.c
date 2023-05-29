@@ -1054,9 +1054,18 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         break;
       }
     case 0xd6: // NOLINT
-      {
+      {        // SUI d8
         num_cycles = SUB(cpu, getImmediate8BitValue(cpu)) + 3; // 7 cycles
         cpu->pc += 1;
+        break;
+      }
+    case 0xd8: // NOLINT
+      {        // RC
+        if ((cpu->flags & FLAG_CY) == FLAG_CY)
+          {
+            return RET(cpu) + 1; // 11 cycles
+          }
+        num_cycles = 5;
         break;
       }
     case 0xda:                                 // NOLINT
