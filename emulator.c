@@ -5,6 +5,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+
+static uint8_t port_in(i8080 *cpu, uint8_t port);
+static void port_out(i8080 *cpu, uint8_t port, uint8_t value);
+
 // Add Register or Memory to Accumulator with Carry
 int
 ADC(i8080 *cpu, const u_int8_t *reg)
