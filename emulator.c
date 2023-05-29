@@ -25,15 +25,12 @@ ADC(i8080 *cpu, const u_int8_t *reg)
 
 // Logical AND with Accumulator
 int
-ANA(i8080 *cpu, const uint8_t *reg)
+ANA(i8080 *cpu, const uint8_t value)
 {
-  uint8_t temp = cpu->a;
-  cpu->a = cpu->a & *reg;
-
+  cpu->a = cpu->a & value;
   update_zero_flag(cpu, cpu->a);
   update_sign_flag(cpu, cpu->a);
   update_parity_flag(cpu, cpu->a);
-  update_aux_carry_flag(cpu, temp, cpu->a);
   update_carry_flag(cpu, false);
   return 4; // NOLINT
 }
@@ -828,9 +825,14 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         num_cycles = SUB(cpu, &cpu->a);
         break;
       }
+    case 0xa0: // NOLINT
+      {        // ANA B
+        num_cycles = ANA(cpu, cpu->b);
+        break;
+      }
     case 0xa7: // NOLINT
       {        // ANA A
-        num_cycles = ANA(cpu, &cpu->a);
+        num_cycles = ANA(cpu, cpu->a);
         break;
       }
     case 0xaf: // NOLINT
