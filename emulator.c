@@ -1407,26 +1407,45 @@ void play_sound(i8080* cpu, uint8_t bank) {
     if (data != cpu->last_out_port3) {
       if ((data & 0x1) && !(cpu->last_out_port3 & 0x1)) {
         sound_to_play = 0;
-        Mix_PlayChannel(-1, cpu->sounds[sound_to_play],0);
       }
       if ((data & 0x2) && !(cpu->last_out_port3 & 0x2)) {
         sound_to_play = 1;
-        Mix_PlayChannel(-1, cpu->sounds[sound_to_play],0);
 
       }
       if ((data & 0x4) && !(cpu->last_out_port3 & 0x4)) {
         sound_to_play = 2;
-        Mix_PlayChannel(-1, cpu->sounds[sound_to_play],0);
 
       }
       if ((data & 0x8) && !(cpu->last_out_port3 & 0x8)) {
         sound_to_play = 3;
-        Mix_PlayChannel(-1, cpu->sounds[sound_to_play],0);
 
       }
       cpu->last_out_port3 = data;
     }
+  } else if (bank == 2) {
+    if (data != cpu->last_out_port5) {
+      if ((data & 0x1) && !(cpu->last_out_port5 & 0x1)) {
+        sound_to_play = 4;
+      }
+      if ((data & 0x2) && !(cpu->last_out_port5 & 0x2)) {
+        sound_to_play = 5;
+      }
+      if ((data & 0x4) && !(cpu->last_out_port5 & 0x4)) {
+        sound_to_play = 6;
+      }
+      if ((data & 0x8) && !(cpu->last_out_port5 & 0x8)) {
+        sound_to_play = 7;
+      }
+      if ((data & 0x10) && !(cpu->last_out_port5 & 0x10)) {
+        sound_to_play = 8;
+      }
+      cpu->last_out_port5 = data;
+    }
   }
+  if (sound_to_play != -1 && cpu->sounds[sound_to_play] != NULL){
+    Mix_PlayChannel(-1, cpu->sounds[sound_to_play],0);
+
+  } 
 }
 void
 cpu_init(i8080 *cpu)
@@ -1454,15 +1473,15 @@ cpu_init(i8080 *cpu)
 
   cpu->last_out_port3 = 0;
   cpu->last_out_port5 = 0;
-  /*cpu->sounds[0] = */load_sound("sound/8.wav", &cpu->sounds[0]);
-  /*cpu->sounds[1] = */load_sound("sound/1.wav", &cpu->sounds[1]);
-  /*cpu->sounds[2] = */load_sound("sound/2.wav", &cpu->sounds[2]);
-  /*cpu->sounds[3] = */load_sound("sound/3.wav", &cpu->sounds[3]);
-  /*cpu->sounds[4] = */load_sound("sound/4.wav", &cpu->sounds[4]);
-  /*cpu->sounds[5] = */load_sound("sound/5.wav", &cpu->sounds[5]);
-  /*cpu->sounds[6] = */load_sound("sound/6.wav", &cpu->sounds[6]);
-  /*cpu->sounds[7] = */load_sound("sound/7.wav", &cpu->sounds[7]);
-  /*cpu->sounds[8] = */load_sound("sound/0.wav", &cpu->sounds[8]);
+  load_sound("sounds/8.wav", &cpu->sounds[0]);
+  load_sound("sounds/1.wav", &cpu->sounds[1]);
+  load_sound("sounds/2.wav", &cpu->sounds[2]);
+  load_sound("sounds/3.wav", &cpu->sounds[3]);
+  load_sound("sounds/4.wav", &cpu->sounds[4]);
+  load_sound("sounds/5.wav", &cpu->sounds[5]);
+  load_sound("sounds/6.wav", &cpu->sounds[6]);
+  load_sound("sounds/7.wav", &cpu->sounds[7]);
+  load_sound("sounds/0.wav", &cpu->sounds[8]);
 
 
 
