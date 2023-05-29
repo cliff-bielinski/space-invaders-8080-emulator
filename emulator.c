@@ -49,6 +49,18 @@ CALL(i8080 *cpu, uint16_t address)
   return 17; // NOLINT
 }
 
+// Compare Register or Memory with Accumulator
+int
+CMP(i8080 *cpu, uint8_t value)
+{
+  u_int8_t result = cpu->a - value;
+  update_zero_flag(cpu, result);
+  update_carry_flag(cpu, value > cpu->a);
+  update_parity_flag(cpu, result);
+  update_sign_flag(cpu, result);
+  return 4; // NOLINT
+}
+
 // Decimal Adjust Accumulator
 int
 DAA(i8080 *cpu)
@@ -834,7 +846,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         break;
       }
     case 0x97: // NOLINT
-      {
+      {        // SUB A
         num_cycles = SUB(cpu, &cpu->a);
         break;
       }
@@ -850,7 +862,7 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       }
     case 0xa6: // NOLINT
       {        // ANA M
-        num_cycles = ANA(cpu, cpu_read_mem(cpu, readRegisterPair(cpu, HL)));
+        num_cycles = ANA(cpu, cpu_read_mem(cpu, readRegisterPair(cpu, HL))) + 3; // 7 cycles
         break;
       }
     case 0xa7: // NOLINT
@@ -880,7 +892,12 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
       }
     case 0xb6: // NOLINT
       {        // ORA M
-        num_cycles = ORA(cpu, cpu_read_mem(cpu, readRegisterPair(cpu, HL)));
+        num_cycles = ORA(cpu, cpu_read_mem(cpu, readRegisterPair(cpu, HL))) + 3; // 7 cycles
+        break;
+      }
+    case 0xb8: // NOLINT
+      {        // CMP B
+        num_cycles = CMP(cpu, cpu->b);
         break;
       }
     case 0xc1: // NOLINT

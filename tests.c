@@ -1818,7 +1818,7 @@ test_opcode_0xa6(void) // NOLINT
   int code_found = execute_instruction(&cpu, 0xa6); // NOLINT
 
   // verify
-  CU_ASSERT(code_found == 4);
+  CU_ASSERT(code_found == 7);
   CU_ASSERT(1 == cpu.pc);
   CU_ASSERT(0x0C == cpu.a); // NOLINT
   CU_ASSERT((cpu.flags & FLAG_S) == 0);
@@ -1934,7 +1934,7 @@ test_opcode_0xb6(void) // NOLINT
   int code_found = execute_instruction(&cpu, 0xb6); // NOLINT
 
   // verify
-  CU_ASSERT(code_found == 4);
+  CU_ASSERT(code_found == 7);
   CU_ASSERT(1 == cpu.pc);
   CU_ASSERT(cpu.a == 0x3F);
   CU_ASSERT((cpu.flags & FLAG_S) == 0);
@@ -1943,6 +1943,50 @@ test_opcode_0xb6(void) // NOLINT
   CU_ASSERT((cpu.flags & FLAG_CY) == 0);
 
   cpu_write_mem(&cpu, 0xAABB, 0x00);
+}
+
+void
+test_opcode_0xb8(void) // NOLINT
+{                      // CMP B
+  // setup
+  i8080 cpu;
+  cpu_init(&cpu);
+  /* Reg < A */
+  cpu.a = 0x0A;
+  cpu.b = 0x05;
+
+  int code_found = execute_instruction(&cpu, 0xb8); // NOLINT
+
+  CU_ASSERT(code_found == 4);
+  CU_ASSERT(1 == cpu.pc);
+  CU_ASSERT((cpu.flags & FLAG_S) == 0);
+  CU_ASSERT((cpu.flags & FLAG_Z) == 0);
+  CU_ASSERT((cpu.flags & FLAG_P) == FLAG_P);
+  CU_ASSERT((cpu.flags & FLAG_CY) == 0);
+
+  /* Reg > A*/
+  cpu.a = 0x02;
+  cpu.b = 0x05;
+
+  code_found = execute_instruction(&cpu, 0xb8); // NOLINT
+  CU_ASSERT(code_found == 4);
+  CU_ASSERT(2 == cpu.pc);
+  CU_ASSERT((cpu.flags & FLAG_S) == FLAG_S);
+  CU_ASSERT((cpu.flags & FLAG_Z) == 0);
+  CU_ASSERT((cpu.flags & FLAG_P) == 0);
+  CU_ASSERT((cpu.flags & FLAG_CY) == FLAG_CY);
+
+  /* Reg = A*/
+  cpu.a = 0x02;
+  cpu.b = 0x02;
+
+  code_found = execute_instruction(&cpu, 0xb8); // NOLINT
+  CU_ASSERT(code_found == 4);
+  CU_ASSERT(3 == cpu.pc);
+  CU_ASSERT((cpu.flags & FLAG_S) == 0);
+  CU_ASSERT((cpu.flags & FLAG_Z) == FLAG_Z);
+  CU_ASSERT((cpu.flags & FLAG_P) == FLAG_P);
+  CU_ASSERT((cpu.flags & FLAG_CY) == 0);
 }
 
 void
@@ -2617,6 +2661,9 @@ main(void)
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0xb6()",
                          test_opcode_0xb6))
+      || (NULL
+          == CU_add_test(pSuite, "test of test_opcode_0xb8()",
+                         test_opcode_0xb8))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0xc2()",
                          test_opcode_0xc2))
