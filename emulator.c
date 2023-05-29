@@ -873,6 +873,11 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         num_cycles = ORA(cpu, cpu->b);
         break;
       }
+    case 0xb4: // NOLINT
+      {        // ORA H
+        num_cycles = ORA(cpu, cpu->h);
+        break;
+      }
     case 0xc1: // NOLINT
       {        // POP B
         num_cycles = POP(cpu, BC);
