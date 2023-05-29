@@ -216,6 +216,19 @@ NOP()
   return 4; // NOLINT
 }
 
+// Logical OR with accumulator
+int
+ORA(i8080 *cpu, u_int8_t value)
+{
+  cpu->a |= value;
+  // always set to 0
+  update_carry_flag(cpu, false);
+  update_parity_flag(cpu, cpu->a);
+  update_sign_flag(cpu, cpu->a);
+  update_zero_flag(cpu, cpu->a);
+  return 4;
+}
+
 // Pop from Stack
 int
 POP(i8080 *cpu, int pair)
@@ -853,6 +866,11 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
     case 0xaf: // NOLINT
       {        // XRA A
         num_cycles = XRA(cpu, &cpu->a);
+        break;
+      }
+    case 0xb0: // NOLINT
+      {        // ORA B
+        num_cycles = ORA(cpu, cpu->b);
         break;
       }
     case 0xc1: // NOLINT
