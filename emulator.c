@@ -830,6 +830,11 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         num_cycles = ANA(cpu, cpu->b);
         break;
       }
+    case 0xa1: // NOLINT
+      {        // ANA C
+        num_cycles = ANA(cpu, cpu->c);
+        break;
+      }
     case 0xa7: // NOLINT
       {        // ANA A
         num_cycles = ANA(cpu, cpu->a);
