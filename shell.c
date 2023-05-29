@@ -19,6 +19,7 @@ static bool should_quit = false;
 static uint32_t curr_time = 0;
 static uint32_t last_time = 0;
 static uint32_t dt = 0;
+bool colored_screen;
 
 void
 io_loop(i8080 *cpu) // NOLINT(readability-function-cognitive-complexity)
