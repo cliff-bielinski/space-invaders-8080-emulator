@@ -289,7 +289,7 @@ SBI(i8080 *cpu, u_int8_t value)
   update_zero_flag(cpu, cpu->a);
   update_sign_flag(cpu, cpu->a);
   update_parity_flag(cpu, cpu->a);
-  
+
   return 7; // NOLINT
 }
 
@@ -307,7 +307,7 @@ int
 SUB(i8080 *cpu, const uint8_t value)
 {
   // set flags and subtract register value from accumulator
-  update_aux_carry_flag(cpu, cpu->a, ((u_int8_t) ~value + 1));
+  update_aux_carry_flag(cpu, cpu->a, ((u_int8_t)~value + 1));
   update_carry_flag(cpu, cpu->a < value); // carry if borrow
   cpu->a = cpu->a - value;
   update_zero_flag(cpu, cpu->a);
@@ -1071,8 +1071,8 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
         num_cycles = PUSH(cpu, DE);
         break;
       }
-    case 0xd6: // NOLINT
-      {        // SUI d8
+    case 0xd6:                                                 // NOLINT
+      {                                                        // SUI d8
         num_cycles = SUB(cpu, getImmediate8BitValue(cpu)) + 3; // 7 cycles
         cpu->pc += 1;
         break;

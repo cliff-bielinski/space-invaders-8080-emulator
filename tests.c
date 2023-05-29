@@ -1444,8 +1444,8 @@ test_opcode_0xcc(void) // NOLINT
   i8080 cpu;
   cpu_init(&cpu);
 
-  cpu.pc = 0xABCD;                       // NOLINT
-  cpu.sp = 0xDCBA;                       // NOLINT
+  cpu.pc = 0xABCD; // NOLINT
+  cpu.sp = 0xDCBA; // NOLINT
   cpu.flags |= FLAG_Z;
   uint16_t temp = cpu.sp;                // Holds original sp addr
   cpu_write_mem(&cpu, cpu.pc + 1, 0xFE); // NOLINT
@@ -2640,7 +2640,6 @@ test_opcode_0xde(void) // NOLINT
   CU_ASSERT((cpu.flags & FLAG_Z) == 0);
   CU_ASSERT((cpu.flags & FLAG_P) == 0);
   CU_ASSERT((cpu.flags & FLAG_AC) == 0);
-
 
   // clean up
   cpu_write_mem(&cpu, 0x0001, 0x00);
