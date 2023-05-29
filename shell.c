@@ -206,10 +206,6 @@ io_processor(i8080 *cpu) // NOLINT(readability-function-cognitive-complexity)
 
   // update
   has_event = false;
-  SDL_RenderClear(renderer);
-  SDL_RenderCopy(renderer, texture, NULL, NULL);
-  SDL_RenderPresent(renderer);
-
 }
 
 #define CLOCK_SPEED_MS 2000
@@ -340,12 +336,13 @@ main(int argc, char *argv[])
                                         0, 0, 0);
         }
     }
-  renderer = SDL_CreateRenderer(
+  /*renderer = SDL_CreateRenderer(
     window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
   if (renderer == NULL) {
   SDL_Log("unable to create renderer: %s", SDL_GetError());
   return 1;
   }
+  */
   SDL_Joystick *joystick = NULL;
   if (SDL_NumJoysticks() > 0)
     {
