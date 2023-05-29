@@ -173,7 +173,8 @@ io_loop(i8080 *cpu) // NOLINT(readability-function-cognitive-complexity)
                 }
               else if (e.jbutton.button == 4) // NOLINT
                 {
-                  break;
+                  colored_screen = cpu->colored_screen;
+                  colored_screen = !colored_screen;
                 }
             }
           else if (e.type == SDL_JOYBUTTONUP)

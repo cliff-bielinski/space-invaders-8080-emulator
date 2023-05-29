@@ -77,6 +77,7 @@ typedef struct
   bool interrupt_enabled;
   bool halted;
 
+  bool colored_screen;
   // Ports & Shift registers for in/out opcode
   uint8_t port1, port2;
   uint8_t shift_msb, shift_lsb, shift_offset;
