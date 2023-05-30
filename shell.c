@@ -1,11 +1,213 @@
 #include "emulator.h"
 #include <ctype.h>
+
 #include <math.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#define JOYSTICK_DEAD_ZONE 8000
+
+// static SDL_Renderer *renderer = NULL;
+// static SDL_Texture *texture = NULL;
+static SDL_Event e;
+bool has_event = false;
+
+static int speed = 1;
+static bool should_quit = false;
+bool colored_screen;
+
+void
+io_processor(i8080 *cpu) // NOLINT(readability-function-cognitive-complexity)
+{
+
+  has_event = SDL_PollEvent(&e) != 0;
+  if (has_event) // NOLINT
+    {
+      if (e.type == SDL_QUIT)
+        {
+          should_quit = true;
+          exit(1);
+        }
+      else if (e.type == SDL_KEYDOWN)
+        {
+          SDL_Scancode key = e.key.keysym.scancode;
+          if (key == SDL_SCANCODE_C) // C is for Coin
+            {
+              cpu->port1 |= 1 << 0; // NOLINT
+            }
+          else if (key == SDL_SCANCODE_2) // P2 Start Button
+            {
+              cpu->port1 |= 1 << 1; // NOLINT
+            }
+          else if (key == SDL_SCANCODE_RETURN) // P1 Start button
+            {
+              cpu->port1 |= 1 << 2; // NOLINT
+            }
+          else if (key == SDL_SCANCODE_SPACE) // Shoot Button
+            {
+              cpu->port1 |= 1 << 4; // NOLINT
+              cpu->port2 |= 1 << 4; // NOLINT
+            }
+          else if (key == SDL_SCANCODE_LEFT) // Left
+            {
+              cpu->port1 |= 1 << 5; // NOLINT
+              cpu->port2 |= 1 << 5; // NOLINT
+            }
+          else if (key == SDL_SCANCODE_RIGHT) // Right
+            {
+              cpu->port1 |= 1 << 6; // NOLINT
+              cpu->port2 |= 1 << 6; // NOLINT
+            }
+          else if (key == SDL_SCANCODE_T) // Tilt Screen
+            {
+              cpu->port2 |= 1 << 2; // NOLINT
+            }
+          else if (key == SDL_SCANCODE_ESCAPE)
+            {
+              SDL_Event quit_event;
+              quit_event.type = SDL_QUIT;
+              SDL_PushEvent(&quit_event);
+            }
+          else if (key == SDL_SCANCODE_TAB) // Game speed
+            {
+              speed = 5; // NOLINT
+            }
+        }
+      else if (e.type == SDL_KEYUP)
+        {
+          SDL_Scancode key = e.key.keysym.scancode;
+          if (key == SDL_SCANCODE_C) // Coin
+            {
+              cpu->port1 &= 0xFE; // NOLINT
+            }
+          else if (key == SDL_SCANCODE_2) // P2 Start
+            {
+              cpu->port1 &= 0xFD; // NOLINT
+            }
+          else if (key == SDL_SCANCODE_RETURN) // P1 Start
+            {
+              cpu->port1 &= 0xFB; // NOLINT
+            }
+          else if (key == SDL_SCANCODE_SPACE) // Shoot button
+            {
+              cpu->port1 &= 0xEF; // NOLINT
+              cpu->port2 &= 0xEF; // NOLINT
+            }
+          else if (key == SDL_SCANCODE_LEFT) // Left
+            {
+              cpu->port1 &= 0xDF; // NOLINT
+              cpu->port2 &= 0xDF; // NOLINT
+            }
+          else if (key == SDL_SCANCODE_RIGHT) // Right
+            {
+              cpu->port1 &= 0xBF; // NOLINT
+              cpu->port2 &= 0xBF; // NOLINT
+            }
+          else if (key == SDL_SCANCODE_T) // Tilt
+            {
+              cpu->port2 &= 0xFB; // NOLINT
+            }
+          else if (key == SDL_SCANCODE_TAB) // Change Speed
+            {
+              speed = 1;
+            }
+        }
+      else if (e.type == SDL_JOYAXISMOTION)
+        {
+          if (e.jaxis.axis == 0) // NOLINT
+            {
+              if (e.jaxis.value < -JOYSTICK_DEAD_ZONE) // Left
+                {
+                  cpu->port1 |= 1 << 5; // NOLINT
+                  cpu->port2 |= 1 << 5; // NOLINT
+                }
+              else if (e.jaxis.value > JOYSTICK_DEAD_ZONE) // Right
+                {
+                  cpu->port1 |= 1 << 6; // NOLINT
+                  cpu->port2 |= 1 << 6; // NOLINT
+                }
+              else
+                {
+                  cpu->port1 &= 0xDF; // NOLINT
+                  cpu->port2 &= 0xDF; // NOLINT
+
+                  cpu->port1 &= 0xBF; // NOLINT
+                  cpu->port2 &= 0xBF; // NOLINT
+                }
+            }
+          else if (e.type == SDL_JOYBUTTONDOWN)
+            {
+              if (e.jbutton.button == 1) // NOLINT // Coin
+                {
+                  cpu->port1 |= 1 << 0; // NOLINT
+                }
+              else if (e.jbutton.button == 0) // NOLINT // Shoot
+                {
+                  cpu->port1 |= 1 << 4; // NOLINT
+                  cpu->port2 |= 1 << 4; // NOLINT
+                }
+              else if (e.jbutton.button == 8) // NOLINT // Start
+                {
+                  cpu->port1 |= 1 << 2; // NOLINT
+                }
+              else if (e.jbutton.button == 9) // NOLINT // Select
+                {
+                  cpu->port1 |= 1 << 1; // NOLINT
+                }
+              else if (e.jbutton.button == 13) // NOLINT // Left
+                {
+                  cpu->port1 |= 1 << 5; // NOLINT
+                  cpu->port2 |= 1 << 5; // NOLINT
+                }
+              else if (e.jbutton.button == 14) // NOLINT // Right
+                {
+                  cpu->port1 |= 1 << 6; // NOLINT
+                  cpu->port2 |= 1 << 6; // NOLINT
+                }
+              else if (e.jbutton.button == 4) // NOLINT // Color or B/W toggle
+                {
+                  colored_screen = cpu->colored_screen;
+                  colored_screen = !colored_screen;
+                }
+            }
+          else if (e.type == SDL_JOYBUTTONUP)
+            {
+              if (e.jbutton.button == 1) // NOLINT // coin
+                {
+                  cpu->port1 &= 0xFE; // NOLINT
+                }
+              else if (e.jbutton.button == 0) // NOLINT // shoot button
+                {
+                  cpu->port1 &= 0xEF; // NOLINT
+                  cpu->port2 &= 0xEF; // NOLINT
+                }
+              else if (e.jbutton.button == 8) // NOLINT // start
+                {
+                  cpu->port1 &= 0xFB; // NOLINT
+                }
+              else if (e.jbutton.button == 9) // NOLINT // select
+                {
+                  cpu->port1 &= 0xFD; // NOLINT
+                }
+              else if (e.jbutton.button == 13) // NOLINT // left
+                {
+                  cpu->port1 &= 0xDF; // NOLINT
+                  cpu->port2 &= 0xDF; // NOLINT
+                }
+              else if (e.jbutton.button == 14) // NOLINT // right
+                {
+                  cpu->port1 &= 0xBF; // NOLINT
+                  cpu->port2 &= 0xBF; // NOLINT
+                }
+            }
+        }
+    }
+
+  // update
+  has_event = false;
+}
 
 #define CLOCK_SPEED_MS 2000
 #define TICK (1000 * (1.0 / 60.0))
@@ -56,7 +258,6 @@ main(int argc, char *argv[])
       exit(EXIT_FAILURE);
     }
 
-  // initialize CPU state
   i8080 cpu;
   cpu_init(&cpu);
 
@@ -80,7 +281,9 @@ main(int argc, char *argv[])
   // The surface contained by the window
 
   // Initialize SDL
-  if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_JOYSTICK) < 0)
+  if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_JOYSTICK
+               | SDL_INIT_EVENTS)
+      < 0)
     {
       fprintf(stderr, "SDL could not initialize! SDL_Error: %s\n",
               SDL_GetError());
@@ -106,6 +309,20 @@ main(int argc, char *argv[])
           // NOLINTNEXTLINE
           buffer = SDL_CreateRGBSurface(0, SCREEN_WIDTH, SCREEN_HEIGHT, 32, 0,
                                         0, 0, 0);
+        }
+    }
+
+  SDL_Joystick *joystick = NULL;
+  if (SDL_NumJoysticks() > 0)
+    {
+      joystick = SDL_JoystickOpen(0);
+      if (joystick)
+        {
+          SDL_Log("Joystick successfully found");
+        }
+      else
+        {
+          SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Failure opening joystick 0");
         }
     }
 
@@ -135,11 +352,11 @@ main(int argc, char *argv[])
 
           // 3 Update system state for display, input, and sound
           // Update graphics after VBLANK int
+          io_processor(&cpu);
           update_graphics(&cpu, buffer, screen_surface);
           SDL_UpdateWindowSurface(window);
 
           // 4 Check for exit conditions
-
           last_tick = SDL_GetTicks();
         }
     }

@@ -21,7 +21,7 @@ emulator:
 # build shell executable
 shell: emulator
 	$(CC) $(CFLAGS) -c shell.c
-	$(CC) $(CFLAGS) -o shell shell.o emulator.o
+	$(CC) $(CFLAGS) $(LDLIBS) -o shell shell.o emulator.o
 
 # build tests executable and run tests
 test: emulator
