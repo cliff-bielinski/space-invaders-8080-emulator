@@ -1393,59 +1393,75 @@ execute_instruction(i8080 *cpu, uint8_t opcode)
   cpu->pc += 1;
   return num_cycles;
 }
-void load_sound(const char* soundFilePath, Mix_Chunk** sound) {
+void
+load_sound(const char *soundFilePath, Mix_Chunk **sound)
+{
   *sound = Mix_LoadWAV(soundFilePath);
-  if(*sound == NULL) {
-    fprintf(stderr, "Failed to load sound file %s!");
-  }
+  if (*sound == NULL)
+    {
+      fprintf(stderr, "Failed to load sound file %s!");
+    }
 }
-void play_sound(i8080* cpu, uint8_t bank) {
+void
+play_sound(i8080 *cpu, uint8_t bank)
+{
   uint8_t data = cpu->a;
   int sound_to_play = -1;
 
-  if (bank == 1) {
-    if (data != cpu->last_out_port3) {
-      if ((data & 0x1) && !(cpu->last_out_port3 & 0x1)) {
-        sound_to_play = 0;
-      }
-      if ((data & 0x2) && !(cpu->last_out_port3 & 0x2)) {
-        sound_to_play = 1;
-
-      }
-      if ((data & 0x4) && !(cpu->last_out_port3 & 0x4)) {
-        sound_to_play = 2;
-
-      }
-      if ((data & 0x8) && !(cpu->last_out_port3 & 0x8)) {
-        sound_to_play = 3;
-
-      }
-      cpu->last_out_port3 = data;
+  if (bank == 1)
+    {
+      if (data != cpu->last_out_port3)
+        {
+          if ((data & 0x1) && !(cpu->last_out_port3 & 0x1))
+            {
+              sound_to_play = 0;
+            }
+          if ((data & 0x2) && !(cpu->last_out_port3 & 0x2))
+            {
+              sound_to_play = 1;
+            }
+          if ((data & 0x4) && !(cpu->last_out_port3 & 0x4))
+            {
+              sound_to_play = 2;
+            }
+          if ((data & 0x8) && !(cpu->last_out_port3 & 0x8))
+            {
+              sound_to_play = 3;
+            }
+          cpu->last_out_port3 = data;
+        }
     }
-  } else if (bank == 2) {
-    if (data != cpu->last_out_port5) {
-      if ((data & 0x1) && !(cpu->last_out_port5 & 0x1)) {
-        sound_to_play = 4;
-      }
-      if ((data & 0x2) && !(cpu->last_out_port5 & 0x2)) {
-        sound_to_play = 5;
-      }
-      if ((data & 0x4) && !(cpu->last_out_port5 & 0x4)) {
-        sound_to_play = 6;
-      }
-      if ((data & 0x8) && !(cpu->last_out_port5 & 0x8)) {
-        sound_to_play = 7;
-      }
-      if ((data & 0x10) && !(cpu->last_out_port5 & 0x10)) {
-        sound_to_play = 8;
-      }
-      cpu->last_out_port5 = data;
+  else if (bank == 2)
+    {
+      if (data != cpu->last_out_port5)
+        {
+          if ((data & 0x1) && !(cpu->last_out_port5 & 0x1))
+            {
+              sound_to_play = 4;
+            }
+          if ((data & 0x2) && !(cpu->last_out_port5 & 0x2))
+            {
+              sound_to_play = 5;
+            }
+          if ((data & 0x4) && !(cpu->last_out_port5 & 0x4))
+            {
+              sound_to_play = 6;
+            }
+          if ((data & 0x8) && !(cpu->last_out_port5 & 0x8))
+            {
+              sound_to_play = 7;
+            }
+          if ((data & 0x10) && !(cpu->last_out_port5 & 0x10))
+            {
+              sound_to_play = 8;
+            }
+          cpu->last_out_port5 = data;
+        }
     }
-  }
-  if (sound_to_play != -1 && cpu->sounds[sound_to_play] != NULL){
-    Mix_PlayChannel(-1, cpu->sounds[sound_to_play],0);
-
-  } 
+  if (sound_to_play != -1 && cpu->sounds[sound_to_play] != NULL)
+    {
+      Mix_PlayChannel(-1, cpu->sounds[sound_to_play], 0);
+    }
 }
 void
 cpu_init(i8080 *cpu)
@@ -1482,9 +1498,6 @@ cpu_init(i8080 *cpu)
   load_sound("sounds/6.wav", &cpu->sounds[6]);
   load_sound("sounds/7.wav", &cpu->sounds[7]);
   load_sound("sounds/0.wav", &cpu->sounds[8]);
-
-
-
 }
 
 uint8_t
