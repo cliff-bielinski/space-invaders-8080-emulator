@@ -36,7 +36,7 @@ io_processor(i8080 *cpu) // NOLINT(readability-function-cognitive-complexity)
       if (e.type == SDL_QUIT)
         {
           should_quit = true;
-          exit(1);
+          exit(EXIT_SUCCESS);
         }
       else if (e.type == SDL_KEYDOWN)
         {
