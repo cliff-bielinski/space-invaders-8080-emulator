@@ -1574,8 +1574,8 @@ port_in(i8080 *cpu, uint8_t port)
       {
         const uint16_t shift = (cpu->shift_msb << 8) | cpu->shift_lsb;
         value = (shift >> (8 - cpu->shift_offset)) & 0xFF;
+        break;
       }
-      break;
     default:
       fprintf(stderr, "Error: unknown IN port %02x\n", port);
       break;
