@@ -1399,7 +1399,7 @@ load_sound(const char *soundFilePath, Mix_Chunk **sound)
   *sound = Mix_LoadWAV(soundFilePath);
   if (*sound == NULL)
     {
-      fprintf(stderr, "Failed to load sound file %s!");
+      fprintf(stderr, "Failed to load sound file!");
     }
 }
 void
