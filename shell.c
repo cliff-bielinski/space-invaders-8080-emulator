@@ -203,17 +203,7 @@ io_processor(i8080 *cpu) // NOLINT(readability-function-cognitive-complexity)
                 }
             }
         }
-      else if (e.type == SDL_WINDOWEVENT)
-        {
-          if (e.window.event == SDL_WINDOWEVENT_RESIZED)
-            {
-              SDL_SetWindowSize(window, e.window.data1, e.window.data2);
-            }
-        }
     }
-
-  // update
-  has_event = false;
 }
 
 #define CLOCK_SPEED_MS 2000
