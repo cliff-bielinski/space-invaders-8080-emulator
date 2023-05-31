@@ -18,6 +18,8 @@ static int speed = 1;
 static bool should_quit = false;
 bool colored_screen;
 
+
+
 void
 io_processor(i8080 *cpu) // NOLINT(readability-function-cognitive-complexity)
 {
@@ -294,8 +296,8 @@ main(int argc, char *argv[])
       // Create window
       window = SDL_CreateWindow("Space Invaders Emulator",
                                 SDL_WINDOWPOS_UNDEFINED,
-                                SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH,
-                                SCREEN_HEIGHT, SDL_WINDOW_RESIZABLE);
+                                SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH * 2,
+                                SCREEN_HEIGHT * 2, SDL_WINDOW_RESIZABLE);
       if (window == NULL)
         {
           fprintf(stderr, "Window could not be created! SDL_Error: %s\n",
