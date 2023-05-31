@@ -1669,11 +1669,12 @@ update_graphics(i8080 *cpu, SDL_Surface *buffer, SDL_Surface *surface)
         }
     }
 
-  // Copy buffer to screen surface.
-  SDL_Surface *optimized_surface = NULL;
-  optimized_surface = SDL_ConvertSurface(buffer, surface->format, 0);
+  // Convert buffer to scaled screen surface.
+  SDL_Surface *scaled_surface = NULL;
+  scaled_surface = SDL_ConvertSurface(buffer, surface->format, 0);
 
-  SDL_BlitScaled(optimized_surface, NULL, surface, NULL);
+  // Copy scaled surface to screen.
+  SDL_BlitScaled(scaled_surface, NULL, surface, NULL);
 }
 
 // DEBUGGING FUNCTIONS

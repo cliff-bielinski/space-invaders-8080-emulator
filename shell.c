@@ -18,8 +18,6 @@ static int speed = 1;
 static bool should_quit = false;
 bool colored_screen;
 
-
-
 void
 io_processor(i8080 *cpu) // NOLINT(readability-function-cognitive-complexity)
 {
@@ -203,6 +201,13 @@ io_processor(i8080 *cpu) // NOLINT(readability-function-cognitive-complexity)
                   cpu->port1 &= 0xBF; // NOLINT
                   cpu->port2 &= 0xBF; // NOLINT
                 }
+            }
+        }
+      else if (e.type == SDL_WINDOWEVENT)
+        {
+          if (e.window.event == SDL_WINDOWEVENT_RESIZED)
+            {
+              SDL_SetWindowSize(window, e.window.data1, e.window.data2);
             }
         }
     }
