@@ -204,6 +204,9 @@ io_processor(i8080 *cpu) // NOLINT(readability-function-cognitive-complexity)
             }
         }
     }
+    
+  // update
+  has_event = false;
 }
 
 #define CLOCK_SPEED_MS 2000
