@@ -204,7 +204,7 @@ io_processor(i8080 *cpu) // NOLINT(readability-function-cognitive-complexity)
             }
         }
     }
-    
+
   // update
   has_event = false;
 }
@@ -350,13 +350,12 @@ main(int argc, char *argv[])
           // set number of cycles for next tick
           num_cycles = CYCLES_PER_TICK / 2 - cycle_offset;
 
-          // 3 Update system state for display, input, and sound
-          // Update graphics after VBLANK int
+          // Update system state for display, input, and sound
           io_processor(&cpu);
           update_graphics(&cpu, buffer, screen_surface);
           SDL_UpdateWindowSurface(window);
 
-          // 4 Check for exit conditions
+          // Check for exit conditions
           last_tick = SDL_GetTicks();
         }
     }
