@@ -8,7 +8,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - run: sudo apt update
-      - run: sudo apt install libcunit1 libcunit1-doc libcunit1-dev libsdl2-dev
+      - run: sudo apt install libcunit1 libcunit1-doc libcunit1-dev libsdl2-dev libsdl2-mixer-dev
       - uses: cpp-linter/cpp-linter-action@v2
         id: linter
         env:
@@ -35,7 +35,7 @@ jobs:
     - name: install cunit
       run: sudo apt install libcunit1 libcunit1-doc libcunit1-dev
     - name: install sdl
-      run: sudo apt install libsdl2-dev
+      run: sudo apt install libsdl2-dev libsdl2-mixer-dev
 
 # clean
     - name: cleaning up
