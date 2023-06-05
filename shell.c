@@ -284,8 +284,8 @@ main(int argc, char *argv[])
       // Create window
       window = SDL_CreateWindow("Space Invaders Emulator",
                                 SDL_WINDOWPOS_UNDEFINED,
-                                SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH,
-                                SCREEN_HEIGHT, SDL_WINDOW_RESIZABLE);
+                                SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH * 2,
+                                SCREEN_HEIGHT * 2, SDL_WINDOW_RESIZABLE);
       if (window == NULL)
         {
           fprintf(stderr, "Window could not be created! SDL_Error: %s\n",
@@ -362,13 +362,12 @@ main(int argc, char *argv[])
           // set number of cycles for next tick
           num_cycles = CYCLES_PER_TICK / 2 - cycle_offset;
 
-          // 3 Update system state for display, input, and sound
-          // Update graphics after VBLANK int
+          // Update system state for display, input, and sound
           io_processor(&cpu);
           update_graphics(&cpu, buffer, screen_surface);
           SDL_UpdateWindowSurface(window);
 
-          // 4 Check for exit conditions
+          // Check for exit conditions
           last_tick = SDL_GetTicks();
         }
     }
