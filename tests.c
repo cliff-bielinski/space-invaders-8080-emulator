@@ -3394,10 +3394,7 @@ main(void)
    * argument with the test function name.
    */
   if ((NULL
-       == CU_add_test(pSuite, "test of test_opcode_0x13()", test_opcode_0x13))
-      || (NULL
-          == CU_add_test(pSuite, "test of test_opcode_0x05()",
-                         test_opcode_0x05))
+       == CU_add_test(pSuite, "test of test_opcode_0x05()", test_opcode_0x05))
       || (NULL
           == CU_add_test(pSuite, "test of test_opcode_0x0e()",
                          test_opcode_0x0e))

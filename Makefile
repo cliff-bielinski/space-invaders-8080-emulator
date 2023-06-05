@@ -2,7 +2,7 @@
 CC = clang
 
 # compiler flags
-CFLAGS = -g -W -Wall -Wextra -pedantic `pkg-config --cflags --libs sdl2`
+CFLAGS = -g -W -Wall -Wextra -pedantic `pkg-config --cflags --libs sdl2 SDL2_mixer`
 
 # targets to build
 TARGETS = disassembler_8080 shell

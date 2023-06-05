@@ -11,6 +11,14 @@
 
 // static SDL_Renderer *renderer = NULL;
 // static SDL_Texture *texture = NULL;
+char sound1_path[15] = "./sounds/0.wav";
+char sound2_path[15] = "./sounds/1.wav";
+char sound3_path[15] = "./sounds/2.wav";
+char sound4_path[15] = "./sounds/3.wav";
+char sound5_path[15] = "./sounds/4.wav";
+char sound6_path[15] = "./sounds/5.wav";
+char sound7_path[15] = "./sounds/6.wav";
+
 static SDL_Event e;
 bool has_event = false;
 
@@ -28,7 +36,7 @@ io_processor(i8080 *cpu) // NOLINT(readability-function-cognitive-complexity)
       if (e.type == SDL_QUIT)
         {
           should_quit = true;
-          exit(1);
+          exit(EXIT_SUCCESS);
         }
       else if (e.type == SDL_KEYDOWN)
         {
@@ -257,7 +265,42 @@ main(int argc, char *argv[])
                       "one non-option argument (rom_filepath).\n");
       exit(EXIT_FAILURE);
     }
-
+  // Initialize SDL
+  if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_JOYSTICK
+               | SDL_INIT_EVENTS | SDL_INIT_AUDIO)
+      < 0)
+    {
+      fprintf(stderr, "SDL could not initialize! SDL_Error: %s\n",
+              SDL_GetError());
+      exit(EXIT_FAILURE);
+    }
+  else
+    {
+      if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
+        {
+          fprintf(stderr, "SDL mixer could not initialize!");
+          exit(EXIT_FAILURE);
+        }
+      // Create window
+      window = SDL_CreateWindow("Space Invaders Emulator",
+                                SDL_WINDOWPOS_UNDEFINED,
+                                SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH * 2,
+                                SCREEN_HEIGHT * 2, SDL_WINDOW_RESIZABLE);
+      if (window == NULL)
+        {
+          fprintf(stderr, "Window could not be created! SDL_Error: %s\n",
+                  SDL_GetError());
+          exit(EXIT_FAILURE);
+        }
+      else
+        {
+          // Get window surface
+          screen_surface = SDL_GetWindowSurface(window);
+          // NOLINTNEXTLINE
+          buffer = SDL_CreateRGBSurface(0, SCREEN_WIDTH, SCREEN_HEIGHT, 32, 0,
+                                        0, 0, 0);
+        }
+    }
   i8080 cpu;
   cpu_init(&cpu);
 
@@ -279,38 +322,6 @@ main(int argc, char *argv[])
   int num_cycles = CYCLES_PER_TICK / 2;
 
   // The surface contained by the window
-
-  // Initialize SDL
-  if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_JOYSTICK
-               | SDL_INIT_EVENTS)
-      < 0)
-    {
-      fprintf(stderr, "SDL could not initialize! SDL_Error: %s\n",
-              SDL_GetError());
-      exit(EXIT_FAILURE);
-    }
-  else
-    {
-      // Create window
-      window = SDL_CreateWindow("Space Invaders Emulator",
-                                SDL_WINDOWPOS_UNDEFINED,
-                                SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH * 2,
-                                SCREEN_HEIGHT * 2, SDL_WINDOW_RESIZABLE);
-      if (window == NULL)
-        {
-          fprintf(stderr, "Window could not be created! SDL_Error: %s\n",
-                  SDL_GetError());
-          exit(EXIT_FAILURE);
-        }
-      else
-        {
-          // Get window surface
-          screen_surface = SDL_GetWindowSurface(window);
-          // NOLINTNEXTLINE
-          buffer = SDL_CreateRGBSurface(0, SCREEN_WIDTH, SCREEN_HEIGHT, 32, 0,
-                                        0, 0, 0);
-        }
-    }
 
   SDL_Joystick *joystick = NULL;
   if (SDL_NumJoysticks() > 0)
@@ -343,6 +354,7 @@ main(int argc, char *argv[])
 
           // run second half of tick cycles
           cycle_offset = run_cpu(&cpu, num_cycles - abs(cycle_offset));
+          io_processor(&cpu);
 
           // second interrupt
           handle_interrupt(&cpu, 0x02);
@@ -361,6 +373,11 @@ main(int argc, char *argv[])
     }
 
   // Destroy window
+  for (int i = 0; i < NUM_SOUNDS; i++)
+    {
+      Mix_FreeChunk(cpu.sounds[i]);
+    }
+  Mix_CloseAudio();
   SDL_DestroyWindow(window);
   // Quit SDL subsystems
   SDL_Quit();
