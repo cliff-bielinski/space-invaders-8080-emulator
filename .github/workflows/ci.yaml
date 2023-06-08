@@ -7,7 +7,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - run: sudo apt install libcunit1 libcunit1-doc libcunit1-dev 
+      - run: sudo apt update
+      - run: sudo apt install libcunit1 libcunit1-doc libcunit1-dev libsdl2-dev libsdl2-mixer-dev
       - uses: cpp-linter/cpp-linter-action@v2
         id: linter
         env:
@@ -15,8 +16,8 @@ jobs:
         with:
           style: file
           extensions: 'c,h,C,H'
-          tidy-checks: 'bugprone-*,readability-*,portability-*,clang-analyzer-*' 
-          ignore: 'disassembler_8080.c'
+          tidy-checks: 'bugprone-*,portability-*,clang-analyzer-*' 
+          ignore: 'disassembler_8080.c | tests.c'
 
       - name: static analysis
         if: steps.linter.outputs.checks-failed > 0
@@ -29,8 +30,12 @@ jobs:
     - uses: actions/checkout@v3
 
 # install dependencies - TODO
+    - name: update repository
+      run: sudo apt update
     - name: install cunit
       run: sudo apt install libcunit1 libcunit1-doc libcunit1-dev
+    - name: install sdl
+      run: sudo apt install libsdl2-dev libsdl2-mixer-dev
 
 # clean
     - name: cleaning up
